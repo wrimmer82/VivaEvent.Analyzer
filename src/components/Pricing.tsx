@@ -17,8 +17,8 @@ const plans = [
     popular: false
   },
   {
-    name: "Pro Artista",
-    price: "29",
+    name: "Pro",
+    price: "6,99",
     description: "Per artisti professionisti",
     features: [
       "Proposte illimitate",
@@ -32,18 +32,18 @@ const plans = [
     popular: true
   },
   {
-    name: "Venue",
-    price: "49",
-    description: "Per locali e organizzatori",
+    name: "Commission",
+    price: "4-6%",
+    description: "Sul cachet di ogni booking",
     features: [
-      "Accesso illimitato database artisti",
-      "AI matching avanzato",
-      "Dashboard analytics completa",
-      "Gestione eventi multipli",
-      "Supporto dedicato",
-      "API integration"
+      "Split equo artista-venue",
+      "Zero costi fissi mensili",
+      "Pagamenti sicuri garantiti",
+      "Dashboard completa",
+      "Supporto prioritario",
+      "Fatturazione automatica"
     ],
-    cta: "Inizia Ora",
+    cta: "Scopri di Più",
     popular: false
   }
 ];
@@ -114,7 +114,7 @@ const Pricing = () => {
 
         <div className="text-center mt-12">
           <p className="text-sm text-muted-foreground">
-            + Commissione 8-12% su booking completati • Nessun costo nascosto • Cancella quando vuoi
+            Tutti i piani includono • Protezione pagamenti • Supporto via email • Cancella quando vuoi
           </p>
         </div>
       </div>
