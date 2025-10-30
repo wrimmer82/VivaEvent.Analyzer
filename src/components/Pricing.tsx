@@ -1,7 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Check } from "lucide-react";
-import concertMetallicBackground from "@/assets/concert-metallic-background.png";
+import concertPricingBackground from "@/assets/concert-pricing-background.png";
 
 const plans = [
   {
@@ -55,7 +55,7 @@ const Pricing = () => {
       <div 
         className="absolute inset-0 opacity-10"
         style={{
-          backgroundImage: `url(${concertMetallicBackground})`,
+          backgroundImage: `url(${concertPricingBackground})`,
           backgroundSize: 'cover',
           backgroundPosition: 'center',
           backgroundRepeat: 'no-repeat'
