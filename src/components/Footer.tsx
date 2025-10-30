@@ -52,7 +52,7 @@ const Footer = () => {
               </li>
               <li className="flex items-center gap-2">
                 <MapPin className="w-4 h-4" />
-                <span>Milano, Italia</span>
+                <span>Roma, Italia</span>
               </li>
             </ul>
           </div>
