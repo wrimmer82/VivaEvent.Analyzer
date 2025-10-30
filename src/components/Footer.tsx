@@ -11,7 +11,7 @@ const Footer = () => {
               <div className="flex items-center justify-center w-10 h-10 rounded-lg bg-gradient-to-br from-primary to-accent">
                 <Music2 className="w-6 h-6 text-white" />
               </div>
-              <span className="text-xl font-bold">VivaEagle</span>
+              <span className="text-xl font-bold">VivaEvent</span>
             </div>
             <p className="text-sm text-secondary-foreground/80">
               Il marketplace che connette artisti e venue in modo semplice e automatizzato.
@@ -46,8 +46,8 @@ const Footer = () => {
             <ul className="space-y-3 text-sm text-secondary-foreground/80">
               <li className="flex items-center gap-2">
                 <Mail className="w-4 h-4" />
-                <a href="mailto:info@vivaeagle.it" className="hover:text-secondary-foreground transition-colors">
-                  info@vivaeagle.it
+                <a href="mailto:info@vivaevent.it" className="hover:text-secondary-foreground transition-colors">
+                  info@vivaevent.it
                 </a>
               </li>
               <li className="flex items-center gap-2">
@@ -64,7 +64,7 @@ const Footer = () => {
 
         <div className="pt-8 border-t border-secondary-foreground/20">
           <div className="flex flex-col md:flex-row justify-between items-center gap-4 text-sm text-secondary-foreground/60">
-            <p>© 2025 VivaEagle. Tutti i diritti riservati.</p>
+            <p>© 2025 VivaEvent. Tutti i diritti riservati.</p>
             <div className="flex gap-6">
               <a href="#" className="hover:text-secondary-foreground transition-colors">Privacy Policy</a>
               <a href="#" className="hover:text-secondary-foreground transition-colors">Termini di Servizio</a>

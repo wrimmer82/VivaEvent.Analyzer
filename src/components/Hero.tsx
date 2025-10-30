@@ -15,7 +15,7 @@ const Hero = () => {
           {/* Logo badge */}
           <div className="inline-flex items-center gap-2 px-4 py-2 bg-card border border-border rounded-full shadow-card">
             <Music className="w-5 h-5 text-primary" />
-            <span className="text-sm font-semibold text-foreground">Il Marketplace per Live Music</span>
+            <span className="text-sm font-semibold text-foreground">VivaEvent - Il Marketplace per Live Music</span>
           </div>
 
           {/* Main heading */}
