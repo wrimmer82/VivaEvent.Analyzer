@@ -8,7 +8,7 @@ const plans = [
     price: "0",
     description: "Perfetto per iniziare",
     features: [
-      "3 proposte al mese",
+      "1 proposta al mese",
       "Profilo base",
       "Supporto via email",
       "Accesso alla community"
