@@ -3,11 +3,11 @@ import { ArrowRight, Music2 } from "lucide-react";
 
 const CTA = () => {
   return (
-    <section className="py-24 relative overflow-hidden" style={{ background: 'linear-gradient(135deg, hsl(0, 0%, 0%), hsl(45, 100%, 20%), hsl(0, 0%, 10%))' }}>
+    <section className="py-24 relative overflow-hidden" style={{ background: 'linear-gradient(135deg, hsl(0, 0%, 0%), hsl(45, 100%, 12%), hsl(0, 0%, 5%), hsl(0, 0%, 0%))' }}>
       {/* Decorative elements */}
       <div className="absolute inset-0 bg-grid-white/10 bg-[size:20px_20px]" />
-      <div className="absolute top-0 right-0 w-96 h-96" style={{ background: 'radial-gradient(circle, hsl(45, 100%, 25%) 0%, transparent 70%)', filter: 'blur(80px)' }} />
-      <div className="absolute bottom-0 left-0 w-96 h-96" style={{ background: 'radial-gradient(circle, hsl(45, 100%, 20%) 0%, transparent 70%)', filter: 'blur(80px)' }} />
+      <div className="absolute top-0 right-0 w-96 h-96" style={{ background: 'radial-gradient(circle, hsl(45, 100%, 15%) 0%, transparent 70%)', filter: 'blur(80px)' }} />
+      <div className="absolute bottom-0 left-0 w-96 h-96" style={{ background: 'radial-gradient(circle, hsl(45, 100%, 12%) 0%, transparent 70%)', filter: 'blur(80px)' }} />
       
       <div className="container mx-auto px-4 relative z-10">
         <div className="max-w-4xl mx-auto text-center space-y-8">
