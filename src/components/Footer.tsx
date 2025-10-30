@@ -1,4 +1,4 @@
-import { Music2, Mail, MapPin, Phone } from "lucide-react";
+import { Music2, Mail, MapPin } from "lucide-react";
 
 const Footer = () => {
   return (
@@ -46,17 +46,13 @@ const Footer = () => {
             <ul className="space-y-3 text-sm text-secondary-foreground/80">
               <li className="flex items-center gap-2">
                 <Mail className="w-4 h-4" />
-                <a href="mailto:info@vivaevent.it" className="hover:text-secondary-foreground transition-colors">
-                  info@vivaevent.it
+                <a href="mailto:eagleslive@spidmail.it" className="hover:text-secondary-foreground transition-colors">
+                  eagleslive@spidmail.it
                 </a>
               </li>
               <li className="flex items-center gap-2">
                 <MapPin className="w-4 h-4" />
                 <span>Milano, Italia</span>
-              </li>
-              <li className="flex items-center gap-2">
-                <Phone className="w-4 h-4" />
-                <span>+39 XXX XXX XXXX</span>
               </li>
             </ul>
           </div>
