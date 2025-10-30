@@ -65,11 +65,15 @@ const Pricing = () => {
           {plans.map((plan, index) => (
             <Card 
               key={index}
-              className={`relative flex flex-col ${
+              className={`relative flex flex-col bg-gradient-to-br from-card via-card to-card/50 backdrop-blur-sm ${
                 plan.popular 
                   ? 'border-2 border-primary shadow-elegant scale-105' 
-                  : 'border-border'
+                  : 'border-[hsl(210,20%,35%)]'
               }`}
+              style={!plan.popular ? {
+                background: 'linear-gradient(135deg, hsl(0, 0%, 5%), hsl(210, 15%, 12%))',
+                borderColor: 'hsl(210, 20%, 35%)'
+              } : undefined}
             >
               {plan.popular && (
                 <div className="absolute -top-4 left-1/2 -translate-x-1/2">

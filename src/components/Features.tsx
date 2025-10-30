@@ -58,7 +58,11 @@ const Features = () => {
             return (
               <div
                 key={index}
-                className="group relative p-8 rounded-2xl bg-card/50 backdrop-blur-sm border border-border hover:border-primary/50 transition-all hover:shadow-elegant"
+                className="group relative p-8 rounded-2xl backdrop-blur-sm border transition-all hover:shadow-elegant"
+                style={{
+                  background: 'linear-gradient(135deg, hsl(210, 12%, 10%), hsl(210, 20%, 15%), hsl(210, 12%, 12%))',
+                  borderColor: 'hsl(210, 20%, 30%)'
+                }}
               >
                 <div className={`inline-flex w-14 h-14 rounded-xl bg-gradient-to-br ${feature.color} items-center justify-center mb-4 group-hover:scale-110 transition-transform`}>
                   <Icon className="w-7 h-7 text-white" />

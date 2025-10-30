@@ -39,10 +39,16 @@ All colors MUST be HSL.
     --radius: 0.75rem;
 
     /* Custom design tokens */
+    --metallic: 210 15% 40%;
+    --metallic-light: 210 20% 55%;
+    --metallic-dark: 210 12% 25%;
+    
     --gradient-hero: linear-gradient(135deg, hsl(210 100% 3%), hsl(195 100% 50%));
     --gradient-card: linear-gradient(180deg, hsl(210 90% 8%), hsl(210 95% 6%));
+    --gradient-metallic: linear-gradient(135deg, hsl(210 12% 18%), hsl(210 20% 35%), hsl(210 12% 20%));
     --shadow-elegant: 0 10px 40px -10px hsl(195 100% 50% / 0.5);
     --shadow-card: 0 4px 20px -2px hsl(195 100% 50% / 0.15);
+    --shadow-metallic: 0 4px 16px -2px hsl(210 15% 20% / 0.6);
     --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 
     --sidebar-background: 0 0% 98%;
@@ -84,10 +90,16 @@ All colors MUST be HSL.
     --input: 210 50% 15%;
     --ring: 195 100% 50%;
 
+    --metallic: 210 15% 40%;
+    --metallic-light: 210 20% 55%;
+    --metallic-dark: 210 12% 25%;
+    
     --gradient-hero: linear-gradient(135deg, hsl(210 100% 3%), hsl(195 100% 50%));
     --gradient-card: linear-gradient(180deg, hsl(210 90% 8%), hsl(210 95% 6%));
+    --gradient-metallic: linear-gradient(135deg, hsl(210 12% 18%), hsl(210 20% 35%), hsl(210 12% 20%));
     --shadow-elegant: 0 10px 40px -10px hsl(195 100% 50% / 0.5);
     --shadow-card: 0 4px 20px -2px hsl(195 100% 50% / 0.15);
+    --shadow-metallic: 0 4px 16px -2px hsl(210 15% 20% / 0.6);
 
     --sidebar-background: 240 5.9% 10%;
     --sidebar-foreground: 240 4.8% 95.9%;
