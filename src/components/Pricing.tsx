@@ -118,9 +118,12 @@ const Pricing = () => {
           ))}
         </div>
 
-        <div className="text-center mt-12">
+        <div className="text-center mt-12 space-y-2">
           <p className="text-sm text-muted-foreground">
             Tutti i piani includono • Protezione pagamenti • Supporto via email • Cancella quando vuoi
+          </p>
+          <p className="text-sm font-medium text-primary">
+            ✨ Sempre gratuito per artisti minorenni
           </p>
         </div>
       </div>
