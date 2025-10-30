@@ -88,7 +88,9 @@ const Pricing = () => {
                 <CardDescription className="text-base">{plan.description}</CardDescription>
                 <div className="mt-6">
                   <span className="text-5xl font-bold text-foreground">€{plan.price}</span>
-                  <span className="text-muted-foreground ml-2">/mese</span>
+                  {plan.name !== "Commission" && (
+                    <span className="text-muted-foreground ml-2">/mese</span>
+                  )}
                 </div>
               </CardHeader>
 
