@@ -5,7 +5,8 @@ const CTA = () => {
   return (
     <section className="py-24 relative overflow-hidden" style={{ background: 'linear-gradient(135deg, hsl(0, 0%, 0%), hsl(45, 100%, 12%), hsl(0, 0%, 5%), hsl(0, 0%, 0%))' }}>
       {/* Decorative elements */}
-      <div className="absolute inset-0 bg-grid-white/10 bg-[size:20px_20px]" />
+      <div className="absolute top-0 left-0 right-0 h-32" style={{ background: 'linear-gradient(to bottom, hsl(var(--muted) / 0.3), transparent)' }} />
+      <div className="absolute bottom-0 left-0 right-0 h-32" style={{ background: 'linear-gradient(to top, hsl(0, 0%, 0%), transparent)' }} />
       <div className="absolute top-0 right-0 w-96 h-96" style={{ background: 'radial-gradient(circle, hsl(45, 100%, 15%) 0%, transparent 70%)', filter: 'blur(80px)' }} />
       <div className="absolute bottom-0 left-0 w-96 h-96" style={{ background: 'radial-gradient(circle, hsl(45, 100%, 12%) 0%, transparent 70%)', filter: 'blur(80px)' }} />
       
