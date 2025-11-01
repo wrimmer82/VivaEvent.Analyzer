@@ -1,9 +1,34 @@
+import { useState, useEffect, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { ArrowRight, Music2 } from "lucide-react";
 
 const CTA = () => {
+  const [isVisible, setIsVisible] = useState(false);
+  const sectionRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setIsVisible(true);
+        }
+      },
+      { threshold: 0.2 }
+    );
+
+    if (sectionRef.current) {
+      observer.observe(sectionRef.current);
+    }
+
+    return () => {
+      if (sectionRef.current) {
+        observer.unobserve(sectionRef.current);
+      }
+    };
+  }, []);
+
   return (
-    <section className="py-24 relative overflow-hidden" style={{ background: 'linear-gradient(135deg, hsl(0, 0%, 0%), hsl(45, 100%, 12%), hsl(0, 0%, 5%), hsl(0, 0%, 0%))' }}>
+    <section ref={sectionRef} className="py-24 relative overflow-hidden" style={{ background: 'linear-gradient(135deg, hsl(0, 0%, 0%), hsl(45, 100%, 12%), hsl(0, 0%, 5%), hsl(0, 0%, 0%))' }}>
       {/* Decorative elements */}
       <div className="absolute top-0 left-0 right-0 h-32" style={{ background: 'linear-gradient(to bottom, hsl(var(--muted) / 0.3), transparent)' }} />
       <div className="absolute bottom-0 left-0 right-0 h-32" style={{ background: 'linear-gradient(to top, hsl(0, 0%, 0%), transparent)' }} />
@@ -16,7 +41,7 @@ const CTA = () => {
             <Music2 className="w-10 h-10" style={{ color: 'hsl(180, 100%, 50%)' }} />
           </div>
           
-          <h2 className="text-4xl md:text-6xl font-bold" style={{ color: 'hsl(180, 100%, 50%)' }}>
+          <h2 className={`text-4xl md:text-6xl font-bold transition-all duration-700 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`} style={{ color: 'hsl(180, 100%, 50%)' }}>
             Pronto a Rivoluzionare il Tuo Booking?
           </h2>
           
