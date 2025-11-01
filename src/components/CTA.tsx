@@ -24,6 +24,15 @@ const CTA = () => {
             Unisciti a centinaia di artisti e venue che stanno già usando VivaEvent per semplificare i loro concerti
           </p>
 
+          <div className="max-w-3xl mx-auto pt-6 space-y-3">
+            <p className="text-lg font-bold" style={{ color: 'hsl(180, 100%, 50%)' }}>
+              Suite di produttività
+            </p>
+            <p className="text-base leading-relaxed" style={{ color: 'hsl(180, 100%, 60%)' }}>
+              Dimenticatevi di fogli di calcolo, fax e assegni cartacei. VivaEvent semplifica la prenotazione dell&apos;intrattenimento dal vivo. Siamo la prima piattaforma di prenotazione basata su cloud a fornire una soluzione semplice per negoziare contratti, riscuotere pagamenti online e monitorare gli obiettivi di fatturato in tempo reale.
+            </p>
+          </div>
+
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center pt-4">
             <Button 
               size="lg" 
