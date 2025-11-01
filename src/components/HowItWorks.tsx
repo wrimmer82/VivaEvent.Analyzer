@@ -85,7 +85,10 @@ const HowItWorks = () => {
 
           <TabsContent value="venues" className="space-y-8">
             <div className="grid md:grid-cols-3 gap-6">
-              <Card className="border-2 hover:border-accent/50 transition-all hover:shadow-card">
+              <Card 
+                className="border-2 hover:border-accent/50 transition-all hover:shadow-card cursor-pointer"
+                onClick={() => navigate("/profilo-venue")}
+              >
                 <CardContent className="pt-6 text-center space-y-4">
                   <div className="w-16 h-16 mx-auto bg-gradient-to-br from-accent to-primary rounded-2xl flex items-center justify-center">
                     <Building2 className="w-8 h-8 text-white" />
