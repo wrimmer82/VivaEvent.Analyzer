@@ -21,7 +21,7 @@ const CTA = () => {
           </h2>
           
           <p className="text-xl md:text-2xl max-w-2xl mx-auto" style={{ color: 'hsl(180, 100%, 60%)' }}>
-            Unisciti a centinaia di artisti e venue che stanno già usando VivaEagle per semplificare i loro concerti
+            Unisciti a centinaia di artisti e venue che stanno già usando VivaEvent per semplificare i loro concerti
           </p>
 
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center pt-4">
