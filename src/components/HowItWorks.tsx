@@ -1,9 +1,12 @@
 import { Music, Building2, TrendingUp, FileCheck, CreditCard, Bot } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { useNavigate } from "react-router-dom";
 import concertMetallicBackground from "@/assets/concert-metallic-background.png";
 
 const HowItWorks = () => {
+  const navigate = useNavigate();
+  
   return (
     <section id="how-it-works" className="py-24 bg-muted/30 relative overflow-hidden">
       <div 
@@ -39,7 +42,10 @@ const HowItWorks = () => {
 
           <TabsContent value="artists" className="space-y-8">
             <div className="grid md:grid-cols-3 gap-6">
-              <Card className="border-2 hover:border-primary/50 transition-all hover:shadow-card">
+              <Card 
+                className="border-2 hover:border-primary/50 transition-all hover:shadow-card cursor-pointer"
+                onClick={() => navigate("/crea-profilo")}
+              >
                 <CardContent className="pt-6 text-center space-y-4">
                   <div className="w-16 h-16 mx-auto bg-gradient-to-br from-primary to-accent rounded-2xl flex items-center justify-center">
                     <Music className="w-8 h-8 text-white" />
