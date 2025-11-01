@@ -20,11 +20,11 @@ const CTA = () => {
             Pronto a Rivoluzionare il Tuo Booking?
           </h2>
           
-          <p className="text-xl md:text-2xl max-w-2xl mx-auto" style={{ color: 'hsl(180, 100%, 60%)' }}>
+          <p className="text-xl md:text-2xl max-w-2xl mx-auto animate-fade-in" style={{ color: 'hsl(180, 100%, 60%)', animationDelay: '0.2s', opacity: 0, animationFillMode: 'forwards' }}>
             Unisciti a centinaia di artisti e venue che stanno già usando VivaEvent per semplificare i loro concerti
           </p>
 
-          <div className="max-w-3xl mx-auto pt-6 space-y-3">
+          <div className="max-w-3xl mx-auto pt-6 space-y-3 animate-fade-in" style={{ animationDelay: '0.4s', opacity: 0, animationFillMode: 'forwards' }}>
             <p className="text-lg font-bold" style={{ color: 'hsl(180, 100%, 50%)' }}>
               Suite di produttività
             </p>
@@ -33,7 +33,7 @@ const CTA = () => {
             </p>
           </div>
 
-          <div className="flex justify-center items-center pt-4">
+          <div className="flex justify-center items-center pt-4 animate-fade-in" style={{ animationDelay: '0.6s', opacity: 0, animationFillMode: 'forwards' }}>
             <Button 
               size="lg" 
               className="group text-lg px-8 py-6 shadow-xl"
@@ -44,7 +44,7 @@ const CTA = () => {
             </Button>
           </div>
 
-          <p className="text-sm pt-4" style={{ color: 'hsl(180, 100%, 60%, 0.8)' }}>
+          <p className="text-sm pt-4 animate-fade-in" style={{ color: 'hsl(180, 100%, 60%, 0.8)', animationDelay: '0.8s', opacity: 0, animationFillMode: 'forwards' }}>
             Nessuna carta di credito richiesta • Inizia in 2 minuti • Cancella quando vuoi
           </p>
         </div>
