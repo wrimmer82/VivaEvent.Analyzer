@@ -1,5 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { Music2 } from "lucide-react";
+import { Link } from "react-router-dom";
 
 const Navbar = () => {
   return (
@@ -16,6 +17,12 @@ const Navbar = () => {
 
           {/* Navigation links */}
           <div className="hidden md:flex items-center gap-8">
+            <Link to="/crea-profilo" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
+              Artisti
+            </Link>
+            <Link to="/profilo-venue" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
+              Venue
+            </Link>
             <a href="#features" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
               Features
             </a>
