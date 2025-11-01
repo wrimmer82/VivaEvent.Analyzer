@@ -33,7 +33,7 @@ const CTA = () => {
             </p>
           </div>
 
-          <div className="flex flex-col sm:flex-row gap-4 justify-center items-center pt-4">
+          <div className="flex justify-center items-center pt-4">
             <Button 
               size="lg" 
               className="group text-lg px-8 py-6 shadow-xl"
@@ -41,14 +41,6 @@ const CTA = () => {
             >
               Inizia Gratis Oggi
               <ArrowRight className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" />
-            </Button>
-            <Button 
-              size="lg" 
-              variant="outline" 
-              className="text-lg px-8 py-6 backdrop-blur-sm"
-              style={{ background: 'hsl(180, 100%, 50%, 0.1)', color: 'hsl(180, 100%, 50%)', borderColor: 'hsl(180, 100%, 50%, 0.5)' }}
-            >
-              Prenota Demo
             </Button>
           </div>
 
