@@ -57,9 +57,14 @@ const Features = () => {
           <h2 className="text-4xl md:text-5xl font-bold text-foreground mb-4">
             Tutto Quello che Ti Serve
           </h2>
-          <p className="text-xl text-muted-foreground">
+          <p className="text-xl text-muted-foreground mb-6">
             Una piattaforma completa per gestire ogni aspetto del booking musicale
           </p>
+          <div className="text-sm text-muted-foreground/80 space-y-3 max-w-2xl mx-auto">
+            <p className="font-semibold">Oltre la prenotazione</p>
+            <p>VivaEvent non si limita a prenotare.</p>
+            <p>Forniamo ai principali artisti e agenzie di booking gli strumenti necessari per massimizzare ricavi, tempo ed efficienza. Abbiamo aiutato migliaia di artisti, relatori e agenti di booking a semplificare i loro processi di prenotazione, scoprire nuovi talenti e monitorare le vendite dei biglietti.</p>
+          </div>
         </div>
 
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-6xl mx-auto">
