@@ -1,10 +1,10 @@
-import { Music2, Mail, MapPin } from "lucide-react";
+import { Music2, Mail, MapPin, Youtube, Linkedin } from "lucide-react";
 
 const Footer = () => {
   return (
     <footer className="pt-16 pb-8" style={{ background: 'hsl(0, 0%, 0%)', color: 'hsl(0, 0%, 90%)' }}>
       <div className="container mx-auto px-4">
-        <div className="grid md:grid-cols-4 gap-12 mb-12">
+        <div className="grid md:grid-cols-5 gap-12 mb-12">
           {/* Brand */}
           <div className="space-y-4">
             <div className="flex items-center gap-2">
@@ -38,6 +38,31 @@ const Footer = () => {
               <li><a href="#" className="transition-colors hover:brightness-125">Community</a></li>
               <li><a href="#" className="transition-colors hover:brightness-125">Supporto</a></li>
             </ul>
+          </div>
+
+          {/* Seguici */}
+          <div>
+            <h3 className="font-semibold mb-4">Seguici</h3>
+            <div className="flex gap-4">
+              <a 
+                href="https://youtube.com" 
+                target="_blank" 
+                rel="noopener noreferrer" 
+                className="transition-transform hover:scale-110"
+                style={{ color: 'hsl(0, 0%, 70%)' }}
+              >
+                <Youtube className="w-6 h-6" />
+              </a>
+              <a 
+                href="https://linkedin.com" 
+                target="_blank" 
+                rel="noopener noreferrer" 
+                className="transition-transform hover:scale-110"
+                style={{ color: 'hsl(0, 0%, 70%)' }}
+              >
+                <Linkedin className="w-6 h-6" />
+              </a>
+            </div>
           </div>
 
           {/* Contatti */}
