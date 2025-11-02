@@ -20,6 +20,9 @@ const Navbar = () => {
             <Link to="/crea-profilo" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
               Artisti
             </Link>
+            <Link to="/profilo-professionista" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
+              Professionisti
+            </Link>
             <Link to="/profilo-venue" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
               Venue
             </Link>

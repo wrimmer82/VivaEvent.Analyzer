@@ -34,7 +34,7 @@ const Hero = () => {
 
           {/* Subheading */}
           <p className="text-xl md:text-2xl text-muted-foreground max-w-2xl mx-auto leading-relaxed animate-fade-in" style={{ animationDelay: '0.2s' }}>
-            Piattaforma intelligente che connette <span className="text-primary font-semibold">artisti</span> e <span className="text-accent font-semibold">venue</span> automatizzando booking, contratti e pagamenti
+            Piattaforma intelligente che connette <span className="text-primary font-semibold">artisti</span>, <span className="text-accent font-semibold">professionisti</span> e <span className="text-accent font-semibold">venue</span> automatizzando booking, contratti e pagamenti
           </p>
 
           {/* CTA buttons */}

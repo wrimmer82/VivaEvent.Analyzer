@@ -24,15 +24,19 @@ const HowItWorks = () => {
             Come Funziona
           </h2>
           <p className="text-xl text-muted-foreground">
-            Processo completamente automatizzato con AI per artisti e venue
+            Processo completamente automatizzato con AI per artisti, professionisti e venue
           </p>
         </div>
 
         <Tabs defaultValue="artists" className="max-w-5xl mx-auto">
-          <TabsList className="grid w-full grid-cols-2 mb-12">
+          <TabsList className="grid w-full grid-cols-3 mb-12">
             <TabsTrigger value="artists" className="text-lg py-3">
               <Music className="w-5 h-5 mr-2" />
               Per Artisti
+            </TabsTrigger>
+            <TabsTrigger value="professionals" className="text-lg py-3">
+              <Bot className="w-5 h-5 mr-2" />
+              Per Professionisti
             </TabsTrigger>
             <TabsTrigger value="venues" className="text-lg py-3">
               <Building2 className="w-5 h-5 mr-2" />
@@ -77,6 +81,49 @@ const HowItWorks = () => {
                   <h3 className="text-xl font-semibold text-foreground">Contratto Digitale</h3>
                   <p className="text-muted-foreground">
                     Firma elettronica e pagamento escrow automatico per massima sicurezza
+                  </p>
+                </CardContent>
+              </Card>
+            </div>
+          </TabsContent>
+
+          <TabsContent value="professionals" className="space-y-8">
+            <div className="grid md:grid-cols-3 gap-6">
+              <Card 
+                className="border-2 hover:border-primary/50 transition-all hover:shadow-card cursor-pointer"
+                onClick={() => navigate("/profilo-professionista")}
+              >
+                <CardContent className="pt-6 text-center space-y-4">
+                  <div className="w-16 h-16 mx-auto bg-gradient-to-br from-primary to-accent rounded-2xl flex items-center justify-center">
+                    <Bot className="w-8 h-8 text-white" />
+                  </div>
+                  <h3 className="text-xl font-semibold text-foreground">Crea Profilo Pro</h3>
+                  <p className="text-muted-foreground">
+                    Inserisci specializzazione, portfolio, esperienza e tariffe orarie
+                  </p>
+                </CardContent>
+              </Card>
+
+              <Card className="border-2 hover:border-primary/50 transition-all hover:shadow-card">
+                <CardContent className="pt-6 text-center space-y-4">
+                  <div className="w-16 h-16 mx-auto bg-gradient-to-br from-primary to-accent rounded-2xl flex items-center justify-center">
+                    <TrendingUp className="w-8 h-8 text-white" />
+                  </div>
+                  <h3 className="text-xl font-semibold text-foreground">Matching Progetti</h3>
+                  <p className="text-muted-foreground">
+                    Ricevi proposte per collaborazioni, tour management e servizi tecnici
+                  </p>
+                </CardContent>
+              </Card>
+
+              <Card className="border-2 hover:border-primary/50 transition-all hover:shadow-card">
+                <CardContent className="pt-6 text-center space-y-4">
+                  <div className="w-16 h-16 mx-auto bg-gradient-to-br from-primary to-accent rounded-2xl flex items-center justify-center">
+                    <FileCheck className="w-8 h-8 text-white" />
+                  </div>
+                  <h3 className="text-xl font-semibold text-foreground">Contratti & Pagamenti</h3>
+                  <p className="text-muted-foreground">
+                    Gestisci contratti di servizio e ricevi pagamenti protetti e sicuri
                   </p>
                 </CardContent>
               </Card>
