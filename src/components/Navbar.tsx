@@ -36,12 +36,16 @@ const Navbar = () => {
 
           {/* CTA buttons */}
           <div className="flex items-center gap-3">
-            <Button variant="ghost" size="sm">
-              Accedi
-            </Button>
-            <Button size="sm" className="hidden sm:inline-flex">
-              Inizia Gratis
-            </Button>
+            <Link to="/accedi">
+              <Button variant="ghost" size="sm">
+                Accedi
+              </Button>
+            </Link>
+            <Link to="/accedi">
+              <Button size="sm" className="hidden sm:inline-flex">
+                Inizia Gratis
+              </Button>
+            </Link>
           </div>
         </div>
       </div>
