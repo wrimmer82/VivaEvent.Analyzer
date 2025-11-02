@@ -8,12 +8,12 @@ const Navbar = () => {
       <div className="container mx-auto px-4">
         <div className="flex h-16 items-center justify-between">
           {/* Logo */}
-          <div className="flex items-center gap-2">
+          <Link to="/" className="flex items-center gap-2 cursor-pointer hover:opacity-80 transition-opacity">
             <div className="flex items-center justify-center w-10 h-10 rounded-lg bg-gradient-to-br from-primary to-accent">
               <Music2 className="w-6 h-6 text-white" />
             </div>
             <span className="text-xl font-bold text-foreground">VivaEvent</span>
-          </div>
+          </Link>
 
           {/* Navigation links */}
           <div className="hidden md:flex items-center gap-8">
