@@ -54,7 +54,7 @@ const Footer = () => {
                 <Youtube className="w-6 h-6" />
               </a>
               <a 
-                href="https://www.linkedin.com/company/109757376/" 
+                href="https://www.linkedin.com/company/viva-eagles/?viewAsMember=true" 
                 target="_blank" 
                 rel="noopener noreferrer" 
                 className="transition-transform hover:scale-110"
