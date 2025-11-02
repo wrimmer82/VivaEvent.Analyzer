@@ -9,11 +9,15 @@ import { z } from "zod";
 import { Music2, Eye, EyeOff } from "lucide-react";
 
 const authSchema = z.object({
-  email: z.string().trim().email({ message: "Email non valida" }),
+  email: z.string().trim().email({ message: "Email non valida" }).max(255, { message: "Email troppo lunga" }),
   password: z
     .string()
-    .min(6, { message: "La password deve essere di almeno 6 caratteri" }),
-  fullName: z.string().trim().optional(),
+    .min(8, { message: "La password deve essere di almeno 8 caratteri" })
+    .regex(/[A-Z]/, { message: "La password deve contenere almeno una lettera maiuscola" })
+    .regex(/[a-z]/, { message: "La password deve contenere almeno una lettera minuscola" })
+    .regex(/[0-9]/, { message: "La password deve contenere almeno un numero" })
+    .regex(/[^A-Za-z0-9]/, { message: "La password deve contenere almeno un carattere speciale" }),
+  fullName: z.string().trim().max(200, { message: "Il nome deve essere massimo 200 caratteri" }).optional(),
 });
 
 const Auth = () => {
@@ -23,8 +27,26 @@ const Auth = () => {
   const [fullName, setFullName] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [failedAttempts, setFailedAttempts] = useState(() => {
+    const stored = localStorage.getItem("auth_failed_attempts");
+    return stored ? parseInt(stored, 10) : 0;
+  });
+  const [lockoutUntil, setLockoutUntil] = useState<number | null>(() => {
+    const stored = localStorage.getItem("auth_lockout_until");
+    return stored ? parseInt(stored, 10) : null;
+  });
   const navigate = useNavigate();
   const { toast } = useToast();
+
+  // Check and clear lockout if expired
+  useEffect(() => {
+    if (lockoutUntil && Date.now() > lockoutUntil) {
+      setLockoutUntil(null);
+      setFailedAttempts(0);
+      localStorage.removeItem("auth_lockout_until");
+      localStorage.removeItem("auth_failed_attempts");
+    }
+  }, [lockoutUntil]);
 
   useEffect(() => {
     // Check if user is already logged in
@@ -51,6 +73,18 @@ const Auth = () => {
 
   const handleEmailAuth = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    // Check if user is locked out
+    if (lockoutUntil && Date.now() < lockoutUntil) {
+      const remainingSeconds = Math.ceil((lockoutUntil - Date.now()) / 1000);
+      toast({
+        title: "Troppi tentativi",
+        description: `Riprova tra ${remainingSeconds} secondi`,
+        variant: "destructive",
+      });
+      return;
+    }
+
     setLoading(true);
 
     try {
@@ -79,20 +113,37 @@ const Auth = () => {
         });
 
         if (error) {
-          if (error.message.includes("Invalid login credentials")) {
+          // Increment failed attempts
+          const newFailedAttempts = failedAttempts + 1;
+          setFailedAttempts(newFailedAttempts);
+          localStorage.setItem("auth_failed_attempts", newFailedAttempts.toString());
+
+          // Calculate lockout duration with exponential backoff
+          if (newFailedAttempts >= 5) {
+            const lockoutDuration = Math.min(60000 * Math.pow(2, newFailedAttempts - 5), 900000); // Max 15 minutes
+            const lockoutTime = Date.now() + lockoutDuration;
+            setLockoutUntil(lockoutTime);
+            localStorage.setItem("auth_lockout_until", lockoutTime.toString());
+            
             toast({
-              title: "Errore di accesso",
-              description: "Email o password non corretti",
+              title: "Account temporaneamente bloccato",
+              description: `Troppi tentativi falliti. Riprova tra ${Math.ceil(lockoutDuration / 1000)} secondi`,
               variant: "destructive",
             });
           } else {
+            // Generic error message to prevent account enumeration
             toast({
               title: "Errore di accesso",
-              description: error.message,
+              description: "Credenziali non valide. Riprova.",
               variant: "destructive",
             });
           }
         } else {
+          // Reset failed attempts on successful login
+          setFailedAttempts(0);
+          localStorage.removeItem("auth_failed_attempts");
+          localStorage.removeItem("auth_lockout_until");
+          
           toast({
             title: "Accesso effettuato",
             description: "Benvenuto!",
@@ -309,9 +360,18 @@ const Auth = () => {
               </div>
             </div>
 
-            <Button type="submit" className="w-full" disabled={loading}>
+            <Button 
+              type="submit" 
+              className="w-full" 
+              disabled={loading || (lockoutUntil !== null && Date.now() < lockoutUntil)}
+            >
               {loading ? "Caricamento..." : isLogin ? "Login" : "Registrati"}
             </Button>
+            {failedAttempts > 0 && failedAttempts < 5 && isLogin && (
+              <p className="text-sm text-muted-foreground text-center mt-2">
+                Tentativi rimasti: {5 - failedAttempts}
+              </p>
+            )}
           </form>
 
           {isLogin && (
