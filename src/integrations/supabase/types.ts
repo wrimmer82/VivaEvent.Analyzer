@@ -14,6 +14,82 @@ export type Database = {
   }
   public: {
     Tables: {
+      artisti: {
+        Row: {
+          cachet_desiderato: number
+          citta: string
+          created_at: string
+          email: string
+          genere_musicale: string
+          id: string
+          nome_completo: string
+          user_id: string
+        }
+        Insert: {
+          cachet_desiderato: number
+          citta: string
+          created_at?: string
+          email: string
+          genere_musicale: string
+          id?: string
+          nome_completo: string
+          user_id: string
+        }
+        Update: {
+          cachet_desiderato?: number
+          citta?: string
+          created_at?: string
+          email?: string
+          genere_musicale?: string
+          id?: string
+          nome_completo?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "artisti_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: true
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      professionisti: {
+        Row: {
+          created_at: string
+          email: string
+          id: string
+          nome_completo: string
+          ruolo: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          email: string
+          id?: string
+          nome_completo: string
+          ruolo: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          email?: string
+          id?: string
+          nome_completo?: string
+          ruolo?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "professionisti_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: true
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       profiles: {
         Row: {
           avatar_url: string | null
@@ -44,6 +120,74 @@ export type Database = {
         }
         Relationships: []
       }
+      users: {
+        Row: {
+          created_at: string
+          email: string
+          id: string
+          user_type: Database["public"]["Enums"]["user_type"]
+        }
+        Insert: {
+          created_at?: string
+          email: string
+          id: string
+          user_type: Database["public"]["Enums"]["user_type"]
+        }
+        Update: {
+          created_at?: string
+          email?: string
+          id?: string
+          user_type?: Database["public"]["Enums"]["user_type"]
+        }
+        Relationships: []
+      }
+      venues: {
+        Row: {
+          budget_medio: number
+          capacita: number
+          citta: string
+          created_at: string
+          email: string
+          generi_preferiti: string[]
+          id: string
+          indirizzo: string
+          nome_locale: string
+          user_id: string
+        }
+        Insert: {
+          budget_medio: number
+          capacita: number
+          citta: string
+          created_at?: string
+          email: string
+          generi_preferiti: string[]
+          id?: string
+          indirizzo: string
+          nome_locale: string
+          user_id: string
+        }
+        Update: {
+          budget_medio?: number
+          capacita?: number
+          citta?: string
+          created_at?: string
+          email?: string
+          generi_preferiti?: string[]
+          id?: string
+          indirizzo?: string
+          nome_locale?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "venues_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: true
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never
@@ -52,7 +196,7 @@ export type Database = {
       [_ in never]: never
     }
     Enums: {
-      [_ in never]: never
+      user_type: "artista" | "venue" | "professionista"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -179,6 +323,8 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      user_type: ["artista", "venue", "professionista"],
+    },
   },
 } as const
