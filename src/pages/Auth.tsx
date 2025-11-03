@@ -53,7 +53,7 @@ const Auth = () => {
     const checkSession = async () => {
       const { data: { session } } = await supabase.auth.getSession();
       if (session) {
-        navigate("/");
+        navigate("/inizia-ora");
       }
     };
 
@@ -63,7 +63,7 @@ const Auth = () => {
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       (event, session) => {
         if (session) {
-          navigate("/");
+          navigate("/inizia-ora");
         }
       }
     );
@@ -150,7 +150,7 @@ const Auth = () => {
           });
         }
       } else {
-        const redirectUrl = `${window.location.origin}/`;
+        const redirectUrl = `${window.location.origin}/inizia-ora`;
         
         const { error } = await supabase.auth.signUp({
           email,
@@ -198,7 +198,7 @@ const Auth = () => {
   const handleGoogleAuth = async () => {
     setLoading(true);
     try {
-      const redirectUrl = `${window.location.origin}/`;
+      const redirectUrl = `${window.location.origin}/inizia-ora`;
       
       const { error } = await supabase.auth.signInWithOAuth({
         provider: "google",

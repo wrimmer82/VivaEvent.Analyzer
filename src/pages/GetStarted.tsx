@@ -177,6 +177,33 @@ const GetStarted = () => {
         </div>
       </section>
 
+      {/* Video Section */}
+      <section className="py-16 px-4 bg-secondary/30">
+        <div className="container mx-auto max-w-4xl">
+          <div className="text-center mb-8">
+            <h2 className="text-3xl md:text-4xl font-bold mb-4">
+              See VivaEvent in Action
+            </h2>
+            <p className="text-muted-foreground text-lg">
+              Watch how our platform revolutionizes live music booking
+            </p>
+          </div>
+          <div className="relative w-full aspect-video rounded-lg overflow-hidden shadow-2xl">
+            <iframe 
+              width="100%" 
+              height="100%" 
+              src="https://www.youtube.com/embed/qenQ0D5R8kI?si=sJsDqZ5eadP4Le9S" 
+              title="YouTube video player" 
+              frameBorder="0"
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
+              referrerPolicy="strict-origin-when-cross-origin" 
+              allowFullScreen
+              className="absolute inset-0"
+            />
+          </div>
+        </div>
+      </section>
+
       {/* Steps Section */}
       <section className="py-16 px-4">
         <div className="container mx-auto max-w-6xl">
@@ -215,7 +242,7 @@ const GetStarted = () => {
       </section>
 
       {/* Benefits Section */}
-      <section className="py-16 px-4 bg-secondary/30">
+      <section className="py-16 px-4">
         <div className="container mx-auto max-w-6xl">
           <div className="text-center mb-12">
             <h2 className="text-3xl md:text-4xl font-bold mb-4">
