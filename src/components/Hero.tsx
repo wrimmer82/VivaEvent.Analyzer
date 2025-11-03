@@ -1,6 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { Music, ArrowRight, Sparkles } from "lucide-react";
 import MatrixRain from "./MatrixRain";
+import { Link } from "react-router-dom";
 
 const Hero = () => {
   return (
@@ -39,12 +40,16 @@ const Hero = () => {
 
           {/* CTA buttons */}
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center pt-4 animate-fade-in" style={{ animationDelay: '0.3s' }}>
-            <Button size="lg" className="group text-lg px-8 py-6 bg-primary text-primary-foreground hover:bg-primary/90 shadow-elegant hover:shadow-[0_0_40px_rgba(0,217,255,0.6)] transition-all">
-              Inizia Gratis
-              <ArrowRight className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" />
+            <Button size="lg" className="group text-lg px-8 py-6 bg-primary text-primary-foreground hover:bg-primary/90 shadow-elegant hover:shadow-[0_0_40px_rgba(0,217,255,0.6)] transition-all" asChild>
+              <Link to="/inizia-ora">
+                Inizia Gratis
+                <ArrowRight className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" />
+              </Link>
             </Button>
-            <Button size="lg" variant="outline" className="text-lg px-8 py-6 border-primary/50 text-foreground hover:bg-primary/10 hover:border-primary transition-all">
-              Scopri Come Funziona
+            <Button size="lg" variant="outline" className="text-lg px-8 py-6 border-primary/50 text-foreground hover:bg-primary/10 hover:border-primary transition-all" asChild>
+              <Link to="/#how-it-works">
+                Scopri Come Funziona
+              </Link>
             </Button>
           </div>
 

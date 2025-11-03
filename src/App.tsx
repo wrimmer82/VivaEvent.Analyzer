@@ -8,6 +8,7 @@ import ArtistProfile from "./pages/ArtistProfile";
 import VenueProfile from "./pages/VenueProfile";
 import ProfessionalProfile from "./pages/ProfessionalProfile";
 import Auth from "./pages/Auth";
+import GetStarted from "./pages/GetStarted";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -24,6 +25,7 @@ const App = () => (
           <Route path="/profilo-professionista" element={<ProfessionalProfile />} />
           <Route path="/profilo-venue" element={<VenueProfile />} />
           <Route path="/accedi" element={<Auth />} />
+          <Route path="/inizia-ora" element={<GetStarted />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>

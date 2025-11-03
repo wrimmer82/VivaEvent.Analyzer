@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { ArrowRight, Music2 } from "lucide-react";
+import { Link } from "react-router-dom";
 
 const CTA = () => {
   const [isVisible, setIsVisible] = useState(false);
@@ -63,9 +64,12 @@ const CTA = () => {
               size="lg" 
               className="group text-lg px-8 py-6 shadow-xl"
               style={{ background: 'hsl(180, 100%, 50%)', color: 'hsl(0, 0%, 0%)', fontWeight: 'bold' }}
+              asChild
             >
-              Inizia Gratis Oggi
-              <ArrowRight className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" />
+              <Link to="/inizia-ora">
+                Inizia Gratis Oggi
+                <ArrowRight className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" />
+              </Link>
             </Button>
           </div>
 
