@@ -1,4 +1,5 @@
-import { Music2, Mail, MapPin, Youtube, Linkedin } from "lucide-react";
+import { Mail, MapPin, Youtube, Linkedin } from "lucide-react";
+import logoImage from "@/assets/viva-eagles-logo.png";
 
 const Footer = () => {
   return (
@@ -8,8 +9,8 @@ const Footer = () => {
           {/* Brand */}
           <div className="space-y-4">
             <div className="flex items-center gap-2">
-              <div className="flex items-center justify-center w-10 h-10 rounded-lg bg-gradient-to-br from-primary to-accent">
-                <Music2 className="w-6 h-6 text-white" />
+              <div className="flex items-center justify-center w-10 h-10">
+                <img src={logoImage} alt="VivaEvent Logo" className="w-10 h-10 object-contain" />
               </div>
               <span className="text-xl font-bold">VivaEvent</span>
             </div>
