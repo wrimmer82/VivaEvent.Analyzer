@@ -399,7 +399,7 @@ const Auth = () => {
                   className="text-primary hover:underline font-medium"
                   onClick={() => setIsLogin(false)}
                 >
-                  Organizza una demo di 15 minuti
+                  Registrati
                 </button>
               </>
             ) : (
