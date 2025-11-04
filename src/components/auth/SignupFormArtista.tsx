@@ -290,7 +290,7 @@ const SignupFormArtista = ({ onBack, onSwitchToLogin }: SignupFormArtistaProps) 
         <div className="space-y-2">
           <Label>Cachet Desiderato: €{cachet[0]}</Label>
           <Slider
-            value={cachet}
+            defaultValue={[500]}
             onValueChange={setCachet}
             min={100}
             max={2000}

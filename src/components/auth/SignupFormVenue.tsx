@@ -347,7 +347,7 @@ const SignupFormVenue = ({ onBack, onSwitchToLogin }: SignupFormVenueProps) => {
         <div className="space-y-2">
           <Label>Budget Medio per Evento: €{budget[0]}</Label>
           <Slider
-            value={budget}
+            defaultValue={[1000]}
             onValueChange={setBudget}
             min={100}
             max={5000}
