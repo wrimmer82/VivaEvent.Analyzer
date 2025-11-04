@@ -4,7 +4,7 @@ import MatchCard, { MatchCardProps } from "@/components/dashboard/MatchCard";
 import FilterSidebar from "@/components/dashboard/FilterSidebar";
 import StatsSidebar from "@/components/dashboard/StatsSidebar";
 import { Badge } from "@/components/ui/badge";
-import { User } from "lucide-react";
+import { User, X } from "lucide-react";
 
 const mockMatches: MatchCardProps[] = [
   {
@@ -120,36 +120,55 @@ const mockMatches: MatchCardProps[] = [
 ];
 
 export interface FilterState {
-  genere: string;
-  città: string;
-  budgetMin: number;
-  budgetMax: number;
-  ratingMin: number;
+  genres: string[];          // array di generi selezionati
+  city: string;              // città selezionata
+  radius: number;            // raggio in km
+  budgetMin: number;         // budget minimo
+  budgetMax: number;         // budget massimo
+  minRating: number;         // rating minimo
+  dateStart: string | null;  // data inizio
+  dateEnd: string | null;    // data fine
 }
 
 const Dashboard = () => {
   const [sortBy, setSortBy] = useState("match");
   const [filters, setFilters] = useState<FilterState>({
-    genere: "all",
-    città: "all",
+    genres: [],
+    city: 'Tutte',
+    radius: 50,
     budgetMin: 0,
-    budgetMax: 3000,
-    ratingMin: 0
+    budgetMax: 5000,
+    minRating: 0,
+    dateStart: null,
+    dateEnd: null
   });
 
+  // Apply filters function
+  const applyFilters = () => {
+    return mockMatches.filter((match) => {
+      // 1. Filtro genere
+      const genreMatch = filters.genres.length === 0 || 
+                         filters.genres.some(g => match.genere.toLowerCase().includes(g.toLowerCase()));
+      
+      // 2. Filtro città
+      const cityMatch = filters.city === 'Tutte' || match.città === filters.city;
+      
+      // 3. Filtro budget (capacity * 10 = budget stimato)
+      const matchValue = match.capacity ? match.capacity * 10 : 0;
+      const budgetMatch = matchValue >= filters.budgetMin && matchValue <= filters.budgetMax;
+      
+      // 4. Filtro rating
+      const ratingMatch = match.rating >= filters.minRating;
+      
+      // 5. Date: per ora sempre true (TODO)
+      const dateMatch = true;
+      
+      return genreMatch && cityMatch && budgetMatch && ratingMatch && dateMatch;
+    });
+  };
+
   // Filter matches based on filters
-  const filteredMatches = mockMatches.filter((match) => {
-    if (filters.genere !== "all" && !match.genere.toLowerCase().includes(filters.genere.toLowerCase())) {
-      return false;
-    }
-    if (filters.città !== "all" && match.città !== filters.città) {
-      return false;
-    }
-    if (match.rating < filters.ratingMin) {
-      return false;
-    }
-    return true;
-  });
+  const filteredMatches = applyFilters();
 
   // Sort filtered matches
   const sortedMatches = [...filteredMatches].sort((a, b) => {
@@ -198,12 +217,79 @@ const Dashboard = () => {
               </Select>
             </div>
 
-            {/* Match Grid */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              {sortedMatches.map((match) => (
-                <MatchCard key={match.id} {...match} />
-              ))}
-            </div>
+            {/* Active Filters Tags */}
+            {(filters.genres.length > 0 || filters.city !== 'Tutte' || filters.budgetMin > 0 || filters.budgetMax < 5000 || filters.minRating > 0) && (
+              <div className="flex flex-wrap gap-2 mb-4">
+                {filters.genres.map(genre => (
+                  <Badge key={genre} className="bg-cyan-500/20 text-cyan-400 px-3 py-1 cursor-pointer hover:bg-cyan-500/30">
+                    {genre}
+                    <X 
+                      className="h-3 w-3 ml-1 inline" 
+                      onClick={() => setFilters({...filters, genres: filters.genres.filter(g => g !== genre)})}
+                    />
+                  </Badge>
+                ))}
+                {filters.city !== 'Tutte' && (
+                  <Badge className="bg-cyan-500/20 text-cyan-400 px-3 py-1 cursor-pointer hover:bg-cyan-500/30">
+                    {filters.city}
+                    <X 
+                      className="h-3 w-3 ml-1 inline" 
+                      onClick={() => setFilters({...filters, city: 'Tutte'})}
+                    />
+                  </Badge>
+                )}
+                {(filters.budgetMin > 0 || filters.budgetMax < 5000) && (
+                  <Badge className="bg-cyan-500/20 text-cyan-400 px-3 py-1 cursor-pointer hover:bg-cyan-500/30">
+                    €{filters.budgetMin} - €{filters.budgetMax}
+                    <X 
+                      className="h-3 w-3 ml-1 inline" 
+                      onClick={() => setFilters({...filters, budgetMin: 0, budgetMax: 5000})}
+                    />
+                  </Badge>
+                )}
+                {filters.minRating > 0 && (
+                  <Badge className="bg-cyan-500/20 text-cyan-400 px-3 py-1 cursor-pointer hover:bg-cyan-500/30">
+                    Rating {filters.minRating}+
+                    <X 
+                      className="h-3 w-3 ml-1 inline" 
+                      onClick={() => setFilters({...filters, minRating: 0})}
+                    />
+                  </Badge>
+                )}
+              </div>
+            )}
+
+            {/* Match Grid or Empty State */}
+            {sortedMatches.length === 0 ? (
+              <div className="bg-[#1a1f2e] border border-cyan-500/30 rounded-lg p-12 text-center">
+                <div className="text-6xl mb-4">😔</div>
+                <h3 className="text-white text-xl font-bold mb-2">Nessun match trovato</h3>
+                <p className="text-gray-400 mb-4">
+                  Nessun venue corrisponde ai criteri di ricerca selezionati
+                </p>
+                <button
+                  onClick={() => setFilters({
+                    genres: [],
+                    city: 'Tutte',
+                    radius: 50,
+                    budgetMin: 0,
+                    budgetMax: 5000,
+                    minRating: 0,
+                    dateStart: null,
+                    dateEnd: null
+                  })}
+                  className="bg-cyan-500 hover:bg-cyan-600 text-white px-6 py-2 rounded-lg transition-colors"
+                >
+                  Reset Filtri
+                </button>
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {sortedMatches.map((match) => (
+                  <MatchCard key={match.id} {...match} />
+                ))}
+              </div>
+            )}
           </main>
 
           {/* Stats Sidebar - Right */}
