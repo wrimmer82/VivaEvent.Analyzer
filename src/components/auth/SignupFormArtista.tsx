@@ -12,7 +12,11 @@ import { z } from "zod";
 
 const artistSchema = z.object({
   nomeCompleto: z.string().trim().min(1, { message: "Nome completo richiesto" }).max(100),
-  email: z.string().trim().email({ message: "Email non valida" }),
+  email: z.string()
+    .trim()
+    .min(1, { message: "Email richiesta" })
+    .regex(/^[^\s@]+@[^\s@]+\.[^\s@]+$/, { message: "Email non valida" })
+    .max(255, { message: "Email troppo lunga" }),
   password: z
     .string()
     .min(8, { message: "Minimo 8 caratteri" })
