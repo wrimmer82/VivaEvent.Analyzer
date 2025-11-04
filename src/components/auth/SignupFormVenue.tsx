@@ -14,7 +14,6 @@ const venueSchema = z.object({
   email: z.string()
     .trim()
     .min(1, { message: "Email richiesta" })
-    .regex(/^[^\s@]+@[^\s@]+\.[^\s@]+$/, { message: "Email non valida" })
     .max(255, { message: "Email troppo lunga" }),
   password: z
     .string()
