@@ -1,109 +1,127 @@
-import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
-import { supabase } from "@/integrations/supabase/client";
-import { User } from "@supabase/supabase-js";
-import HeroCard from "@/components/dashboard/HeroCard";
-import SuggestedMatches from "@/components/dashboard/SuggestedMatches";
-import BookingsTable from "@/components/dashboard/BookingsTable";
-import NotificationsDrawer from "@/components/dashboard/NotificationsDrawer";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Search, LogOut } from "lucide-react";
+import { useState } from "react";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import MatchCard, { MatchCardProps } from "@/components/dashboard/MatchCard";
+import FilterSidebar from "@/components/dashboard/FilterSidebar";
+import StatsSidebar from "@/components/dashboard/StatsSidebar";
+
+const mockMatches: MatchCardProps[] = [
+  {
+    id: '1',
+    nome: 'The Midnight Stars',
+    tipo: 'artista',
+    genere: 'Rock Alternativo',
+    città: 'Milano',
+    cachet: 1500,
+    rating: 4.5,
+    avatarUrl: 'https://api.dicebear.com/7.x/avataaars/svg?seed=midnight',
+    matchScore: 87
+  },
+  {
+    id: '2',
+    nome: 'Club Alcatraz',
+    tipo: 'venue',
+    genere: 'Rock, Metal',
+    città: 'Milano',
+    capacity: 2000,
+    rating: 4.8,
+    avatarUrl: 'https://api.dicebear.com/7.x/identicon/svg?seed=alcatraz',
+    matchScore: 92
+  },
+  {
+    id: '3',
+    nome: 'Luna Jazz Quartet',
+    tipo: 'artista',
+    genere: 'Jazz Fusion',
+    città: 'Bologna',
+    cachet: 800,
+    rating: 4.2,
+    avatarUrl: 'https://api.dicebear.com/7.x/avataaars/svg?seed=luna',
+    matchScore: 78
+  },
+  {
+    id: '4',
+    nome: 'Live Music Hall',
+    tipo: 'venue',
+    genere: 'Pop, Indie',
+    città: 'Torino',
+    capacity: 500,
+    rating: 4.6,
+    avatarUrl: 'https://api.dicebear.com/7.x/identicon/svg?seed=livehall',
+    matchScore: 81
+  },
+  {
+    id: '5',
+    nome: 'Electric Dreams',
+    tipo: 'artista',
+    genere: 'Electronic, House',
+    città: 'Roma',
+    cachet: 2000,
+    rating: 4.7,
+    avatarUrl: 'https://api.dicebear.com/7.x/avataaars/svg?seed=electric',
+    matchScore: 73
+  },
+  {
+    id: '6',
+    nome: 'Ritmo Latino Club',
+    tipo: 'venue',
+    genere: 'Reggaeton, Salsa',
+    città: 'Napoli',
+    capacity: 300,
+    rating: 4.3,
+    avatarUrl: 'https://api.dicebear.com/7.x/identicon/svg?seed=ritmo',
+    matchScore: 65
+  }
+];
 
 const Dashboard = () => {
-  const navigate = useNavigate();
-  const [user, setUser] = useState<User | null>(null);
-  const [searchQuery, setSearchQuery] = useState("");
-  const [notificationsOpen, setNotificationsOpen] = useState(false);
+  const [sortBy, setSortBy] = useState("match");
 
-  useEffect(() => {
-    // Check auth
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      if (!session) {
-        navigate("/accedi");
-      } else {
-        setUser(session.user);
-      }
-    });
-
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
-      if (!session) {
-        navigate("/accedi");
-      } else {
-        setUser(session.user);
-      }
-    });
-
-    return () => subscription.unsubscribe();
-  }, [navigate]);
-
-  const handleLogout = async () => {
-    await supabase.auth.signOut();
-    navigate("/");
-  };
-
-  if (!user) return null;
+  const sortedMatches = [...mockMatches].sort((a, b) => {
+    if (sortBy === "match") return b.matchScore - a.matchScore;
+    if (sortBy === "rating") return b.rating - a.rating;
+    return 0; // "recent" - keep original order
+  });
 
   return (
-    <div className="min-h-screen bg-background">
-      {/* Header */}
-      <header className="border-b border-border bg-card/50 backdrop-blur-sm sticky top-0 z-10">
-        <div className="container mx-auto px-4 py-4">
-          <div className="flex items-center justify-between gap-4">
-            <div className="flex items-center gap-4 flex-1 max-w-xl">
-              <h1 className="text-2xl font-bold text-primary">VivaEagle</h1>
-              <div className="relative flex-1">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                <Input
-                  placeholder="Search artists, venues, genres..."
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  className="pl-10"
-                />
-              </div>
+    <div className="min-h-screen bg-[#0f1419]">
+      <div className="container mx-auto px-4 py-8">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+          {/* Filter Sidebar - Left */}
+          <aside className="hidden lg:block lg:col-span-2">
+            <FilterSidebar />
+          </aside>
+
+          {/* Main Content - Center */}
+          <main className="lg:col-span-7">
+            {/* Header */}
+            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
+              <h1 className="text-white text-2xl font-bold">Match Suggeriti per Te</h1>
+              <Select value={sortBy} onValueChange={setSortBy}>
+                <SelectTrigger className="w-[200px] bg-[#1a1f2e] border-cyan-500/30 text-white">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent className="bg-[#1a1f2e] border-cyan-500/30 text-white">
+                  <SelectItem value="match">Per Match Score</SelectItem>
+                  <SelectItem value="rating">Per Rating</SelectItem>
+                  <SelectItem value="recent">Più Recenti</SelectItem>
+                </SelectContent>
+              </Select>
             </div>
-            <div className="flex items-center gap-2">
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => setNotificationsOpen(true)}
-              >
-                Notifications
-              </Button>
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={handleLogout}
-              >
-                <LogOut className="h-4 w-4 mr-2" />
-                Logout
-              </Button>
+
+            {/* Match Grid */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {sortedMatches.map((match) => (
+                <MatchCard key={match.id} {...match} />
+              ))}
             </div>
-          </div>
+          </main>
+
+          {/* Stats Sidebar - Right */}
+          <aside className="hidden xl:block lg:col-span-3">
+            <StatsSidebar />
+          </aside>
         </div>
-      </header>
-
-      {/* Main Content */}
-      <main className="container mx-auto px-4 py-8">
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          {/* Left Column - Main Content */}
-          <div className="lg:col-span-2 space-y-6">
-            <HeroCard user={user} />
-            <SuggestedMatches searchQuery={searchQuery} />
-          </div>
-
-          {/* Right Column - Sidebar */}
-          <div className="lg:col-span-1 space-y-6">
-            <BookingsTable />
-          </div>
-        </div>
-      </main>
-
-      {/* Notifications Drawer */}
-      <NotificationsDrawer
-        open={notificationsOpen}
-        onOpenChange={setNotificationsOpen}
-      />
+      </div>
     </div>
   );
 };
