@@ -38,7 +38,7 @@ const Navbar = () => {
           {/* CTA buttons */}
           <div className="flex items-center gap-3">
             <Link to="/accedi">
-              <Button variant="ghost" size="sm">
+              <Button variant="ghost" size="sm" className="px-[2px] py-[2px] text-2xl">
                 Accedi
               </Button>
             </Link>
