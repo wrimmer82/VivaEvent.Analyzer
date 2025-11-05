@@ -4,102 +4,53 @@ import { Badge } from "@/components/ui/badge";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { Link } from "react-router-dom";
-import { 
-  Music, 
-  Building2, 
-  Briefcase, 
-  CheckCircle2, 
-  ArrowRight,
-  Users,
-  Calendar,
-  TrendingUp,
-  Shield
-} from "lucide-react";
-
+import { Music, Building2, Briefcase, CheckCircle2, ArrowRight, Users, Calendar, TrendingUp, Shield } from "lucide-react";
 const GetStarted = () => {
-  const userTypes = [
-    {
-      icon: Music,
-      title: "Artista",
-      description: "Sei un musicista o una band? Trova venue e opportunità per esibirti.",
-      features: [
-        "Crea il tuo profilo artistico",
-        "Carica la tua musica e video",
-        "Ricevi proposte di booking",
-        "Gestisci i tuoi eventi",
-        "Analizza le tue performance"
-      ],
-      link: "/crea-profilo",
-      color: "from-primary to-accent"
-    },
-    {
-      icon: Building2,
-      title: "Venue",
-      description: "Gestisci un locale o uno spazio per eventi? Trova gli artisti perfetti.",
-      features: [
-        "Pubblica i tuoi spazi disponibili",
-        "Cerca artisti per genere e stile",
-        "Gestisci le prenotazioni",
-        "Calendario eventi integrato",
-        "Statistiche di affluenza"
-      ],
-      link: "/profilo-venue",
-      color: "from-accent to-primary"
-    },
-    {
-      icon: Briefcase,
-      title: "Professionista",
-      description: "Sei un manager, booking agent o promoter? Gestisci il tuo roster.",
-      features: [
-        "Gestisci più artisti",
-        "Negozia contratti",
-        "Dashboard completa",
-        "Report finanziari",
-        "Networking professionale"
-      ],
-      link: "/profilo-professionista",
-      color: "from-primary/80 to-accent/80"
-    }
-  ];
-
-  const steps = [
-    {
-      number: "01",
-      title: "Registrati",
-      description: "Crea il tuo account gratuito in pochi secondi. Scegli il tipo di profilo più adatto a te.",
-      icon: Users
-    },
-    {
-      number: "02",
-      title: "Completa il Profilo",
-      description: "Aggiungi le tue informazioni, foto, video e tutto ciò che ti rappresenta al meglio.",
-      icon: CheckCircle2
-    },
-    {
-      number: "03",
-      title: "Inizia a Connetterti",
-      description: "Cerca opportunità, invia proposte o ricevi offerte. Il nostro AI ti aiuta a trovare i match perfetti.",
-      icon: Calendar
-    },
-    {
-      number: "04",
-      title: "Cresci e Prospera",
-      description: "Monitora le tue performance, gestisci i pagamenti e fai crescere la tua presenza nel mondo della musica live.",
-      icon: TrendingUp
-    }
-  ];
-
-  const benefits = [
-    "Matching AI intelligente per artisti e venue",
-    "Pagamenti sicuri e tracciati",
-    "Contratti digitali automatici",
-    "Calendario e gestione eventi",
-    "Analytics e statistiche dettagliate",
-    "Supporto clienti dedicato"
-  ];
-
-  return (
-    <div className="min-h-screen flex flex-col bg-background">
+  const userTypes = [{
+    icon: Music,
+    title: "Artista",
+    description: "Sei un musicista o una band? Trova venue e opportunità per esibirti.",
+    features: ["Crea il tuo profilo artistico", "Carica la tua musica e video", "Ricevi proposte di booking", "Gestisci i tuoi eventi", "Analizza le tue performance"],
+    link: "/crea-profilo",
+    color: "from-primary to-accent"
+  }, {
+    icon: Building2,
+    title: "Venue",
+    description: "Gestisci un locale o uno spazio per eventi? Trova gli artisti perfetti.",
+    features: ["Pubblica i tuoi spazi disponibili", "Cerca artisti per genere e stile", "Gestisci le prenotazioni", "Calendario eventi integrato", "Statistiche di affluenza"],
+    link: "/profilo-venue",
+    color: "from-accent to-primary"
+  }, {
+    icon: Briefcase,
+    title: "Professionista",
+    description: "Sei un manager, booking agent o promoter? Gestisci il tuo roster.",
+    features: ["Gestisci più artisti", "Negozia contratti", "Dashboard completa", "Report finanziari", "Networking professionale"],
+    link: "/profilo-professionista",
+    color: "from-primary/80 to-accent/80"
+  }];
+  const steps = [{
+    number: "01",
+    title: "Registrati",
+    description: "Crea il tuo account gratuito in pochi secondi. Scegli il tipo di profilo più adatto a te.",
+    icon: Users
+  }, {
+    number: "02",
+    title: "Completa il Profilo",
+    description: "Aggiungi le tue informazioni, foto, video e tutto ciò che ti rappresenta al meglio.",
+    icon: CheckCircle2
+  }, {
+    number: "03",
+    title: "Inizia a Connetterti",
+    description: "Cerca opportunità, invia proposte o ricevi offerte. Il nostro AI ti aiuta a trovare i match perfetti.",
+    icon: Calendar
+  }, {
+    number: "04",
+    title: "Cresci e Prospera",
+    description: "Monitora le tue performance, gestisci i pagamenti e fai crescere la tua presenza nel mondo della musica live.",
+    icon: TrendingUp
+  }];
+  const benefits = ["Matching AI intelligente per artisti e venue", "Pagamenti sicuri e tracciati", "Contratti digitali automatici", "Calendario e gestione eventi", "Analytics e statistiche dettagliate", "Supporto clienti dedicato"];
+  return <div className="min-h-screen flex flex-col bg-background">
       <Navbar />
       
       {/* Hero Section */}
@@ -118,12 +69,10 @@ const GetStarted = () => {
             </p>
             <div className="flex gap-4 justify-center flex-wrap">
               <Button size="lg" asChild className="gap-2">
-                <Link to="/accedi">
-                  Inizia Ora <ArrowRight className="w-4 h-4" />
-                </Link>
+                
               </Button>
               <Button size="lg" variant="outline" asChild>
-                <Link to="/#how-it-works">Scopri Come Funziona</Link>
+                
               </Button>
             </div>
           </div>
@@ -143,12 +92,9 @@ const GetStarted = () => {
           </div>
           
           <div className="grid md:grid-cols-3 gap-6">
-            {userTypes.map((type, index) => (
-              <Card 
-                key={index} 
-                className="hover:shadow-lg transition-all duration-300 hover:-translate-y-1 animate-fade-in"
-                style={{ animationDelay: `${index * 100}ms` }}
-              >
+            {userTypes.map((type, index) => <Card key={index} className="hover:shadow-lg transition-all duration-300 hover:-translate-y-1 animate-fade-in" style={{
+            animationDelay: `${index * 100}ms`
+          }}>
                 <CardHeader>
                   <div className={`w-16 h-16 rounded-lg bg-gradient-to-br ${type.color} flex items-center justify-center mb-4`}>
                     <type.icon className="w-8 h-8 text-white" />
@@ -160,19 +106,16 @@ const GetStarted = () => {
                 </CardHeader>
                 <CardContent className="space-y-4">
                   <ul className="space-y-2">
-                    {type.features.map((feature, idx) => (
-                      <li key={idx} className="flex items-start gap-2">
+                    {type.features.map((feature, idx) => <li key={idx} className="flex items-start gap-2">
                         <CheckCircle2 className="w-5 h-5 text-primary shrink-0 mt-0.5" />
                         <span className="text-sm text-muted-foreground">{feature}</span>
-                      </li>
-                    ))}
+                      </li>)}
                   </ul>
                   <Button className="w-full" asChild>
                     <Link to={type.link}>Inizia come {type.title}</Link>
                   </Button>
                 </CardContent>
-              </Card>
-            ))}
+              </Card>)}
           </div>
         </div>
       </section>
@@ -189,17 +132,7 @@ const GetStarted = () => {
             </p>
           </div>
           <div className="relative w-full aspect-video rounded-lg overflow-hidden shadow-2xl">
-            <iframe 
-              width="100%" 
-              height="100%" 
-              src="https://www.youtube.com/embed/qenQ0D5R8kI?si=sJsDqZ5eadP4Le9S" 
-              title="YouTube video player" 
-              frameBorder="0"
-              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
-              referrerPolicy="strict-origin-when-cross-origin" 
-              allowFullScreen
-              className="absolute inset-0"
-            />
+            <iframe width="100%" height="100%" src="https://www.youtube.com/embed/qenQ0D5R8kI?si=sJsDqZ5eadP4Le9S" title="YouTube video player" frameBorder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerPolicy="strict-origin-when-cross-origin" allowFullScreen className="absolute inset-0" />
           </div>
         </div>
       </section>
@@ -217,12 +150,9 @@ const GetStarted = () => {
           </div>
 
           <div className="grid md:grid-cols-2 gap-8">
-            {steps.map((step, index) => (
-              <div 
-                key={index} 
-                className="flex gap-4 animate-fade-in"
-                style={{ animationDelay: `${index * 150}ms` }}
-              >
+            {steps.map((step, index) => <div key={index} className="flex gap-4 animate-fade-in" style={{
+            animationDelay: `${index * 150}ms`
+          }}>
                 <div className="flex-shrink-0">
                   <div className="w-12 h-12 rounded-full bg-gradient-to-br from-primary to-accent flex items-center justify-center text-white font-bold">
                     {step.number}
@@ -235,8 +165,7 @@ const GetStarted = () => {
                   </div>
                   <p className="text-muted-foreground">{step.description}</p>
                 </div>
-              </div>
-            ))}
+              </div>)}
           </div>
         </div>
       </section>
@@ -254,18 +183,14 @@ const GetStarted = () => {
           </div>
 
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {benefits.map((benefit, index) => (
-              <Card 
-                key={index} 
-                className="p-6 hover:shadow-md transition-all animate-fade-in"
-                style={{ animationDelay: `${index * 100}ms` }}
-              >
+            {benefits.map((benefit, index) => <Card key={index} className="p-6 hover:shadow-md transition-all animate-fade-in" style={{
+            animationDelay: `${index * 100}ms`
+          }}>
                 <div className="flex items-start gap-3">
                   <Shield className="w-5 h-5 text-primary shrink-0 mt-0.5" />
                   <p className="font-medium">{benefit}</p>
                 </div>
-              </Card>
-            ))}
+              </Card>)}
           </div>
         </div>
       </section>
@@ -295,8 +220,6 @@ const GetStarted = () => {
       </section>
 
       <Footer />
-    </div>
-  );
+    </div>;
 };
-
 export default GetStarted;
