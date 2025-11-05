@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -10,7 +10,8 @@ import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { useToast } from "@/hooks/use-toast";
-import { ArrowLeft, Upload, Music, Image as ImageIcon, Video, Users, TrendingUp } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
+import { ArrowLeft, Upload, Music, Image as ImageIcon, Video, Users, TrendingUp, LogOut, ArrowRight, Loader2 } from "lucide-react";
 import Navbar from "@/components/Navbar";
 
 const formSchema = z.object({
@@ -28,6 +29,10 @@ const formSchema = z.object({
 const ArtistProfile = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+  const [userId, setUserId] = useState<string | null>(null);
+  const [artistId, setArtistId] = useState<string | null>(null);
   const [epkFile, setEpkFile] = useState<File | null>(null);
   const [photos, setPhotos] = useState<File[]>([]);
   const [audioSamples, setAudioSamples] = useState<File[]>([]);
@@ -48,17 +53,148 @@ const ArtistProfile = () => {
     },
   });
 
-  const onSubmit = (values: z.infer<typeof formSchema>) => {
-    console.log("Form submitted:", values);
-    console.log("EPK:", epkFile);
-    console.log("Photos:", photos);
-    console.log("Audio Samples:", audioSamples);
-    console.log("Video Link:", videoLink);
-    
-    toast({
-      title: "Profilo Creato! 🎵",
-      description: "Il tuo profilo artista è stato salvato con successo.",
-    });
+  const artistName = form.watch("artistName");
+
+  useEffect(() => {
+    checkAuthAndLoadProfile();
+  }, []);
+
+  const checkAuthAndLoadProfile = async () => {
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+
+      if (!session) {
+        navigate("/accedi");
+        return;
+      }
+
+      setUserId(session.user.id);
+
+      // Load existing artist profile
+      const { data: artistData, error: artistError } = await supabase
+        .from("artisti")
+        .select("*")
+        .eq("user_id", session.user.id)
+        .maybeSingle();
+
+      if (artistError) {
+        console.error("Error loading artist profile:", artistError);
+      }
+
+      if (artistData) {
+        setArtistId(artistData.id);
+        form.reset({
+          artistName: artistData.nome_completo || "",
+          genre: artistData.genere_musicale || "",
+          bio: artistData.biografia || "",
+          localFanbase: artistData.citta || "",
+          instagram: "",
+          facebook: "",
+          spotify: "",
+          youtube: "",
+          tiktok: "",
+        });
+      }
+    } catch (error) {
+      console.error("Error checking auth:", error);
+      toast({
+        title: "Errore",
+        description: "Impossibile caricare il profilo",
+        variant: "destructive",
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleLogout = async () => {
+    const { error } = await supabase.auth.signOut();
+    if (error) {
+      toast({
+        title: "Errore",
+        description: "Si è verificato un errore durante il logout",
+        variant: "destructive",
+      });
+    } else {
+      toast({
+        title: "Logout effettuato",
+        description: "A presto!",
+      });
+      navigate("/accedi");
+    }
+  };
+
+  const onSubmit = async (values: z.infer<typeof formSchema>) => {
+    if (!userId) {
+      toast({
+        title: "Errore",
+        description: "Utente non autenticato",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setSaving(true);
+
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) {
+        navigate("/accedi");
+        return;
+      }
+
+      const artistPayload = {
+        user_id: userId,
+        nome_completo: values.artistName,
+        genere_musicale: values.genre,
+        biografia: values.bio,
+        citta: values.localFanbase,
+        email: session.user.email || "",
+        cachet_desiderato: 0,
+      };
+
+      if (artistId) {
+        // Update existing profile
+        const { error: updateError } = await supabase
+          .from("artisti")
+          .update(artistPayload)
+          .eq("id", artistId);
+
+        if (updateError) throw updateError;
+      } else {
+        // Insert new profile
+        const { data: newArtist, error: insertError } = await supabase
+          .from("artisti")
+          .insert(artistPayload)
+          .select()
+          .single();
+
+        if (insertError) throw insertError;
+        if (newArtist) setArtistId(newArtist.id);
+      }
+
+      // Update profile_completed flag in users table
+      const { error: userError } = await supabase
+        .from("users")
+        .update({ profile_completed: true })
+        .eq("id", userId);
+
+      if (userError) throw userError;
+
+      toast({
+        title: "Profilo Salvato! 🎵",
+        description: "Il tuo profilo artista è stato salvato con successo.",
+      });
+    } catch (error) {
+      console.error("Error saving profile:", error);
+      toast({
+        title: "Errore",
+        description: "Impossibile salvare il profilo",
+        variant: "destructive",
+      });
+    } finally {
+      setSaving(false);
+    }
   };
 
   const handlePhotoUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -73,10 +209,44 @@ const ArtistProfile = () => {
     }
   };
 
+  const isProfileComplete = () => {
+    const values = form.getValues();
+    return values.artistName && values.genre && values.bio && values.localFanbase;
+  };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <div className="text-foreground text-xl flex items-center gap-2">
+          <Loader2 className="w-5 h-5 animate-spin" />
+          Caricamento...
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-background">
       <Navbar />
       
+      {/* Header with greeting and logout */}
+      <div className="border-b border-border bg-card">
+        <div className="container mx-auto px-4 py-4 flex justify-between items-center">
+          <div className="flex-1"></div>
+          {userId && artistName && (
+            <div className="flex items-center gap-4">
+              <span className="text-foreground text-lg">
+                Ciao, <span className="font-bold text-primary">{artistName}</span>!
+              </span>
+              <Button variant="destructive" size="sm" onClick={handleLogout} className="gap-2">
+                <LogOut className="h-4 w-4" />
+                Logout
+              </Button>
+            </div>
+          )}
+        </div>
+      </div>
+
       <div className="container mx-auto px-4 py-12">
         <Button
           variant="ghost"
@@ -90,10 +260,10 @@ const ArtistProfile = () => {
         <div className="max-w-4xl mx-auto">
           <div className="text-center mb-12">
             <h1 className="text-4xl md:text-5xl font-bold text-foreground mb-4">
-              Crea il Tuo Profilo Artista
+              {artistId ? "Il Tuo Profilo Artista" : "Crea il Tuo Profilo Artista"}
             </h1>
             <p className="text-xl text-muted-foreground">
-              Carica i tuoi contenuti e inizia a trovare venue perfetti per te
+              {artistId ? "Modifica i tuoi contenuti e le tue informazioni" : "Carica i tuoi contenuti e inizia a trovare venue perfetti per te"}
             </p>
           </div>
 
@@ -361,10 +531,45 @@ const ArtistProfile = () => {
                 </CardContent>
               </Card>
 
-              <div className="flex justify-center pt-6">
-                <Button type="submit" size="lg" className="w-full md:w-auto px-12">
-                  Salva Profilo Artista
-                </Button>
+              <div className="flex flex-col gap-4 pt-6">
+                <div className="flex justify-center">
+                  <Button 
+                    type="submit" 
+                    size="lg" 
+                    className="w-full md:w-auto px-12"
+                    disabled={saving}
+                  >
+                    {saving ? (
+                      <>
+                        <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                        Salvataggio...
+                      </>
+                    ) : (
+                      "Salva Profilo Artista"
+                    )}
+                  </Button>
+                </div>
+
+                {/* Button to Dashboard - Gold/Warning color */}
+                <div className="flex justify-center">
+                  <Button
+                    type="button"
+                    variant="warning"
+                    size="lg"
+                    className="w-full md:w-auto px-12 text-lg font-bold"
+                    onClick={() => navigate("/dashboard")}
+                    disabled={!isProfileComplete()}
+                  >
+                    <ArrowRight className="w-5 h-5 mr-2" />
+                    Vai alla Dashboard di Matching
+                  </Button>
+                </div>
+                
+                {!isProfileComplete() && (
+                  <p className="text-center text-sm text-muted-foreground">
+                    Completa il profilo per accedere al matching
+                  </p>
+                )}
               </div>
             </form>
           </Form>

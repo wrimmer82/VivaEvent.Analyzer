@@ -16,6 +16,7 @@ export type Database = {
     Tables: {
       artisti: {
         Row: {
+          biografia: string | null
           cachet_desiderato: number
           citta: string
           created_at: string
@@ -26,6 +27,7 @@ export type Database = {
           user_id: string
         }
         Insert: {
+          biografia?: string | null
           cachet_desiderato: number
           citta: string
           created_at?: string
@@ -36,6 +38,7 @@ export type Database = {
           user_id: string
         }
         Update: {
+          biografia?: string | null
           cachet_desiderato?: number
           citta?: string
           created_at?: string
