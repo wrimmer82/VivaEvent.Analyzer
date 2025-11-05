@@ -334,8 +334,9 @@ const SignupFormVenue = ({ onBack, onSwitchToLogin }: SignupFormVenueProps) => {
                 <Checkbox
                   checked={selectedGenres.includes(genere.toLowerCase())}
                   onCheckedChange={() => toggleGenre(genere.toLowerCase())}
+                  onClick={(e) => e.stopPropagation()}
                 />
-                <label className="text-sm cursor-pointer">{genere}</label>
+                <label className="text-sm cursor-pointer select-none">{genere}</label>
               </div>
             ))}
           </div>
@@ -345,9 +346,9 @@ const SignupFormVenue = ({ onBack, onSwitchToLogin }: SignupFormVenueProps) => {
         </div>
 
         <div className="space-y-2">
-          <Label>Budget Medio per Evento: €{budget[0]}</Label>
+          <Label>Budget Medio per Evento: €{budget[0] || 1000}</Label>
           <Slider
-            defaultValue={[1000]}
+            value={budget}
             onValueChange={setBudget}
             min={100}
             max={5000}
