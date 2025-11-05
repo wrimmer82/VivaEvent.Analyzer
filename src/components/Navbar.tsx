@@ -1,10 +1,8 @@
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
 import logoImage from "@/assets/viva-eagles-logo.png";
-
 const Navbar = () => {
-  return (
-    <nav className="sticky top-0 z-50 w-full border-b border-primary/20 bg-background/80 backdrop-blur-lg">
+  return <nav className="sticky top-0 z-50 w-full border-b border-primary/20 bg-background/80 backdrop-blur-lg">
       <div className="container mx-auto px-4">
         <div className="flex h-16 items-center justify-between">
           {/* Logo */}
@@ -45,15 +43,11 @@ const Navbar = () => {
               </Button>
             </Link>
             <Link to="/accedi">
-              <Button size="sm" className="hidden sm:inline-flex">
-                Inizia Gratis
-              </Button>
+              
             </Link>
           </div>
         </div>
       </div>
-    </nav>
-  );
+    </nav>;
 };
-
 export default Navbar;
