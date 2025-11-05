@@ -55,6 +55,45 @@ export type Database = {
           },
         ]
       }
+      booking_requests: {
+        Row: {
+          created_at: string
+          event_date: string
+          event_time: string
+          id: string
+          personal_message: string | null
+          proposed_compensation: number
+          receiver_id: string
+          sender_id: string
+          status: Database["public"]["Enums"]["booking_status"]
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          event_date: string
+          event_time: string
+          id?: string
+          personal_message?: string | null
+          proposed_compensation: number
+          receiver_id: string
+          sender_id: string
+          status?: Database["public"]["Enums"]["booking_status"]
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          event_date?: string
+          event_time?: string
+          id?: string
+          personal_message?: string | null
+          proposed_compensation?: number
+          receiver_id?: string
+          sender_id?: string
+          status?: Database["public"]["Enums"]["booking_status"]
+          updated_at?: string
+        }
+        Relationships: []
+      }
       professionisti: {
         Row: {
           created_at: string
@@ -196,6 +235,7 @@ export type Database = {
       [_ in never]: never
     }
     Enums: {
+      booking_status: "pending" | "accepted" | "rejected" | "cancelled"
       user_type: "artista" | "venue" | "professionista"
     }
     CompositeTypes: {
@@ -324,6 +364,7 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
+      booking_status: ["pending", "accepted", "rejected", "cancelled"],
       user_type: ["artista", "venue", "professionista"],
     },
   },

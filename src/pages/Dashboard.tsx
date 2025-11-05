@@ -3,6 +3,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import MatchCard, { MatchCardProps } from "@/components/dashboard/MatchCard";
 import FilterSidebar from "@/components/dashboard/FilterSidebar";
 import StatsSidebar from "@/components/dashboard/StatsSidebar";
+import { BookingModal } from "@/components/dashboard/BookingModal";
 import { Badge } from "@/components/ui/badge";
 import { User, X } from "lucide-react";
 
@@ -141,6 +142,18 @@ const Dashboard = () => {
     minRating: 0,
     dateStart: null,
     dateEnd: null
+  });
+
+  const [bookingModal, setBookingModal] = useState<{
+    open: boolean;
+    receiverId: string;
+    receiverName: string;
+    receiverType: string;
+  }>({
+    open: false,
+    receiverId: "",
+    receiverName: "",
+    receiverType: "",
   });
 
   // Apply filters function
@@ -286,7 +299,18 @@ const Dashboard = () => {
             ) : (
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 {sortedMatches.map((match) => (
-                  <MatchCard key={match.id} {...match} />
+                  <MatchCard 
+                    key={match.id} 
+                    {...match}
+                    onBookingClick={() =>
+                      setBookingModal({
+                        open: true,
+                        receiverId: match.id,
+                        receiverName: match.nome,
+                        receiverType: match.tipo,
+                      })
+                    }
+                  />
                 ))}
               </div>
             )}
@@ -298,6 +322,15 @@ const Dashboard = () => {
           </aside>
         </div>
       </div>
+
+      {/* Booking Modal */}
+      <BookingModal
+        open={bookingModal.open}
+        onOpenChange={(open) => setBookingModal({ ...bookingModal, open })}
+        receiverId={bookingModal.receiverId}
+        receiverName={bookingModal.receiverName}
+        receiverType={bookingModal.receiverType}
+      />
     </div>
   );
 };

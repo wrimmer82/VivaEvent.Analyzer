@@ -14,6 +14,7 @@ export interface MatchCardProps {
   rating: number;
   avatarUrl: string;
   matchScore: number;
+  onBookingClick?: () => void;
 }
 
 const MatchCard = ({ 
@@ -26,7 +27,8 @@ const MatchCard = ({
   capacity, 
   rating, 
   avatarUrl, 
-  matchScore 
+  matchScore,
+  onBookingClick
 }: MatchCardProps) => {
   const getMatchScoreColor = (score: number) => {
     if (score > 70) return "bg-green-500";
@@ -39,7 +41,11 @@ const MatchCard = ({
   };
 
   const handleSendProposal = () => {
-    console.log('Send proposal to:', id);
+    if (onBookingClick) {
+      onBookingClick();
+    } else {
+      console.log('Send proposal to:', id);
+    }
   };
 
   return (
@@ -100,7 +106,7 @@ const MatchCard = ({
           className="flex-1 bg-cyan-500 hover:bg-cyan-600 text-white"
           onClick={handleSendProposal}
         >
-          Invia Proposta
+          Prenota 🎯
         </Button>
       </div>
     </div>

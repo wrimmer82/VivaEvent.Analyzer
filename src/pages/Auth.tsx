@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Music2 } from "lucide-react";
 import LoginForm from "@/components/auth/LoginForm";
@@ -11,10 +11,22 @@ import SignupFormProfessionista from "@/components/auth/SignupFormProfessionista
 type UserType = "artista" | "venue" | "professionista" | null;
 
 const Auth = () => {
+  const [searchParams] = useSearchParams();
+  const tipoFromUrl = searchParams.get("tipo") as UserType;
+  
   const [isLogin, setIsLogin] = useState(true);
-  const [signupStep, setSignupStep] = useState<1 | 2>(1);
-  const [selectedUserType, setSelectedUserType] = useState<UserType>(null);
+  const [signupStep, setSignupStep] = useState<1 | 2>(tipoFromUrl ? 2 : 1);
+  const [selectedUserType, setSelectedUserType] = useState<UserType>(tipoFromUrl);
   const navigate = useNavigate();
+
+  // Auto-switch to signup if tipo param is present
+  useEffect(() => {
+    if (tipoFromUrl) {
+      setIsLogin(false);
+      setSignupStep(2);
+      setSelectedUserType(tipoFromUrl);
+    }
+  }, [tipoFromUrl]);
 
   useEffect(() => {
     const checkSession = async () => {

@@ -11,21 +11,21 @@ const GetStarted = () => {
     title: "Artista",
     description: "Sei un musicista o una band? Trova venue e opportunità per esibirti.",
     features: ["Crea il tuo profilo artistico", "Carica la tua musica e video", "Ricevi proposte di booking", "Gestisci i tuoi eventi", "Analizza le tue performance"],
-    link: "/crea-profilo",
+    link: "/accedi?tipo=artista",
     color: "from-primary to-accent"
   }, {
     icon: Building2,
     title: "Venue",
     description: "Gestisci un locale o uno spazio per eventi? Trova gli artisti perfetti.",
     features: ["Pubblica i tuoi spazi disponibili", "Cerca artisti per genere e stile", "Gestisci le prenotazioni", "Calendario eventi integrato", "Statistiche di affluenza"],
-    link: "/profilo-venue",
+    link: "/accedi?tipo=venue",
     color: "from-accent to-primary"
   }, {
     icon: Briefcase,
     title: "Professionista",
     description: "Sei un manager, booking agent o promoter? Gestisci il tuo roster.",
     features: ["Gestisci più artisti", "Negozia contratti", "Dashboard completa", "Report finanziari", "Networking professionale"],
-    link: "/profilo-professionista",
+    link: "/accedi?tipo=professionista",
     color: "from-primary/80 to-accent/80"
   }];
   const steps = [{
