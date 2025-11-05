@@ -32,17 +32,15 @@ const Auth = () => {
     const checkSession = async () => {
       const { data: { session } } = await supabase.auth.getSession();
       if (session) {
-        // Check user type and redirect accordingly
+        // Check profile completion status
         const { data: userData } = await supabase
           .from("users")
-          .select("user_type")
+          .select("user_type, profile_completed")
           .eq("id", session.user.id)
           .maybeSingle();
 
         if (userData) {
-          redirectToDashboard(userData.user_type);
-        } else {
-          navigate("/dashboard");
+          redirectBasedOnProfile(userData.user_type, userData.profile_completed);
         }
       }
     };
@@ -54,14 +52,12 @@ const Auth = () => {
         if (session && event === "SIGNED_IN") {
           const { data: userData } = await supabase
             .from("users")
-            .select("user_type")
+            .select("user_type, profile_completed")
             .eq("id", session.user.id)
             .maybeSingle();
 
           if (userData) {
-            redirectToDashboard(userData.user_type);
-          } else {
-            navigate("/dashboard");
+            redirectBasedOnProfile(userData.user_type, userData.profile_completed);
           }
         }
       }
@@ -70,9 +66,24 @@ const Auth = () => {
     return () => subscription.unsubscribe();
   }, [navigate]);
 
-  const redirectToDashboard = (userType: string) => {
-    // Redirect all user types to the main dashboard
-    navigate("/dashboard");
+  const redirectBasedOnProfile = (userType: string, profileCompleted: boolean) => {
+    if (!profileCompleted) {
+      // Redirect to profile creation
+      switch (userType) {
+        case "artista":
+          navigate("/crea-profilo");
+          break;
+        case "venue":
+          navigate("/profilo-venue");
+          break;
+        case "professionista":
+          navigate("/profilo-professionista");
+          break;
+      }
+    } else {
+      // Redirect to personal profile page
+      navigate("/profile-dashboard");
+    }
   };
 
   const handleUserTypeSelect = (userType: UserType) => {

@@ -164,18 +164,21 @@ export type Database = {
           created_at: string
           email: string
           id: string
+          profile_completed: boolean
           user_type: Database["public"]["Enums"]["user_type"]
         }
         Insert: {
           created_at?: string
           email: string
           id: string
+          profile_completed?: boolean
           user_type: Database["public"]["Enums"]["user_type"]
         }
         Update: {
           created_at?: string
           email?: string
           id?: string
+          profile_completed?: boolean
           user_type?: Database["public"]["Enums"]["user_type"]
         }
         Relationships: []

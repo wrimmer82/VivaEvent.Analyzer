@@ -5,12 +5,14 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Index from "./pages/Index";
 import Dashboard from "./pages/Dashboard";
+import ProfileDashboard from "./pages/ProfileDashboard";
 import ArtistProfile from "./pages/ArtistProfile";
 import VenueProfile from "./pages/VenueProfile";
 import ProfessionalProfile from "./pages/ProfessionalProfile";
 import Auth from "./pages/Auth";
 import GetStarted from "./pages/GetStarted";
 import NotFound from "./pages/NotFound";
+import ProtectedRoute from "./components/ProtectedRoute";
 
 const queryClient = new QueryClient();
 
@@ -22,7 +24,15 @@ const App = () => (
       <BrowserRouter>
         <Routes>
           <Route path="/" element={<Index />} />
-          <Route path="/dashboard" element={<Dashboard />} />
+          <Route path="/profile-dashboard" element={<ProfileDashboard />} />
+          <Route 
+            path="/dashboard" 
+            element={
+              <ProtectedRoute>
+                <Dashboard />
+              </ProtectedRoute>
+            } 
+          />
           <Route path="/crea-profilo" element={<ArtistProfile />} />
           <Route path="/profilo-professionista" element={<ProfessionalProfile />} />
           <Route path="/profilo-venue" element={<VenueProfile />} />
