@@ -57,7 +57,16 @@ const LoginForm = ({ onSwitchToSignup, onBackToHome }: LoginFormProps) => {
       });
 
       if (error) {
-        setLoginError("Email o password incorretta");
+        // Handle specific error types
+        if (error.message.includes("Email not confirmed")) {
+          setLoginError(
+            "📧 Devi confermare la tua email prima di accedere. Controlla la tua casella di posta per il link di conferma."
+          );
+        } else if (error.message.includes("Invalid login credentials")) {
+          setLoginError("Email o password incorretta");
+        } else {
+          setLoginError(error.message || "Si è verificato un errore durante l'accesso");
+        }
       } else {
         toast({
           title: "Accesso riuscito!",
