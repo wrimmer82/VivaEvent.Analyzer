@@ -1,5 +1,6 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
+import { useState, useEffect } from "react";
 import * as z from "zod";
 import { Button } from "@/components/ui/button";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
@@ -7,9 +8,10 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
+import { supabase } from "@/integrations/supabase/client";
 import Navbar from "@/components/Navbar";
-import { Briefcase } from "lucide-react";
+import { Briefcase, LogOut, Loader2 } from "lucide-react";
 
 const formSchema = z.object({
   fullName: z.string().min(2, "Il nome deve contenere almeno 2 caratteri"),
@@ -29,6 +31,9 @@ const formSchema = z.object({
 const ProfessionalProfile = () => {
   const { toast } = useToast();
   const navigate = useNavigate();
+  const [loading, setLoading] = useState(true);
+  const [userId, setUserId] = useState<string | null>(null);
+  const [professionalId, setProfessionalId] = useState<string | null>(null);
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -48,6 +53,79 @@ const ProfessionalProfile = () => {
     },
   });
 
+  const professionalName = form.watch("fullName");
+
+  useEffect(() => {
+    checkAuthAndLoadProfile();
+  }, []);
+
+  const checkAuthAndLoadProfile = async () => {
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+
+      if (!session) {
+        navigate("/accedi");
+        return;
+      }
+
+      setUserId(session.user.id);
+
+      const { data: professionalData, error: professionalError } = await supabase
+        .from("professionisti")
+        .select("*")
+        .eq("user_id", session.user.id)
+        .maybeSingle();
+
+      if (professionalError) {
+        console.error("Error loading professional profile:", professionalError);
+      }
+
+      if (professionalData) {
+        setProfessionalId(professionalData.id);
+        form.reset({
+          fullName: professionalData.nome_completo || "",
+          profession: professionalData.ruolo || "",
+          bio: "",
+          experience: "",
+          hourlyRate: "",
+          portfolio: "",
+          instagram: "",
+          linkedin: "",
+          website: "",
+          skills: "",
+          availability: "",
+          location: "",
+        });
+      }
+    } catch (error) {
+      console.error("Error checking auth:", error);
+      toast({
+        title: "Errore",
+        description: "Impossibile caricare il profilo",
+        variant: "destructive",
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleLogout = async () => {
+    const { error } = await supabase.auth.signOut();
+    if (error) {
+      toast({
+        title: "Errore",
+        description: "Si è verificato un errore durante il logout",
+        variant: "destructive",
+      });
+    } else {
+      toast({
+        title: "Logout effettuato",
+        description: "A presto!",
+      });
+      navigate("/accedi");
+    }
+  };
+
   const onSubmit = (values: z.infer<typeof formSchema>) => {
     console.log(values);
     toast({
@@ -56,9 +134,39 @@ const ProfessionalProfile = () => {
     });
   };
 
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <div className="text-foreground text-xl flex items-center gap-2">
+          <Loader2 className="w-5 h-5 animate-spin" />
+          Caricamento...
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-background">
       <Navbar />
+      
+      {/* Header with greeting and logout */}
+      <div className="border-b border-border bg-card">
+        <div className="container mx-auto px-4 py-4 flex justify-between items-center">
+          <div className="flex-1"></div>
+          {userId && professionalName && (
+            <div className="flex items-center gap-4">
+              <span className="text-foreground text-lg">
+                Ciao, <Link to="/profile-dashboard" className="font-bold text-primary hover:text-primary/80 transition-colors cursor-pointer">{professionalName}</Link>!
+              </span>
+              <Button variant="destructive" size="sm" onClick={handleLogout} className="gap-2">
+                <LogOut className="h-4 w-4" />
+                Logout
+              </Button>
+            </div>
+          )}
+        </div>
+      </div>
+
       <div className="container mx-auto px-4 py-12">
         <div className="max-w-4xl mx-auto space-y-8">
           <div className="text-center space-y-4">

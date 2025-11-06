@@ -12,6 +12,7 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { ArrowLeft, Upload, Music, Image as ImageIcon, Video, Users, TrendingUp, LogOut, ArrowRight, Loader2 } from "lucide-react";
+import { Link } from "react-router-dom";
 import Navbar from "@/components/Navbar";
 
 const formSchema = z.object({
@@ -236,7 +237,7 @@ const ArtistProfile = () => {
           {userId && artistName && (
             <div className="flex items-center gap-4">
               <span className="text-foreground text-lg">
-                Ciao, <span className="font-bold text-primary">{artistName}</span>!
+                Ciao, <Link to="/profile-dashboard" className="font-bold text-primary hover:text-primary/80 transition-colors cursor-pointer">{artistName}</Link>!
               </span>
               <Button variant="destructive" size="sm" onClick={handleLogout} className="gap-2">
                 <LogOut className="h-4 w-4" />

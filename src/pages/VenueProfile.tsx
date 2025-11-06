@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useState, useEffect } from "react";
+import { useNavigate, Link } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
@@ -10,8 +10,9 @@ import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage, FormDescription } from "@/components/ui/form";
 import { useToast } from "@/hooks/use-toast";
-import { ArrowLeft, Building2, Users, Music, Euro, Calendar, MapPin, ExternalLink } from "lucide-react";
+import { ArrowLeft, Building2, Users, Music, Euro, Calendar, MapPin, ExternalLink, LogOut, Loader2 } from "lucide-react";
 import { Checkbox } from "@/components/ui/checkbox";
+import { supabase } from "@/integrations/supabase/client";
 import Navbar from "@/components/Navbar";
 
 const musicGenres = [
@@ -48,6 +49,9 @@ const VenueProfile = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
   const [googleMapsLink, setGoogleMapsLink] = useState("");
+  const [loading, setLoading] = useState(true);
+  const [userId, setUserId] = useState<string | null>(null);
+  const [venueId, setVenueId] = useState<string | null>(null);
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -66,6 +70,79 @@ const VenueProfile = () => {
       website: "",
     },
   });
+
+  const venueName = form.watch("venueName");
+
+  useEffect(() => {
+    checkAuthAndLoadProfile();
+  }, []);
+
+  const checkAuthAndLoadProfile = async () => {
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+
+      if (!session) {
+        navigate("/accedi");
+        return;
+      }
+
+      setUserId(session.user.id);
+
+      const { data: venueData, error: venueError } = await supabase
+        .from("venues")
+        .select("*")
+        .eq("user_id", session.user.id)
+        .maybeSingle();
+
+      if (venueError) {
+        console.error("Error loading venue profile:", venueError);
+      }
+
+      if (venueData) {
+        setVenueId(venueData.id);
+        form.reset({
+          venueName: venueData.nome_locale || "",
+          description: "",
+          capacity: venueData.capacita?.toString() || "",
+          address: venueData.indirizzo || "",
+          city: venueData.citta || "",
+          budgetMin: "",
+          budgetMax: venueData.budget_medio?.toString() || "",
+          genres: venueData.generi_preferiti || [],
+          availableDates: "",
+          email: venueData.email || "",
+          phone: "",
+          website: "",
+        });
+      }
+    } catch (error) {
+      console.error("Error checking auth:", error);
+      toast({
+        title: "Errore",
+        description: "Impossibile caricare il profilo",
+        variant: "destructive",
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleLogout = async () => {
+    const { error } = await supabase.auth.signOut();
+    if (error) {
+      toast({
+        title: "Errore",
+        description: "Si è verificato un errore durante il logout",
+        variant: "destructive",
+      });
+    } else {
+      toast({
+        title: "Logout effettuato",
+        description: "A presto!",
+      });
+      navigate("/accedi");
+    }
+  };
 
   const onSubmit = (values: z.infer<typeof formSchema>) => {
     console.log("Form submitted:", values);
@@ -88,10 +165,39 @@ const VenueProfile = () => {
     }
   };
 
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <div className="text-foreground text-xl flex items-center gap-2">
+          <Loader2 className="w-5 h-5 animate-spin" />
+          Caricamento...
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-background">
       <Navbar />
       
+      {/* Header with greeting and logout */}
+      <div className="border-b border-border bg-card">
+        <div className="container mx-auto px-4 py-4 flex justify-between items-center">
+          <div className="flex-1"></div>
+          {userId && venueName && (
+            <div className="flex items-center gap-4">
+              <span className="text-foreground text-lg">
+                Ciao, <Link to="/profile-dashboard" className="font-bold text-primary hover:text-primary/80 transition-colors cursor-pointer">{venueName}</Link>!
+              </span>
+              <Button variant="destructive" size="sm" onClick={handleLogout} className="gap-2">
+                <LogOut className="h-4 w-4" />
+                Logout
+              </Button>
+            </div>
+          )}
+        </div>
+      </div>
+
       <div className="container mx-auto px-4 py-12">
         <Button
           variant="ghost"
