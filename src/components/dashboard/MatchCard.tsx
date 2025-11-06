@@ -2,6 +2,7 @@ import { Star, MapPin, Euro, Users } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
+import { useNavigate } from "react-router-dom";
 
 export interface MatchCardProps {
   id: string;
@@ -18,18 +19,19 @@ export interface MatchCardProps {
 }
 
 const MatchCard = ({ 
-  id, 
+  id,
   nome, 
   tipo, 
   genere, 
   città, 
-  cachet, 
-  capacity, 
+  cachet,
+  capacity,
   rating, 
   avatarUrl, 
   matchScore,
-  onBookingClick
+  onBookingClick 
 }: MatchCardProps) => {
+  const navigate = useNavigate();
   const getMatchScoreColor = (score: number) => {
     if (score > 70) return "bg-green-500";
     if (score >= 50) return "bg-yellow-500";
@@ -37,7 +39,7 @@ const MatchCard = ({
   };
 
   const handleViewProfile = () => {
-    console.log('View profile:', id);
+    navigate(`/venue/${id}`);
   };
 
   const handleSendProposal = () => {

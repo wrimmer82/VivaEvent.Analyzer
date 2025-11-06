@@ -9,6 +9,7 @@ import ProfileDashboard from "./pages/ProfileDashboard";
 import ArtistProfile from "./pages/ArtistProfile";
 import VenueProfile from "./pages/VenueProfile";
 import ProfessionalProfile from "./pages/ProfessionalProfile";
+import VenuePublicProfile from "./pages/VenuePublicProfile";
 import Auth from "./pages/Auth";
 import GetStarted from "./pages/GetStarted";
 import NotFound from "./pages/NotFound";
@@ -36,6 +37,7 @@ const App = () => (
           <Route path="/crea-profilo" element={<ArtistProfile />} />
           <Route path="/profilo-professionista" element={<ProfessionalProfile />} />
           <Route path="/profilo-venue" element={<VenueProfile />} />
+          <Route path="/venue/:id" element={<VenuePublicProfile />} />
           <Route path="/accedi" element={<Auth />} />
           <Route path="/inizia-ora" element={<GetStarted />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
