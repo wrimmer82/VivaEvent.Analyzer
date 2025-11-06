@@ -16,6 +16,7 @@ export type Database = {
     Tables: {
       artisti: {
         Row: {
+          avatar_url: string | null
           biografia: string | null
           cachet_desiderato: number
           citta: string
@@ -27,6 +28,7 @@ export type Database = {
           user_id: string
         }
         Insert: {
+          avatar_url?: string | null
           biografia?: string | null
           cachet_desiderato: number
           citta: string
@@ -38,6 +40,7 @@ export type Database = {
           user_id: string
         }
         Update: {
+          avatar_url?: string | null
           biografia?: string | null
           cachet_desiderato?: number
           citta?: string
@@ -99,6 +102,7 @@ export type Database = {
       }
       professionisti: {
         Row: {
+          avatar_url: string | null
           created_at: string
           email: string
           id: string
@@ -107,6 +111,7 @@ export type Database = {
           user_id: string
         }
         Insert: {
+          avatar_url?: string | null
           created_at?: string
           email: string
           id?: string
@@ -115,6 +120,7 @@ export type Database = {
           user_id: string
         }
         Update: {
+          avatar_url?: string | null
           created_at?: string
           email?: string
           id?: string
@@ -188,6 +194,7 @@ export type Database = {
       }
       venues: {
         Row: {
+          avatar_url: string | null
           budget_medio: number
           capacita: number
           citta: string
@@ -200,6 +207,7 @@ export type Database = {
           user_id: string
         }
         Insert: {
+          avatar_url?: string | null
           budget_medio: number
           capacita: number
           citta: string
@@ -212,6 +220,7 @@ export type Database = {
           user_id: string
         }
         Update: {
+          avatar_url?: string | null
           budget_medio?: number
           capacita?: number
           citta?: string
