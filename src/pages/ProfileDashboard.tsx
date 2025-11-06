@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
@@ -18,6 +18,8 @@ import {
   TrendingUp,
   LogOut,
   ArrowRight,
+  Camera,
+  UserCircle,
 } from "lucide-react";
 
 interface UserProfile {
@@ -34,6 +36,7 @@ interface ProfileDetails {
   generi_preferiti?: string[];
   ruolo?: string;
   capacita?: number;
+  avatar_url?: string;
 }
 
 const ProfileDashboard = () => {
@@ -41,6 +44,9 @@ const ProfileDashboard = () => {
   const [loading, setLoading] = useState(true);
   const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
   const [profileDetails, setProfileDetails] = useState<ProfileDetails | null>(null);
+  const [uploading, setUploading] = useState(false);
+  const [userId, setUserId] = useState<string | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     checkAuthAndLoadProfile();
@@ -70,6 +76,7 @@ const ProfileDashboard = () => {
       }
 
       setUserProfile(userData);
+      setUserId(session.user.id);
 
       // Redirect if profile not completed
       if (!userData.profile_completed) {
@@ -97,7 +104,7 @@ const ProfileDashboard = () => {
         case "artista": {
           const { data } = await supabase
             .from("artisti")
-            .select("nome_completo, citta, genere_musicale")
+            .select("nome_completo, citta, genere_musicale, avatar_url")
             .eq("user_id", userId)
             .maybeSingle();
           if (data) setProfileDetails(data);
@@ -106,7 +113,7 @@ const ProfileDashboard = () => {
         case "venue": {
           const { data } = await supabase
             .from("venues")
-            .select("nome_locale, citta, generi_preferiti, capacita")
+            .select("nome_locale, citta, generi_preferiti, capacita, avatar_url")
             .eq("user_id", userId)
             .maybeSingle();
           if (data) setProfileDetails(data);
@@ -115,7 +122,7 @@ const ProfileDashboard = () => {
         case "professionista": {
           const { data } = await supabase
             .from("professionisti")
-            .select("nome_completo, ruolo")
+            .select("nome_completo, ruolo, avatar_url")
             .eq("user_id", userId)
             .maybeSingle();
           if (data) setProfileDetails(data);
@@ -184,6 +191,69 @@ const ProfileDashboard = () => {
     }
   };
 
+  const handleAvatarClick = () => {
+    fileInputRef.current?.click();
+  };
+
+  const handleAvatarUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    try {
+      setUploading(true);
+
+      if (!event.target.files || event.target.files.length === 0) {
+        return;
+      }
+
+      const file = event.target.files[0];
+      const fileExt = file.name.split('.').pop();
+      const filePath = `${userId}/${Date.now()}.${fileExt}`;
+
+      // Upload to Supabase Storage
+      const { error: uploadError } = await supabase.storage
+        .from('avatars')
+        .upload(filePath, file, { upsert: true });
+
+      if (uploadError) throw uploadError;
+
+      // Get public URL
+      const { data: { publicUrl } } = supabase.storage
+        .from('avatars')
+        .getPublicUrl(filePath);
+
+      // Update profile in database
+      const tableName = userProfile?.user_type === 'artista' ? 'artisti' 
+        : userProfile?.user_type === 'venue' ? 'venues' 
+        : 'professionisti';
+
+      const { error: updateError } = await supabase
+        .from(tableName)
+        .update({ avatar_url: publicUrl })
+        .eq('user_id', userId);
+
+      if (updateError) throw updateError;
+
+      // Update local state
+      setProfileDetails(prev => prev ? { ...prev, avatar_url: publicUrl } : null);
+
+      toast({
+        title: "Avatar aggiornato",
+        description: "La tua immagine profilo è stata aggiornata con successo",
+      });
+    } catch (error) {
+      console.error('Error uploading avatar:', error);
+      toast({
+        title: "Errore",
+        description: "Impossibile caricare l'immagine",
+        variant: "destructive",
+      });
+    } finally {
+      setUploading(false);
+    }
+  };
+
+  const goToProfile = () => {
+    redirectToProfileCreation(userProfile?.user_type || '');
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen bg-[#0f1419] flex items-center justify-center">
@@ -195,8 +265,17 @@ const ProfileDashboard = () => {
   return (
     <div className="min-h-screen bg-[#0f1419]">
       <div className="container mx-auto px-4 py-8">
-        {/* Header with Logout */}
-        <div className="flex justify-end mb-6">
+        {/* Header with Profile and Logout */}
+        <div className="flex justify-between items-center mb-6">
+          <Button 
+            variant="outline" 
+            size="lg" 
+            onClick={goToProfile} 
+            className="gap-2 bg-gradient-to-r from-cyan-500/10 to-blue-500/10 border-cyan-500/30 hover:from-cyan-500/20 hover:to-blue-500/20"
+          >
+            <UserCircle className="h-5 w-5" />
+            Il Tuo Profilo
+          </Button>
           <Button variant="outline" size="sm" onClick={handleLogout} className="gap-2">
             <LogOut className="h-4 w-4" />
             Logout
@@ -207,14 +286,32 @@ const ProfileDashboard = () => {
         <Card className="bg-gradient-to-br from-[#1a1f2e] to-[#0f1419] border-cyan-500/30 mb-8">
           <CardContent className="pt-8">
             <div className="flex flex-col md:flex-row items-center gap-6">
-              <Avatar className="h-32 w-32 border-4 border-cyan-500/30">
-                <AvatarImage src="" />
-                <AvatarFallback className="bg-cyan-500/20 text-cyan-400 text-3xl">
-                  {profileDetails?.nome_completo?.[0] || 
-                   profileDetails?.nome_locale?.[0] || 
-                   userProfile?.email?.[0].toUpperCase()}
-                </AvatarFallback>
-              </Avatar>
+              <div className="relative group">
+                <Avatar className="h-32 w-32 border-4 border-cyan-500/30">
+                  <AvatarImage src={profileDetails?.avatar_url || ""} />
+                  <AvatarFallback className="bg-cyan-500/20 text-cyan-400 text-3xl">
+                    {profileDetails?.nome_completo?.[0] || 
+                     profileDetails?.nome_locale?.[0] || 
+                     userProfile?.email?.[0].toUpperCase()}
+                  </AvatarFallback>
+                </Avatar>
+                <button
+                  onClick={handleAvatarClick}
+                  disabled={uploading}
+                  className="absolute inset-0 flex items-center justify-center bg-black/60 rounded-full opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer disabled:cursor-not-allowed"
+                  aria-label="Cambia avatar"
+                >
+                  <Camera className="h-8 w-8 text-white" />
+                </button>
+                <input
+                  ref={fileInputRef}
+                  type="file"
+                  accept="image/*"
+                  onChange={handleAvatarUpload}
+                  className="hidden"
+                  disabled={uploading}
+                />
+              </div>
 
               <div className="flex-1 text-center md:text-left">
                 <h1 className="text-white text-3xl font-bold mb-2">
