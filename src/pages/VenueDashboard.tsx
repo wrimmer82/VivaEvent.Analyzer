@@ -74,7 +74,18 @@ const VenueDashboard = () => {
         return;
       }
 
+      if (venueError && venueError.code !== 'PGRST116') {
+        console.error("Error fetching venue:", venueError);
+        toast({
+          title: "Errore",
+          description: "Impossibile caricare i dati del venue",
+          variant: "destructive",
+        });
+        return;
+      }
+
       if (!venueData) {
+        // Only redirect if venue really doesn't exist after error check
         toast({
           title: "Profilo non trovato",
           description: "Completa prima il tuo profilo venue",

@@ -188,10 +188,8 @@ const VenueProfile = () => {
         description: "Reindirizzamento alla dashboard...",
       });
 
-      // Redirect to venue dashboard after 1 second
-      setTimeout(() => {
-        navigate("/venue-dashboard");
-      }, 1000);
+      // Redirect to venue dashboard immediately
+      navigate("/venue-dashboard");
     } catch (error) {
       console.error("Error saving venue profile:", error);
       toast({
