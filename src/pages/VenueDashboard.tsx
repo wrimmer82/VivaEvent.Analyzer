@@ -57,22 +57,19 @@ const VenueDashboard = () => {
         return;
       }
 
+      // Check if profile is actually completed first
+      const { data: userData } = await supabase
+        .from("users")
+        .select("profile_completed")
+        .eq("id", session.user.id)
+        .maybeSingle();
+
       // Fetch venue profile
       const { data: venueData, error: venueError } = await supabase
         .from("venues")
         .select("*")
         .eq("user_id", session.user.id)
         .maybeSingle();
-
-      if (venueError) {
-        console.error("Error fetching venue:", venueError);
-        toast({
-          title: "Errore",
-          description: "Impossibile caricare i dati del venue",
-          variant: "destructive",
-        });
-        return;
-      }
 
       if (venueError && venueError.code !== 'PGRST116') {
         console.error("Error fetching venue:", venueError);
@@ -84,8 +81,8 @@ const VenueDashboard = () => {
         return;
       }
 
-      if (!venueData) {
-        // Only redirect if venue really doesn't exist after error check
+      // Only redirect if profile is not completed AND no venue data
+      if (!venueData && !userData?.profile_completed) {
         toast({
           title: "Profilo non trovato",
           description: "Completa prima il tuo profilo venue",

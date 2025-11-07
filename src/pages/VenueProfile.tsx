@@ -183,6 +183,16 @@ const VenueProfile = () => {
         if (error) throw error;
       }
 
+      // Mark profile as completed
+      const { error: userUpdateError } = await supabase
+        .from("users")
+        .update({ profile_completed: true })
+        .eq("id", userId);
+
+      if (userUpdateError) {
+        console.error("Error updating profile_completed:", userUpdateError);
+      }
+
       toast({
         title: "Profilo venue salvato con successo! 🎉",
         description: "Reindirizzamento alla dashboard...",
