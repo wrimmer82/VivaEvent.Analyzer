@@ -38,10 +38,10 @@ const formSchema = z.object({
   city: z.string().min(2, "Città richiesta"),
   budgetMin: z.string().min(1, "Budget minimo richiesto"),
   budgetMax: z.string().min(1, "Budget massimo richiesto"),
-  genres: z.array(z.string()).min(1, "Seleziona almeno un genere"),
+  genres: z.array(z.string()).min(1, "Seleziona almeno un genere").max(3, "Seleziona massimo 3 generi"),
   availableDates: z.string().optional(),
   email: z.string().email("Email non valida"),
-  phone: z.string().min(10, "Numero di telefono richiesto"),
+  phone: z.string(),
   website: z.string().optional(),
 });
 
@@ -144,13 +144,60 @@ const VenueProfile = () => {
     }
   };
 
-  const onSubmit = (values: z.infer<typeof formSchema>) => {
-    console.log("Form submitted:", values);
-    
-    toast({
-      title: "Profilo Venue Creato! 🎪",
-      description: "Il tuo profilo venue è stato salvato con successo.",
-    });
+  const onSubmit = async (values: z.infer<typeof formSchema>) => {
+    try {
+      if (!userId) {
+        toast({
+          title: "Errore",
+          description: "Devi essere autenticato per salvare il profilo",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      const venueData = {
+        user_id: userId,
+        nome_locale: values.venueName,
+        email: values.email,
+        indirizzo: values.address,
+        citta: values.city,
+        capacita: parseInt(values.capacity),
+        budget_medio: parseInt(values.budgetMax),
+        generi_preferiti: values.genres,
+      };
+
+      if (venueId) {
+        // Update existing venue
+        const { error } = await supabase
+          .from("venues")
+          .update(venueData)
+          .eq("id", venueId);
+
+        if (error) throw error;
+      } else {
+        // Insert new venue
+        const { error } = await supabase
+          .from("venues")
+          .insert([venueData]);
+
+        if (error) throw error;
+      }
+
+      toast({
+        title: "Profilo Venue Salvato! 🎪",
+        description: "Il tuo profilo venue è stato salvato con successo.",
+      });
+
+      // Redirect to dashboard
+      navigate("/dashboard");
+    } catch (error) {
+      console.error("Error saving venue profile:", error);
+      toast({
+        title: "Errore",
+        description: "Si è verificato un errore durante il salvataggio del profilo",
+        variant: "destructive",
+      });
+    }
   };
 
   // Generate Google Maps link from address
@@ -372,13 +419,24 @@ const VenueProfile = () => {
                                       <Checkbox
                                         checked={field.value?.includes(genre)}
                                         onCheckedChange={(checked) => {
-                                          return checked
-                                            ? field.onChange([...field.value, genre])
-                                            : field.onChange(
-                                                field.value?.filter(
-                                                  (value) => value !== genre
-                                                )
-                                              );
+                                          if (checked) {
+                                            // Check if already at max (3)
+                                            if (field.value.length >= 3) {
+                                              toast({
+                                                title: "Limite raggiunto",
+                                                description: "Puoi selezionare massimo 3 generi musicali",
+                                                variant: "destructive",
+                                              });
+                                              return;
+                                            }
+                                            field.onChange([...field.value, genre]);
+                                          } else {
+                                            field.onChange(
+                                              field.value?.filter(
+                                                (value) => value !== genre
+                                              )
+                                            );
+                                          }
                                         }}
                                       />
                                     </FormControl>
