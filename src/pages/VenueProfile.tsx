@@ -184,12 +184,14 @@ const VenueProfile = () => {
       }
 
       toast({
-        title: "Profilo Venue Salvato! 🎪",
-        description: "Il tuo profilo venue è stato salvato con successo.",
+        title: "Profilo venue salvato con successo! 🎉",
+        description: "Reindirizzamento alla dashboard...",
       });
 
-      // Redirect to dashboard
-      navigate("/dashboard");
+      // Redirect to venue dashboard after 1 second
+      setTimeout(() => {
+        navigate("/venue/dashboard");
+      }, 1000);
     } catch (error) {
       console.error("Error saving venue profile:", error);
       toast({

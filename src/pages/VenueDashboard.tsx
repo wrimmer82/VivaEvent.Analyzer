@@ -1,64 +1,155 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { User, X, LogOut, Building2, Music, TrendingUp, Star } from "lucide-react";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Skeleton } from "@/components/ui/skeleton";
+import { User, LogOut, Building2, Music, TrendingUp, Star, Mail } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
 
-// Mock data per artisti suggeriti
-const mockArtistMatches = [
-  {
-    id: '1',
-    nome: 'The Rockers',
-    genere: 'Rock, Alternative',
-    città: 'Milano',
-    cachet: 2500,
-    rating: 4.8,
-    avatarUrl: 'https://api.dicebear.com/7.x/identicon/svg?seed=rockers',
-    matchScore: 92,
-    fanbase: 15000
-  },
-  {
-    id: '2',
-    nome: 'Jazz Fusion Band',
-    genere: 'Jazz, Fusion',
-    città: 'Roma',
-    cachet: 1800,
-    rating: 4.6,
-    avatarUrl: 'https://api.dicebear.com/7.x/identicon/svg?seed=jazzfusion',
-    matchScore: 88,
-    fanbase: 8000
-  },
-  {
-    id: '3',
-    nome: 'Electronic Dreams',
-    genere: 'Electronic, House',
-    città: 'Milano',
-    cachet: 3000,
-    rating: 4.7,
-    avatarUrl: 'https://api.dicebear.com/7.x/identicon/svg?seed=electronic',
-    matchScore: 85,
-    fanbase: 22000
-  },
-  {
-    id: '4',
-    nome: 'Pop Stars Collective',
-    genere: 'Pop, Indie',
-    città: 'Torino',
-    cachet: 2200,
-    rating: 4.5,
-    avatarUrl: 'https://api.dicebear.com/7.x/identicon/svg?seed=popstars',
-    matchScore: 81,
-    fanbase: 12000
-  }
-];
+interface Venue {
+  id: string;
+  nome_locale: string;
+  citta: string;
+  capacita: number;
+  avatar_url?: string;
+}
+
+interface ArtistMatch {
+  id: string;
+  nome: string;
+  genere: string;
+  città: string;
+  cachet: number;
+  rating: number;
+  avatarUrl: string;
+  matchScore: number;
+  fanbase: number;
+}
 
 const VenueDashboard = () => {
   const navigate = useNavigate();
   const [sortBy, setSortBy] = useState("match");
+  const [loading, setLoading] = useState(true);
+  const [venue, setVenue] = useState<Venue | null>(null);
+  const [artistMatches, setArtistMatches] = useState<ArtistMatch[]>([]);
+  const [statsData, setStatsData] = useState({
+    proposteRicevute: 0,
+    proposteInviate: 0,
+    tassoSuccesso: "0%",
+    eventiConfermati: 0
+  });
+
+  useEffect(() => {
+    fetchVenueData();
+  }, []);
+
+  const fetchVenueData = async () => {
+    try {
+      setLoading(true);
+      const { data: { session } } = await supabase.auth.getSession();
+
+      if (!session) {
+        navigate("/accedi");
+        return;
+      }
+
+      // Fetch venue profile
+      const { data: venueData, error: venueError } = await supabase
+        .from("venues")
+        .select("*")
+        .eq("user_id", session.user.id)
+        .maybeSingle();
+
+      if (venueError) {
+        console.error("Error fetching venue:", venueError);
+        toast({
+          title: "Errore",
+          description: "Impossibile caricare i dati del venue",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      if (!venueData) {
+        toast({
+          title: "Profilo non trovato",
+          description: "Completa prima il tuo profilo venue",
+        });
+        navigate("/profilo-venue");
+        return;
+      }
+
+      setVenue(venueData);
+
+      // Fetch booking requests received
+      const { count: proposteRicevute } = await supabase
+        .from("booking_requests")
+        .select("*", { count: "exact", head: true })
+        .eq("receiver_id", session.user.id);
+
+      // Fetch booking requests sent
+      const { count: proposteInviate } = await supabase
+        .from("booking_requests")
+        .select("*", { count: "exact", head: true })
+        .eq("sender_id", session.user.id);
+
+      // Fetch confirmed bookings
+      const { count: eventiConfermati } = await supabase
+        .from("booking_requests")
+        .select("*", { count: "exact", head: true })
+        .eq("receiver_id", session.user.id)
+        .eq("status", "accepted");
+
+      // Calculate success rate
+      const totale = (proposteInviate || 0) + (proposteRicevute || 0);
+      const successo = eventiConfermati || 0;
+      const tassoSuccesso = totale > 0 ? Math.round((successo / totale) * 100) : 0;
+
+      setStatsData({
+        proposteRicevute: proposteRicevute || 0,
+        proposteInviate: proposteInviate || 0,
+        tassoSuccesso: `${tassoSuccesso}%`,
+        eventiConfermati: eventiConfermati || 0
+      });
+
+      // Fetch suggested artists (mock data for now - will be replaced with real matching algorithm)
+      const { data: artistsData, error: artistsError } = await supabase
+        .from("artisti")
+        .select("*")
+        .limit(4);
+
+      if (artistsError) {
+        console.error("Error fetching artists:", artistsError);
+      } else if (artistsData) {
+        const formattedArtists: ArtistMatch[] = artistsData.map((artist, index) => ({
+          id: artist.id,
+          nome: artist.nome_completo,
+          genere: artist.genere_musicale,
+          città: artist.citta,
+          cachet: artist.cachet_desiderato || 2000,
+          rating: 4.5 + (index * 0.1),
+          avatarUrl: artist.avatar_url || `https://api.dicebear.com/7.x/identicon/svg?seed=${artist.id}`,
+          matchScore: 90 - (index * 3),
+          fanbase: 10000 + (index * 2000)
+        }));
+        setArtistMatches(formattedArtists);
+      }
+
+    } catch (error) {
+      console.error("Error loading dashboard:", error);
+      toast({
+        title: "Errore",
+        description: "Si è verificato un errore durante il caricamento",
+        variant: "destructive",
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const handleLogout = async () => {
     const { error } = await supabase.auth.signOut();
@@ -78,7 +169,7 @@ const VenueDashboard = () => {
   };
 
   // Sort matches
-  const sortedMatches = [...mockArtistMatches].sort((a, b) => {
+  const sortedMatches = [...artistMatches].sort((a, b) => {
     if (sortBy === "match") return b.matchScore - a.matchScore;
     if (sortBy === "rating") return b.rating - a.rating;
     if (sortBy === "fanbase") return b.fanbase - a.fanbase;
@@ -87,10 +178,10 @@ const VenueDashboard = () => {
 
   // Stats data
   const stats = [
-    { label: "Proposte Ricevute", value: 18, icon: Music },
-    { label: "Proposte Inviate", value: 5, icon: TrendingUp },
-    { label: "Tasso Successo", value: "72%", icon: Star },
-    { label: "Eventi Confermati", value: 12, icon: Building2 }
+    { label: "Proposte Ricevute", value: statsData.proposteRicevute, icon: Mail },
+    { label: "Proposte Inviate", value: statsData.proposteInviate, icon: Music },
+    { label: "Tasso Successo", value: statsData.tassoSuccesso, icon: Star },
+    { label: "Eventi Confermati", value: statsData.eventiConfermati, icon: Building2 }
   ];
 
   // Recent activity
@@ -101,19 +192,40 @@ const VenueDashboard = () => {
     { text: "Proposta accettata da Pop Stars Collective", time: "3 giorni fa", type: "accepted" }
   ];
 
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-[#0f1419]">
+        <div className="container mx-auto px-4 py-8">
+          <Skeleton className="h-12 w-64 mb-6" />
+          <Skeleton className="h-32 w-full mb-8" />
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            <Skeleton className="h-32" />
+            <Skeleton className="h-32" />
+            <Skeleton className="h-32" />
+            <Skeleton className="h-32" />
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-[#0f1419]">
       <div className="container mx-auto px-4 py-8">
-        {/* User Badge & Logout */}
-        <div className="mb-6 flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <Badge className="bg-cyan-500/20 text-cyan-400 px-4 py-2 text-sm">
-              <Building2 className="h-4 w-4 mr-2" />
-              Utente: Venue Test (Venue)
-            </Badge>
-            <Badge variant="secondary" className="bg-amber-500/20 text-amber-400 px-3 py-2 text-xs">
-              DEMO MODE
-            </Badge>
+        {/* Header with Avatar & Logout */}
+        <div className="mb-8 flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+          <div className="flex items-center gap-4">
+            <Avatar className="h-20 w-20 border-2 border-cyan-500 cursor-pointer" onClick={() => navigate("/profilo-venue")}>
+              <AvatarImage src={venue?.avatar_url} />
+              <AvatarFallback className="bg-cyan-500/20 text-cyan-400 text-2xl font-bold">
+                {venue?.nome_locale?.substring(0, 2).toUpperCase()}
+              </AvatarFallback>
+            </Avatar>
+            <div>
+              <h2 className="text-white text-2xl font-bold">{venue?.nome_locale}</h2>
+              <Badge className="bg-green-600 text-white px-3 py-1 rounded-full mt-1">VENUE</Badge>
+              <p className="text-gray-400 mt-1">{venue?.citta} · Capacità {venue?.capacita} pax</p>
+            </div>
           </div>
           <Button 
             variant="outline" 
@@ -127,7 +239,7 @@ const VenueDashboard = () => {
         </div>
 
         {/* Main Header */}
-        <div className="mb-8">
+        <div className="mb-6">
           <h1 className="text-white text-3xl font-bold mb-2">🎛️ Venue Dashboard</h1>
           <p className="text-gray-400">Gestisci il tuo venue e trova gli artisti perfetti</p>
         </div>
@@ -136,19 +248,17 @@ const VenueDashboard = () => {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
           <Button
             onClick={() => navigate("/profilo-venue")}
-            className="bg-cyan-500 hover:bg-cyan-600 text-white h-14 text-base font-semibold"
-            size="lg"
+            className="bg-cyan-500 hover:bg-cyan-600 text-white h-12 text-base font-semibold"
           >
             <User className="h-5 w-5 mr-2" />
-            Vai al Profilo
+            Il Tuo Profilo
           </Button>
           <Button
             onClick={() => navigate("/venue/dashboard/discover")}
-            className="bg-purple-500 hover:bg-purple-600 text-white h-14 text-base font-semibold"
-            size="lg"
+            className="bg-cyan-500 hover:bg-cyan-600 text-white h-12 text-base font-semibold"
           >
             <Music className="h-5 w-5 mr-2" />
-            Vai alla Dashboard Matching
+            Vai alla Dashboard di Matching
           </Button>
         </div>
 
