@@ -254,7 +254,7 @@ const VenueDashboard = () => {
             Il Tuo Profilo
           </Button>
           <Button
-            onClick={() => navigate("/venue/dashboard/discover")}
+            onClick={() => navigate("/venue/discover")}
             className="bg-cyan-500 hover:bg-cyan-600 text-white h-12 text-base font-semibold"
           >
             <Music className="h-5 w-5 mr-2" />

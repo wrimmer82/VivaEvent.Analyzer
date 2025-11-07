@@ -36,7 +36,7 @@ const App = () => (
             } 
           />
           <Route 
-            path="/venue/dashboard" 
+            path="/venue-dashboard" 
             element={
               <ProtectedRoute>
                 <VenueDashboard />

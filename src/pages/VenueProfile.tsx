@@ -190,7 +190,7 @@ const VenueProfile = () => {
 
       // Redirect to venue dashboard after 1 second
       setTimeout(() => {
-        navigate("/venue/dashboard");
+        navigate("/venue-dashboard");
       }, 1000);
     } catch (error) {
       console.error("Error saving venue profile:", error);

@@ -84,7 +84,7 @@ const Auth = () => {
       // Redirect based on user type
       switch (userType) {
         case "venue":
-          navigate("/venue/dashboard");
+          navigate("/venue-dashboard");
           break;
         case "artista":
         case "professionista":
