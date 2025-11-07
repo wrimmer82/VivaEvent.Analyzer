@@ -81,8 +81,17 @@ const Auth = () => {
           break;
       }
     } else {
-      // Redirect to personal profile page
-      navigate("/profile-dashboard");
+      // Redirect based on user type
+      switch (userType) {
+        case "venue":
+          navigate("/venue/dashboard");
+          break;
+        case "artista":
+        case "professionista":
+        default:
+          navigate("/profile-dashboard");
+          break;
+      }
     }
   };
 

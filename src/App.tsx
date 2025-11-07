@@ -10,6 +10,7 @@ import ArtistProfile from "./pages/ArtistProfile";
 import VenueProfile from "./pages/VenueProfile";
 import ProfessionalProfile from "./pages/ProfessionalProfile";
 import VenuePublicProfile from "./pages/VenuePublicProfile";
+import VenueDashboard from "./pages/VenueDashboard";
 import Auth from "./pages/Auth";
 import GetStarted from "./pages/GetStarted";
 import NotFound from "./pages/NotFound";
@@ -31,6 +32,14 @@ const App = () => (
             element={
               <ProtectedRoute>
                 <Dashboard />
+              </ProtectedRoute>
+            } 
+          />
+          <Route 
+            path="/venue/dashboard" 
+            element={
+              <ProtectedRoute>
+                <VenueDashboard />
               </ProtectedRoute>
             } 
           />
