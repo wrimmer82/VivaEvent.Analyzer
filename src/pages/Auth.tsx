@@ -86,8 +86,10 @@ const Auth = () => {
         case "venue":
           navigate("/venue-dashboard");
           break;
-        case "artista":
         case "professionista":
+          navigate("/professional/dashboard");
+          break;
+        case "artista":
         default:
           navigate("/profile-dashboard");
           break;
