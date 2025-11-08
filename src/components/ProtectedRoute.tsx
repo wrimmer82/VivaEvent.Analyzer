@@ -10,6 +10,7 @@ const ProtectedRoute = ({ children }: ProtectedRouteProps) => {
   const [loading, setLoading] = useState(true);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [profileCompleted, setProfileCompleted] = useState(false);
+  const [userType, setUserType] = useState<string | null>(null);
 
   useEffect(() => {
     checkAuth();
@@ -30,12 +31,13 @@ const ProtectedRoute = ({ children }: ProtectedRouteProps) => {
       // Check if profile is completed
       const { data: userData } = await supabase
         .from("users")
-        .select("profile_completed")
+        .select("profile_completed, user_type")
         .eq("id", session.user.id)
         .maybeSingle();
 
       if (userData) {
         setProfileCompleted(userData.profile_completed);
+        setUserType(userData.user_type);
       }
     } catch (error) {
       console.error("Error checking auth:", error);
@@ -57,7 +59,8 @@ const ProtectedRoute = ({ children }: ProtectedRouteProps) => {
     return <Navigate to="/accedi" replace />;
   }
 
-  if (!profileCompleted) {
+  // Professionisti possono accedere alla dashboard anche senza profilo completato
+  if (!profileCompleted && userType !== "professionista") {
     return <Navigate to="/profile-dashboard" replace />;
   }
 

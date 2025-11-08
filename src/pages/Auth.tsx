@@ -67,6 +67,12 @@ const Auth = () => {
   }, [navigate]);
 
   const redirectBasedOnProfile = (userType: string, profileCompleted: boolean) => {
+    // Professionisti vanno sempre alla loro dashboard
+    if (userType === "professionista") {
+      navigate("/professional/dashboard");
+      return;
+    }
+
     if (!profileCompleted) {
       // Redirect to profile creation
       switch (userType) {
@@ -76,18 +82,12 @@ const Auth = () => {
         case "venue":
           navigate("/profilo-venue");
           break;
-        case "professionista":
-          navigate("/profilo-professionista");
-          break;
       }
     } else {
       // Redirect based on user type
       switch (userType) {
         case "venue":
           navigate("/venue-dashboard");
-          break;
-        case "professionista":
-          navigate("/professional/dashboard");
           break;
         case "artista":
         default:
