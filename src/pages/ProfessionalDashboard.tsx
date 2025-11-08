@@ -102,7 +102,7 @@ const ProfessionalDashboard = () => {
                     </div>
                     <Button
                       className="w-full bg-cyan-500 hover:bg-cyan-600 text-white"
-                      onClick={() => navigate("/professional/dashboard/discover")}
+                      onClick={() => navigate("/professional/dashboard/matching")}
                     >
                       <ArrowRight className="h-4 w-4 mr-2" />
                       Vai alla Dashboard di Matching
