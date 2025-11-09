@@ -7,6 +7,7 @@ import { Card } from "@/components/ui/card";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { Star, MapPin, Euro, Users, X, LogOut, Mail, Phone, ArrowRight } from "lucide-react";
 import StatsSidebar from "@/components/dashboard/StatsSidebar";
+import { BookingModal } from "@/components/dashboard/BookingModal";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
 
@@ -163,6 +164,8 @@ const ProfessionalMatchingDashboard = () => {
     newMatch: false,
     minRating: 0
   });
+  const [bookingModalOpen, setBookingModalOpen] = useState(false);
+  const [selectedMatch, setSelectedMatch] = useState<ProfessionalMatch | null>(null);
 
   const handleLogout = async () => {
     const { error } = await supabase.auth.signOut();
@@ -216,6 +219,11 @@ const ProfessionalMatchingDashboard = () => {
 
   const genres = ['Rock', 'Pop', 'Jazz', 'Electronic', 'Indie', 'Metal', 'House', 'Alternative'];
   const cities = ['Tutte', 'Milano', 'Roma', 'Torino', 'Bologna', 'Napoli', 'Firenze'];
+
+  const handleOpenBookingModal = (match: ProfessionalMatch) => {
+    setSelectedMatch(match);
+    setBookingModalOpen(true);
+  };
 
   return (
     <div className="min-h-screen bg-[#0f1419]">
@@ -543,7 +551,7 @@ const ProfessionalMatchingDashboard = () => {
                       </Button>
                       <Button 
                         className="flex-1 bg-cyan-500 hover:bg-cyan-600 text-white gap-2"
-                        onClick={() => console.log('Contact:', match.id)}
+                        onClick={() => handleOpenBookingModal(match)}
                       >
                         {match.tipo === 'venue' ? 'Richiedi Collaborazione' : 'Proponi Collaborazione'}
                         <ArrowRight className="h-4 w-4" />
@@ -561,6 +569,17 @@ const ProfessionalMatchingDashboard = () => {
           </aside>
         </div>
       </div>
+
+      {/* Booking Modal */}
+      {selectedMatch && (
+        <BookingModal
+          open={bookingModalOpen}
+          onOpenChange={setBookingModalOpen}
+          receiverId={selectedMatch.id}
+          receiverName={selectedMatch.nome}
+          receiverType={selectedMatch.tipo}
+        />
+      )}
     </div>
   );
 };
