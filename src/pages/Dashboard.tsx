@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
@@ -11,118 +11,6 @@ import { User, X, LogOut } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
 
-const mockMatches: MatchCardProps[] = [
-  {
-    id: '1',
-    nome: 'Club Alcatraz',
-    tipo: 'venue',
-    genere: 'Rock, Metal',
-    città: 'Milano',
-    capacity: 2000,
-    rating: 4.8,
-    avatarUrl: 'https://api.dicebear.com/7.x/identicon/svg?seed=alcatraz',
-    matchScore: 92
-  },
-  {
-    id: '2',
-    nome: 'Live Music Hall',
-    tipo: 'venue',
-    genere: 'Pop, Indie',
-    città: 'Torino',
-    capacity: 500,
-    rating: 4.6,
-    avatarUrl: 'https://api.dicebear.com/7.x/identicon/svg?seed=livehall',
-    matchScore: 81
-  },
-  {
-    id: '3',
-    nome: 'Ritmo Latino Club',
-    tipo: 'venue',
-    genere: 'Reggaeton, Salsa',
-    città: 'Napoli',
-    capacity: 300,
-    rating: 4.3,
-    avatarUrl: 'https://api.dicebear.com/7.x/identicon/svg?seed=ritmo',
-    matchScore: 65
-  },
-  {
-    id: '4',
-    nome: 'Blue Note Milano',
-    tipo: 'venue',
-    genere: 'Jazz, Blues',
-    città: 'Milano',
-    capacity: 400,
-    rating: 4.9,
-    avatarUrl: 'https://api.dicebear.com/7.x/identicon/svg?seed=bluenote',
-    matchScore: 88
-  },
-  {
-    id: '5',
-    nome: 'Teatro Ariston',
-    tipo: 'venue',
-    genere: 'Rock, Pop',
-    città: 'Roma',
-    capacity: 1500,
-    rating: 4.7,
-    avatarUrl: 'https://api.dicebear.com/7.x/identicon/svg?seed=ariston',
-    matchScore: 79
-  },
-  {
-    id: '6',
-    nome: 'Magazzini Generali',
-    tipo: 'venue',
-    genere: 'Electronic, Techno',
-    città: 'Milano',
-    capacity: 800,
-    rating: 4.5,
-    avatarUrl: 'https://api.dicebear.com/7.x/identicon/svg?seed=magazzini',
-    matchScore: 75
-  },
-  {
-    id: '7',
-    nome: 'Auditorium Parco della Musica',
-    tipo: 'venue',
-    genere: 'Rock, Jazz, Pop',
-    città: 'Roma',
-    capacity: 2800,
-    rating: 4.9,
-    avatarUrl: 'https://api.dicebear.com/7.x/identicon/svg?seed=auditorium',
-    matchScore: 85
-  },
-  {
-    id: '8',
-    nome: 'Fabrique',
-    tipo: 'venue',
-    genere: 'Rock, Metal, Indie',
-    città: 'Milano',
-    capacity: 1600,
-    rating: 4.6,
-    avatarUrl: 'https://api.dicebear.com/7.x/identicon/svg?seed=fabrique',
-    matchScore: 82
-  },
-  {
-    id: '9',
-    nome: 'Atlantico Live',
-    tipo: 'venue',
-    genere: 'Pop, Rock',
-    città: 'Roma',
-    capacity: 1100,
-    rating: 4.4,
-    avatarUrl: 'https://api.dicebear.com/7.x/identicon/svg?seed=atlantico',
-    matchScore: 71
-  },
-  {
-    id: '10',
-    nome: 'Locomotiv Club',
-    tipo: 'venue',
-    genere: 'Rock, Indie, Electronic',
-    città: 'Bologna',
-    capacity: 700,
-    rating: 4.5,
-    avatarUrl: 'https://api.dicebear.com/7.x/identicon/svg?seed=locomotiv',
-    matchScore: 77
-  }
-];
 
 export interface FilterState {
   genres: string[];          // array di generi selezionati
@@ -138,6 +26,8 @@ export interface FilterState {
 const Dashboard = () => {
   const navigate = useNavigate();
   const [sortBy, setSortBy] = useState("match");
+  const [matches, setMatches] = useState<MatchCardProps[]>([]);
+  const [loading, setLoading] = useState(true);
   const [filters, setFilters] = useState<FilterState>({
     genres: [],
     city: 'Tutte',
@@ -161,6 +51,68 @@ const Dashboard = () => {
     receiverType: "",
   });
 
+  useEffect(() => {
+    loadMatches();
+  }, []);
+
+  const loadMatches = async () => {
+    try {
+      setLoading(true);
+
+      // Carica venues dal database
+      const { data: venues, error: venuesError } = await supabase
+        .from('venues')
+        .select('*');
+
+      if (venuesError) throw venuesError;
+
+      // Carica professionisti dal database
+      const { data: professionisti, error: profError } = await supabase
+        .from('professionisti')
+        .select('*');
+
+      if (profError) throw profError;
+
+      // Trasforma venues in MatchCardProps
+      const venueMatches: MatchCardProps[] = (venues || []).map((venue) => ({
+        id: venue.id,
+        nome: venue.nome_locale,
+        tipo: 'venue',
+        genere: Array.isArray(venue.generi_preferiti) ? venue.generi_preferiti.join(', ') : '',
+        città: venue.citta,
+        capacity: venue.capacita,
+        rating: 4.0 + Math.random() * 1, // Random rating tra 4.0 e 5.0
+        avatarUrl: venue.avatar_url || `https://api.dicebear.com/7.x/identicon/svg?seed=${venue.id}`,
+        matchScore: Math.floor(60 + Math.random() * 40) // Random match score tra 60 e 100
+      }));
+
+      // Trasforma professionisti in MatchCardProps
+      const profMatches: MatchCardProps[] = (professionisti || []).map((prof) => ({
+        id: prof.id,
+        nome: `${prof.nome_completo} (${prof.ruolo})`,
+        tipo: 'professionista',
+        genere: prof.ruolo,
+        città: 'N/A',
+        rating: 4.0 + Math.random() * 1,
+        avatarUrl: prof.avatar_url || `https://api.dicebear.com/7.x/identicon/svg?seed=${prof.id}`,
+        matchScore: Math.floor(60 + Math.random() * 40)
+      }));
+
+      // Combina venues e professionisti
+      setMatches([...venueMatches, ...profMatches]);
+
+    } catch (error) {
+      console.error('Error loading matches:', error);
+      toast({
+        title: "Errore",
+        description: "Impossibile caricare i match",
+        variant: "destructive",
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const handleLogout = async () => {
     const { error } = await supabase.auth.signOut();
     if (error) {
@@ -180,7 +132,7 @@ const Dashboard = () => {
 
   // Apply filters function
   const applyFilters = () => {
-    return mockMatches.filter((match) => {
+    return matches.filter((match) => {
       // 1. Filtro genere
       const genreMatch = filters.genres.length === 0 || 
                          filters.genres.some(g => match.genere.toLowerCase().includes(g.toLowerCase()));
@@ -249,7 +201,9 @@ const Dashboard = () => {
             <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
               <div>
                 <h1 className="text-white text-2xl font-bold">Match Suggeriti per Te</h1>
-                <p className="text-gray-400 text-sm mt-1">{sortedMatches.length} venue trovate</p>
+                <p className="text-gray-400 text-sm mt-1">
+                  {loading ? 'Caricamento...' : `${sortedMatches.length} match trovati`}
+                </p>
               </div>
               <Select value={sortBy} onValueChange={setSortBy}>
                 <SelectTrigger className="w-[200px] bg-[#1a1f2e] border-cyan-500/30 text-white">
@@ -306,7 +260,11 @@ const Dashboard = () => {
             )}
 
             {/* Match Grid or Empty State */}
-            {sortedMatches.length === 0 ? (
+            {loading ? (
+              <div className="bg-[#1a1f2e] border border-cyan-500/30 rounded-lg p-12 text-center">
+                <div className="text-white text-xl">Caricamento match...</div>
+              </div>
+            ) : sortedMatches.length === 0 ? (
               <div className="bg-[#1a1f2e] border border-cyan-500/30 rounded-lg p-12 text-center">
                 <div className="text-6xl mb-4">😔</div>
                 <h3 className="text-white text-xl font-bold mb-2">Nessun match trovato</h3>

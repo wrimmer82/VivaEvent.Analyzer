@@ -7,7 +7,7 @@ import { useNavigate } from "react-router-dom";
 export interface MatchCardProps {
   id: string;
   nome: string;
-  tipo: 'artista' | 'venue';
+  tipo: 'artista' | 'venue' | 'professionista';
   genere: string;
   città: string;
   cachet?: number;
@@ -77,10 +77,12 @@ const MatchCard = ({
           <Star className="h-4 w-4 text-yellow-500 fill-yellow-500" />
           <span>{rating} Rating</span>
         </div>
-        <div className="flex items-center gap-2 text-sm text-gray-300">
-          <MapPin className="h-4 w-4 text-cyan-500" />
-          <span>{città}</span>
-        </div>
+        {città !== 'N/A' && (
+          <div className="flex items-center gap-2 text-sm text-gray-300">
+            <MapPin className="h-4 w-4 text-cyan-500" />
+            <span>{città}</span>
+          </div>
+        )}
         {tipo === 'artista' && cachet && (
           <div className="flex items-center gap-2 text-sm text-gray-300">
             <Euro className="h-4 w-4 text-cyan-500" />
@@ -108,7 +110,7 @@ const MatchCard = ({
           className="flex-1 bg-cyan-500 hover:bg-cyan-600 text-white"
           onClick={handleSendProposal}
         >
-          Prenota 🎯
+          {tipo === 'professionista' ? 'Contatta 📧' : 'Prenota 🎯'}
         </Button>
       </div>
     </div>
