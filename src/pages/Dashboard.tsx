@@ -21,6 +21,7 @@ export interface FilterState {
   minRating: number;         // rating minimo
   dateStart: string | null;  // data inizio
   dateEnd: string | null;    // data fine
+  entityType: 'tutti' | 'venue' | 'professionista'; // tipo di entità
 }
 
 const Dashboard = () => {
@@ -36,7 +37,8 @@ const Dashboard = () => {
     budgetMax: 5000,
     minRating: 0,
     dateStart: null,
-    dateEnd: null
+    dateEnd: null,
+    entityType: 'tutti'
   });
 
   const [bookingModal, setBookingModal] = useState<{
@@ -149,8 +151,11 @@ const Dashboard = () => {
       
       // 5. Date: per ora sempre true (TODO)
       const dateMatch = true;
+
+      // 6. Filtro tipo entità (venue/professionista)
+      const entityTypeMatch = filters.entityType === 'tutti' || match.tipo === filters.entityType;
       
-      return genreMatch && cityMatch && budgetMatch && ratingMatch && dateMatch;
+      return genreMatch && cityMatch && budgetMatch && ratingMatch && dateMatch && entityTypeMatch;
     });
   };
 
@@ -218,7 +223,7 @@ const Dashboard = () => {
             </div>
 
             {/* Active Filters Tags */}
-            {(filters.genres.length > 0 || filters.city !== 'Tutte' || filters.budgetMin > 0 || filters.budgetMax < 5000 || filters.minRating > 0) && (
+            {(filters.genres.length > 0 || filters.city !== 'Tutte' || filters.budgetMin > 0 || filters.budgetMax < 5000 || filters.minRating > 0 || filters.entityType !== 'tutti') && (
               <div className="flex flex-wrap gap-2 mb-4">
                 {filters.genres.map(genre => (
                   <Badge key={genre} className="bg-cyan-500/20 text-cyan-400 px-3 py-1 cursor-pointer hover:bg-cyan-500/30">
@@ -256,6 +261,15 @@ const Dashboard = () => {
                     />
                   </Badge>
                 )}
+                {filters.entityType !== 'tutti' && (
+                  <Badge className="bg-cyan-500/20 text-cyan-400 px-3 py-1 cursor-pointer hover:bg-cyan-500/30">
+                    {filters.entityType === 'venue' ? 'Solo Venue' : 'Solo Professionisti'}
+                    <X 
+                      className="h-3 w-3 ml-1 inline" 
+                      onClick={() => setFilters({...filters, entityType: 'tutti'})}
+                    />
+                  </Badge>
+                )}
               </div>
             )}
 
@@ -280,7 +294,8 @@ const Dashboard = () => {
                     budgetMax: 5000,
                     minRating: 0,
                     dateStart: null,
-                    dateEnd: null
+                    dateEnd: null,
+                    entityType: 'tutti'
                   })}
                   className="bg-cyan-500 hover:bg-cyan-600 text-white px-6 py-2 rounded-lg transition-colors"
                 >

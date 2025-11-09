@@ -36,7 +36,8 @@ const FilterSidebar = ({ filters, onFilterChange }: FilterSidebarProps) => {
       budgetMax: 5000,
       minRating: 0,
       dateStart: null,
-      dateEnd: null
+      dateEnd: null,
+      entityType: 'tutti'
     };
     setLocalFilters(resetFilters);
     onFilterChange(resetFilters);
@@ -56,6 +57,21 @@ const FilterSidebar = ({ filters, onFilterChange }: FilterSidebarProps) => {
       </CardHeader>
       <CardContent className="space-y-6">
         
+        {/* Tipo Entità - Select dropdown */}
+        <div className="space-y-3">
+          <Label className="text-gray-300 text-sm font-semibold">Tipo Match ▼</Label>
+          <select
+            value={localFilters.entityType}
+            onChange={(e) => setLocalFilters({ ...localFilters, entityType: e.target.value as 'tutti' | 'venue' | 'professionista' })}
+            className="w-full bg-slate-800 border border-slate-600 text-white rounded-lg px-3 py-2 
+                     focus:ring-2 focus:ring-cyan-500 focus:outline-none text-sm"
+          >
+            <option value="tutti">Tutti</option>
+            <option value="venue">Solo Venue</option>
+            <option value="professionista">Solo Professionisti</option>
+          </select>
+        </div>
+
         {/* Genere Musicale - Multi-select checkboxes */}
         <div className="space-y-3">
           <Label className="text-gray-300 text-sm font-semibold">Genere Musicale ▼</Label>
