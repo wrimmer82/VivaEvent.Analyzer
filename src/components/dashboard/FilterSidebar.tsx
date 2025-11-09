@@ -1,8 +1,19 @@
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
-import { FilterState } from "@/pages/Dashboard";
 import { RotateCcw } from "lucide-react";
 import { useState } from "react";
+
+export interface FilterState {
+  genres: string[];
+  city: string;
+  radius: number;
+  budgetMin: number;
+  budgetMax: number;
+  minRating: number;
+  dateStart: string | null;
+  dateEnd: string | null;
+  entityType: string; // Flexible type for different contexts
+}
 
 interface FilterSidebarProps {
   filters: FilterState;
@@ -62,13 +73,14 @@ const FilterSidebar = ({ filters, onFilterChange }: FilterSidebarProps) => {
           <Label className="text-gray-300 text-sm font-semibold">Tipo Match ▼</Label>
           <select
             value={localFilters.entityType}
-            onChange={(e) => setLocalFilters({ ...localFilters, entityType: e.target.value as 'tutti' | 'venue' | 'professionista' })}
+            onChange={(e) => setLocalFilters({ ...localFilters, entityType: e.target.value })}
             className="w-full bg-slate-800 border border-slate-600 text-white rounded-lg px-3 py-2 
                      focus:ring-2 focus:ring-cyan-500 focus:outline-none text-sm"
           >
             <option value="tutti">Tutti</option>
             <option value="venue">Solo Venue</option>
             <option value="professionista">Solo Professionisti</option>
+            <option value="artista">Solo Artisti</option>
           </select>
         </div>
 

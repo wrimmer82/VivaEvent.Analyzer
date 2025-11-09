@@ -11,7 +11,7 @@ import { User, X, LogOut } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
 
-const Dashboard = () => {
+const VenueMatchingDashboard = () => {
   const navigate = useNavigate();
   const [sortBy, setSortBy] = useState("match");
   const [matches, setMatches] = useState<MatchCardProps[]>([]);
@@ -48,12 +48,12 @@ const Dashboard = () => {
     try {
       setLoading(true);
 
-      // Carica venues dal database
-      const { data: venues, error: venuesError } = await supabase
-        .from('venues')
+      // Carica artisti dal database
+      const { data: artisti, error: artistiError } = await supabase
+        .from('artisti')
         .select('*');
 
-      if (venuesError) throw venuesError;
+      if (artistiError) throw artistiError;
 
       // Carica professionisti dal database
       const { data: professionisti, error: profError } = await supabase
@@ -62,17 +62,17 @@ const Dashboard = () => {
 
       if (profError) throw profError;
 
-      // Trasforma venues in MatchCardProps
-      const venueMatches: MatchCardProps[] = (venues || []).map((venue) => ({
-        id: venue.id,
-        nome: venue.nome_locale,
-        tipo: 'venue',
-        genere: Array.isArray(venue.generi_preferiti) ? venue.generi_preferiti.join(', ') : '',
-        città: venue.citta,
-        capacity: venue.capacita,
-        rating: 4.0 + Math.random() * 1, // Random rating tra 4.0 e 5.0
-        avatarUrl: venue.avatar_url || `https://api.dicebear.com/7.x/identicon/svg?seed=${venue.id}`,
-        matchScore: Math.floor(60 + Math.random() * 40) // Random match score tra 60 e 100
+      // Trasforma artisti in MatchCardProps
+      const artistiMatches: MatchCardProps[] = (artisti || []).map((artista) => ({
+        id: artista.id,
+        nome: artista.nome_completo,
+        tipo: 'artista',
+        genere: artista.genere_musicale,
+        città: artista.citta,
+        cachet: artista.cachet_desiderato,
+        rating: 4.0 + Math.random() * 1,
+        avatarUrl: artista.avatar_url || `https://api.dicebear.com/7.x/identicon/svg?seed=${artista.id}`,
+        matchScore: Math.floor(60 + Math.random() * 40)
       }));
 
       // Trasforma professionisti in MatchCardProps
@@ -87,8 +87,8 @@ const Dashboard = () => {
         matchScore: Math.floor(60 + Math.random() * 40)
       }));
 
-      // Combina venues e professionisti
-      setMatches([...venueMatches, ...profMatches]);
+      // Combina artisti e professionisti
+      setMatches([...artistiMatches, ...profMatches]);
 
     } catch (error) {
       console.error('Error loading matches:', error);
@@ -129,17 +129,17 @@ const Dashboard = () => {
       // 2. Filtro città
       const cityMatch = filters.city === 'Tutte' || match.città === filters.city;
       
-      // 3. Filtro budget (capacity * 10 = budget stimato)
-      const matchValue = match.capacity ? match.capacity * 10 : 0;
+      // 3. Filtro budget
+      const matchValue = match.cachet || 0;
       const budgetMatch = matchValue >= filters.budgetMin && matchValue <= filters.budgetMax;
       
       // 4. Filtro rating
       const ratingMatch = match.rating >= filters.minRating;
       
-      // 5. Date: per ora sempre true (TODO)
+      // 5. Date: per ora sempre true
       const dateMatch = true;
 
-      // 6. Filtro tipo entità (venue/professionista)
+      // 6. Filtro tipo entità (artista/professionista)
       const entityTypeMatch = filters.entityType === 'tutti' || match.tipo === filters.entityType;
       
       return genreMatch && cityMatch && budgetMatch && ratingMatch && dateMatch && entityTypeMatch;
@@ -164,7 +164,7 @@ const Dashboard = () => {
           <div className="flex items-center gap-2">
             <Badge className="bg-cyan-500/20 text-cyan-400 px-4 py-2 text-sm">
               <User className="h-4 w-4 mr-2" />
-              Utente: Artist Test (Artista)
+              Utente: Venue (Demo)
             </Badge>
             <Badge variant="secondary" className="bg-amber-500/20 text-amber-400 px-3 py-2 text-xs">
               DEMO MODE
@@ -250,7 +250,7 @@ const Dashboard = () => {
                 )}
                 {filters.entityType !== 'tutti' && (
                   <Badge className="bg-cyan-500/20 text-cyan-400 px-3 py-1 cursor-pointer hover:bg-cyan-500/30">
-                    {filters.entityType === 'venue' ? 'Solo Venue' : 'Solo Professionisti'}
+                    {filters.entityType === 'artista' ? 'Solo Artisti' : 'Solo Professionisti'}
                     <X 
                       className="h-3 w-3 ml-1 inline" 
                       onClick={() => setFilters({...filters, entityType: 'tutti'})}
@@ -270,7 +270,7 @@ const Dashboard = () => {
                 <div className="text-6xl mb-4">😔</div>
                 <h3 className="text-white text-xl font-bold mb-2">Nessun match trovato</h3>
                 <p className="text-gray-400 mb-4">
-                  Nessun venue corrisponde ai criteri di ricerca selezionati
+                  Nessun profilo corrisponde ai criteri di ricerca selezionati
                 </p>
                 <button
                   onClick={() => setFilters({
@@ -328,4 +328,4 @@ const Dashboard = () => {
   );
 };
 
-export default Dashboard;
+export default VenueMatchingDashboard;

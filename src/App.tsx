@@ -11,6 +11,7 @@ import VenueProfile from "./pages/VenueProfile";
 import ProfessionalProfile from "./pages/ProfessionalProfile";
 import VenuePublicProfile from "./pages/VenuePublicProfile";
 import VenueDashboard from "./pages/VenueDashboard";
+import VenueMatchingDashboard from "./pages/VenueMatchingDashboard";
 import ProfessionalDashboard from "./pages/ProfessionalDashboard";
 import ProfessionalMatchingDashboard from "./pages/ProfessionalMatchingDashboard";
 import Auth from "./pages/Auth";
@@ -46,7 +47,15 @@ const App = () => (
             } 
           />
           <Route 
-            path="/professional/dashboard" 
+            path="/venue/discover" 
+            element={
+              <ProtectedRoute>
+                <VenueMatchingDashboard />
+              </ProtectedRoute>
+            } 
+          />
+          <Route 
+            path="/professional/dashboard"
             element={
               <ProtectedRoute>
                 <ProfessionalDashboard />
