@@ -78,7 +78,6 @@ const FilterSidebar = ({ filters, onFilterChange }: FilterSidebarProps) => {
                      focus:ring-2 focus:ring-cyan-500 focus:outline-none text-sm"
           >
             <option value="tutti">Tutti</option>
-            <option value="venue">Solo Venue</option>
             <option value="professionista">Solo Professionisti</option>
             <option value="artista">Solo Artisti</option>
           </select>
