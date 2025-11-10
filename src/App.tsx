@@ -10,6 +10,8 @@ import ArtistProfile from "./pages/ArtistProfile";
 import VenueProfile from "./pages/VenueProfile";
 import ProfessionalProfile from "./pages/ProfessionalProfile";
 import VenuePublicProfile from "./pages/VenuePublicProfile";
+import ArtistPublicProfile from "./pages/ArtistPublicProfile";
+import ProfessionalPublicProfile from "./pages/ProfessionalPublicProfile";
 import VenueDashboard from "./pages/VenueDashboard";
 import VenueMatchingDashboard from "./pages/VenueMatchingDashboard";
 import ProfessionalDashboard from "./pages/ProfessionalDashboard";
@@ -74,6 +76,8 @@ const App = () => (
           <Route path="/profilo-professionista" element={<ProfessionalProfile />} />
           <Route path="/profilo-venue" element={<VenueProfile />} />
           <Route path="/venue/:id" element={<VenuePublicProfile />} />
+          <Route path="/artista/:id" element={<ArtistPublicProfile />} />
+          <Route path="/professionista/:id" element={<ProfessionalPublicProfile />} />
           <Route path="/accedi" element={<Auth />} />
           <Route path="/inizia-ora" element={<GetStarted />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}

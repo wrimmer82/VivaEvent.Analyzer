@@ -39,7 +39,13 @@ const MatchCard = ({
   };
 
   const handleViewProfile = () => {
-    navigate(`/venue/${id}`);
+    if (tipo === 'artista') {
+      navigate(`/artista/${id}`);
+    } else if (tipo === 'professionista') {
+      navigate(`/professionista/${id}`);
+    } else {
+      navigate(`/venue/${id}`);
+    }
   };
 
   const handleSendProposal = () => {
