@@ -1,5 +1,5 @@
 import { Mail, MapPin, Youtube, Linkedin } from "lucide-react";
-import logoImage from "@/assets/viva-eagles-logo.png";
+import logoImage from "@/assets/logo-ve.png";
 
 const Footer = () => {
   return (

@@ -1,6 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
-import logoImage from "@/assets/viva-eagles-logo.png";
+import logoImage from "@/assets/logo-ve.png";
 const Navbar = () => {
   return <nav className="sticky top-0 z-50 w-full border-b border-primary/20 bg-background/80 backdrop-blur-lg">
       <div className="container mx-auto px-4">
