@@ -228,7 +228,7 @@ const ArtistProfile = () => {
 
   return (
     <div className="min-h-screen bg-background">
-      <Navbar />
+      <Navbar logoLink="/profile-dashboard" />
       
       {/* Header with greeting and logout */}
       <div className="border-b border-border bg-card">

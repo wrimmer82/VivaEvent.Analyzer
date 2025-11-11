@@ -8,7 +8,7 @@ const Footer = () => {
         <div className="grid md:grid-cols-5 gap-12 mb-12">
           {/* Brand */}
           <div className="space-y-4">
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2 cursor-pointer hover:opacity-80 transition-all hover:scale-105">
               <div className="flex items-center justify-center w-10 h-10">
                 <img src={logoImage} alt="VivaEvent Logo" className="w-10 h-10 object-contain" />
               </div>

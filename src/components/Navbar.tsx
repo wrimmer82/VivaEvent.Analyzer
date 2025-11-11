@@ -1,12 +1,17 @@
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
 import logoImage from "@/assets/logo-ve.png";
-const Navbar = () => {
+
+interface NavbarProps {
+  logoLink?: string;
+}
+
+const Navbar = ({ logoLink = "/" }: NavbarProps) => {
   return <nav className="sticky top-0 z-50 w-full border-b border-primary/20 bg-background/80 backdrop-blur-lg">
       <div className="container mx-auto px-4">
         <div className="flex h-16 items-center justify-between">
           {/* Logo */}
-          <Link to="/" className="flex items-center gap-2 cursor-pointer hover:opacity-80 transition-opacity">
+          <Link to={logoLink} className="flex items-center gap-2 cursor-pointer hover:opacity-80 transition-all hover:scale-105">
             <div className="flex items-center justify-center w-10 h-10">
               <img src={logoImage} alt="VivaEvent Logo" className="w-10 h-10 object-contain" />
             </div>
