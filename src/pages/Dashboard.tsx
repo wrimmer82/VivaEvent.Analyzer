@@ -16,6 +16,7 @@ const Dashboard = () => {
   const [sortBy, setSortBy] = useState("match");
   const [matches, setMatches] = useState<MatchCardProps[]>([]);
   const [loading, setLoading] = useState(true);
+  const [userName, setUserName] = useState<string>("Artista");
   const [filters, setFilters] = useState<FilterState>({
     genres: [],
     city: 'Tutte',
@@ -41,8 +42,28 @@ const Dashboard = () => {
   });
 
   useEffect(() => {
+    loadUserData();
     loadMatches();
   }, []);
+
+  const loadUserData = async () => {
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) return;
+
+      const { data: artistData } = await supabase
+        .from('artisti')
+        .select('nome_completo')
+        .eq('user_id', session.user.id)
+        .single();
+
+      if (artistData) {
+        setUserName(artistData.nome_completo || "Artista");
+      }
+    } catch (error) {
+      console.error('Error loading user data:', error);
+    }
+  };
 
   const loadMatches = async () => {
     try {
@@ -164,11 +185,17 @@ const Dashboard = () => {
           <div className="flex items-center gap-2">
             <Badge className="bg-cyan-500/20 text-cyan-400 px-4 py-2 text-sm">
               <User className="h-4 w-4 mr-2" />
-              Utente: Artist Test (Artista)
+              Utente: {userName}
             </Badge>
-            <Badge variant="secondary" className="bg-amber-500/20 text-amber-400 px-3 py-2 text-xs">
-              DEMO MODE
-            </Badge>
+            <Button 
+              variant="secondary" 
+              size="sm" 
+              onClick={() => navigate("/profile-dashboard")}
+              className="gap-2"
+            >
+              <User className="h-4 w-4" />
+              Il Mio Profilo
+            </Button>
           </div>
           <Button 
             variant="outline" 
