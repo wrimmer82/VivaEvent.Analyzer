@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
@@ -6,7 +6,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Skeleton } from "@/components/ui/skeleton";
-import { User, LogOut, Building2, Music, TrendingUp, Star, Mail } from "lucide-react";
+import { User, LogOut, Building2, Music, TrendingUp, Star, Mail, Camera } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
 
@@ -36,6 +36,8 @@ const VenueDashboard = () => {
   const [loading, setLoading] = useState(true);
   const [venue, setVenue] = useState<Venue | null>(null);
   const [artistMatches, setArtistMatches] = useState<ArtistMatch[]>([]);
+  const [avatarUploading, setAvatarUploading] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const [statsData, setStatsData] = useState({
     proposteRicevute: 0,
     proposteInviate: 0,
@@ -159,6 +161,56 @@ const VenueDashboard = () => {
     }
   };
 
+  const handleAvatarClick = () => {
+    fileInputRef.current?.click();
+  };
+
+  const handleAvatarUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file || !venue?.id) return;
+
+    try {
+      setAvatarUploading(true);
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) return;
+
+      const fileExt = file.name.split('.').pop();
+      const filePath = `${session.user.id}/${Math.random()}.${fileExt}`;
+
+      const { error: uploadError } = await supabase.storage
+        .from('avatars')
+        .upload(filePath, file);
+
+      if (uploadError) throw uploadError;
+
+      const { data: { publicUrl } } = supabase.storage
+        .from('avatars')
+        .getPublicUrl(filePath);
+
+      const { error: updateError } = await supabase
+        .from('venues')
+        .update({ avatar_url: publicUrl })
+        .eq('id', venue.id);
+
+      if (updateError) throw updateError;
+
+      setVenue({ ...venue, avatar_url: publicUrl });
+      toast({
+        title: "Avatar aggiornato",
+        description: "La tua immagine del profilo è stata aggiornata con successo",
+      });
+    } catch (error) {
+      console.error('Error uploading avatar:', error);
+      toast({
+        title: "Errore",
+        description: "Impossibile caricare l'avatar",
+        variant: "destructive",
+      });
+    } finally {
+      setAvatarUploading(false);
+    }
+  };
+
   const handleLogout = async () => {
     const { error } = await supabase.auth.signOut();
     if (error) {
@@ -223,12 +275,32 @@ const VenueDashboard = () => {
         {/* Header with Avatar & Logout */}
         <div className="mb-8 flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
           <div className="flex items-center gap-4">
-            <Avatar className="h-20 w-20 border-2 border-cyan-500 cursor-pointer" onClick={() => navigate("/profilo-venue")}>
-              <AvatarImage src={venue?.avatar_url} />
-              <AvatarFallback className="bg-cyan-500/20 text-cyan-400 text-2xl font-bold">
-                {venue?.nome_locale?.substring(0, 2).toUpperCase()}
-              </AvatarFallback>
-            </Avatar>
+            <div className="relative group">
+              <Avatar className="h-20 w-20 border-2 border-cyan-500 cursor-pointer" onClick={handleAvatarClick}>
+                <AvatarImage src={venue?.avatar_url} />
+                <AvatarFallback className="bg-cyan-500/20 text-cyan-400 text-2xl font-bold">
+                  {venue?.nome_locale?.substring(0, 2).toUpperCase()}
+                </AvatarFallback>
+              </Avatar>
+              <div 
+                className="absolute inset-0 flex items-center justify-center bg-black/50 rounded-full opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer"
+                onClick={handleAvatarClick}
+              >
+                <Camera className="h-6 w-6 text-white" />
+              </div>
+              {avatarUploading && (
+                <div className="absolute inset-0 flex items-center justify-center bg-black/70 rounded-full">
+                  <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-cyan-500"></div>
+                </div>
+              )}
+            </div>
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept="image/*"
+              onChange={handleAvatarUpload}
+              className="hidden"
+            />
             <div>
               <h2 className="text-white text-2xl font-bold">{venue?.nome_locale}</h2>
               <Badge className="bg-green-600 text-white px-3 py-1 rounded-full mt-1">VENUE</Badge>
