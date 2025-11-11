@@ -16,6 +16,8 @@ const VenueMatchingDashboard = () => {
   const [sortBy, setSortBy] = useState("match");
   const [matches, setMatches] = useState<MatchCardProps[]>([]);
   const [loading, setLoading] = useState(true);
+  const [venueName, setVenueName] = useState<string>("Venue");
+  const [loggedUserId, setLoggedUserId] = useState<string | null>(null);
   const [filters, setFilters] = useState<FilterState>({
     genres: [],
     city: 'Tutte',
@@ -41,8 +43,30 @@ const VenueMatchingDashboard = () => {
   });
 
   useEffect(() => {
+    loadVenueData();
     loadMatches();
   }, []);
+
+  const loadVenueData = async () => {
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) return;
+
+      setLoggedUserId(session.user.id);
+
+      const { data: venueData } = await supabase
+        .from('venues')
+        .select('nome_locale')
+        .eq('user_id', session.user.id)
+        .single();
+
+      if (venueData) {
+        setVenueName(venueData.nome_locale || "Venue");
+      }
+    } catch (error) {
+      console.error('Error loading venue data:', error);
+    }
+  };
 
   const loadMatches = async () => {
     try {
@@ -62,30 +86,34 @@ const VenueMatchingDashboard = () => {
 
       if (profError) throw profError;
 
-      // Trasforma artisti in MatchCardProps
-      const artistiMatches: MatchCardProps[] = (artisti || []).map((artista) => ({
-        id: artista.id,
-        nome: artista.nome_completo,
-        tipo: 'artista',
-        genere: artista.genere_musicale,
-        città: artista.citta,
-        cachet: artista.cachet_desiderato,
-        rating: 4.0 + Math.random() * 1,
-        avatarUrl: artista.avatar_url || `https://api.dicebear.com/7.x/identicon/svg?seed=${artista.id}`,
-        matchScore: Math.floor(60 + Math.random() * 40)
-      }));
+      // Trasforma artisti in MatchCardProps (escludi l'utente loggato)
+      const artistiMatches: MatchCardProps[] = (artisti || [])
+        .filter((artista) => artista.user_id !== loggedUserId)
+        .map((artista) => ({
+          id: artista.id,
+          nome: artista.nome_completo,
+          tipo: 'artista',
+          genere: artista.genere_musicale,
+          città: artista.citta,
+          cachet: artista.cachet_desiderato,
+          rating: 4.0 + Math.random() * 1,
+          avatarUrl: artista.avatar_url || `https://api.dicebear.com/7.x/identicon/svg?seed=${artista.id}`,
+          matchScore: Math.floor(60 + Math.random() * 40)
+        }));
 
-      // Trasforma professionisti in MatchCardProps
-      const profMatches: MatchCardProps[] = (professionisti || []).map((prof) => ({
-        id: prof.id,
-        nome: `${prof.nome_completo} (${prof.ruolo})`,
-        tipo: 'professionista',
-        genere: prof.ruolo,
-        città: 'N/A',
-        rating: 4.0 + Math.random() * 1,
-        avatarUrl: prof.avatar_url || `https://api.dicebear.com/7.x/identicon/svg?seed=${prof.id}`,
-        matchScore: Math.floor(60 + Math.random() * 40)
-      }));
+      // Trasforma professionisti in MatchCardProps (escludi l'utente loggato)
+      const profMatches: MatchCardProps[] = (professionisti || [])
+        .filter((prof) => prof.user_id !== loggedUserId)
+        .map((prof) => ({
+          id: prof.id,
+          nome: `${prof.nome_completo} (${prof.ruolo})`,
+          tipo: 'professionista',
+          genere: prof.ruolo,
+          città: 'N/A',
+          rating: 4.0 + Math.random() * 1,
+          avatarUrl: prof.avatar_url || `https://api.dicebear.com/7.x/identicon/svg?seed=${prof.id}`,
+          matchScore: Math.floor(60 + Math.random() * 40)
+        }));
 
       // Combina artisti e professionisti
       setMatches([...artistiMatches, ...profMatches]);
@@ -164,11 +192,17 @@ const VenueMatchingDashboard = () => {
           <div className="flex items-center gap-2">
             <Badge className="bg-cyan-500/20 text-cyan-400 px-4 py-2 text-sm">
               <User className="h-4 w-4 mr-2" />
-              Utente: Venue (Demo)
+              {venueName}
             </Badge>
-            <Badge variant="secondary" className="bg-amber-500/20 text-amber-400 px-3 py-2 text-xs">
-              DEMO MODE
-            </Badge>
+            <Button 
+              variant="secondary" 
+              size="sm" 
+              onClick={() => navigate("/profile-dashboard")}
+              className="gap-2"
+            >
+              <User className="h-4 w-4" />
+              Il Mio Profilo
+            </Button>
           </div>
           <Button 
             variant="outline" 
