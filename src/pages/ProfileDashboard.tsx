@@ -47,6 +47,12 @@ const ProfileDashboard = () => {
   const [uploading, setUploading] = useState(false);
   const [userId, setUserId] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const [statsData, setStatsData] = useState({
+    proposteRicevute: 0,
+    proposteInviate: 0,
+    tassoSuccesso: "0%",
+    eventiConfermati: 0
+  });
 
   useEffect(() => {
     checkAuthAndLoadProfile();
@@ -86,6 +92,9 @@ const ProfileDashboard = () => {
 
       // Load specific profile details based on user type
       await loadProfileDetails(session.user.id, userData.user_type);
+      
+      // Load statistics
+      await loadStatistics(session.user.id);
     } catch (error) {
       console.error("Error loading profile:", error);
       toast({
@@ -131,6 +140,50 @@ const ProfileDashboard = () => {
       }
     } catch (error) {
       console.error("Error loading profile details:", error);
+    }
+  };
+
+  const loadStatistics = async (userId: string) => {
+    try {
+      // Fetch booking requests received
+      const { count: proposteRicevute } = await supabase
+        .from("booking_requests")
+        .select("*", { count: "exact", head: true })
+        .eq("receiver_id", userId);
+
+      // Fetch booking requests sent
+      const { count: proposteInviate } = await supabase
+        .from("booking_requests")
+        .select("*", { count: "exact", head: true })
+        .eq("sender_id", userId);
+
+      // Fetch confirmed bookings (both sent and received)
+      const { count: eventiConfermatiRicevuti } = await supabase
+        .from("booking_requests")
+        .select("*", { count: "exact", head: true })
+        .eq("receiver_id", userId)
+        .eq("status", "accepted");
+
+      const { count: eventiConfermatiInviati } = await supabase
+        .from("booking_requests")
+        .select("*", { count: "exact", head: true })
+        .eq("sender_id", userId)
+        .eq("status", "accepted");
+
+      const eventiConfermati = (eventiConfermatiRicevuti || 0) + (eventiConfermatiInviati || 0);
+
+      // Calculate success rate
+      const totale = (proposteInviate || 0) + (proposteRicevute || 0);
+      const tassoSuccesso = totale > 0 ? Math.round((eventiConfermati / totale) * 100) : 0;
+
+      setStatsData({
+        proposteRicevute: proposteRicevute || 0,
+        proposteInviate: proposteInviate || 0,
+        tassoSuccesso: `${tassoSuccesso}%`,
+        eventiConfermati: eventiConfermati
+      });
+    } catch (error) {
+      console.error("Error loading statistics:", error);
     }
   };
 
@@ -354,16 +407,16 @@ const ProfileDashboard = () => {
         </Card>
 
         {/* Stats Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
           <Card className="bg-[#1a1f2e] border-cyan-500/30">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium text-gray-400">
-                Match Ricevuti
+                Proposte Ricevute
               </CardTitle>
               <TrendingUp className="h-4 w-4 text-cyan-400" />
             </CardHeader>
             <CardContent>
-              <div className="text-3xl font-bold text-white">24</div>
+              <div className="text-3xl font-bold text-white">{statsData.proposteRicevute}</div>
               <p className="text-xs text-gray-500 mt-1">+12% dal mese scorso</p>
             </CardContent>
           </Card>
@@ -376,7 +429,7 @@ const ProfileDashboard = () => {
               <Calendar className="h-4 w-4 text-purple-400" />
             </CardHeader>
             <CardContent>
-              <div className="text-3xl font-bold text-white">8</div>
+              <div className="text-3xl font-bold text-white">{statsData.proposteInviate}</div>
               <p className="text-xs text-gray-500 mt-1">Negli ultimi 30 giorni</p>
             </CardContent>
           </Card>
@@ -389,8 +442,21 @@ const ProfileDashboard = () => {
               <Star className="h-4 w-4 text-amber-400" />
             </CardHeader>
             <CardContent>
-              <div className="text-3xl font-bold text-white">67%</div>
+              <div className="text-3xl font-bold text-white">{statsData.tassoSuccesso}</div>
               <p className="text-xs text-gray-500 mt-1">Media industria: 42%</p>
+            </CardContent>
+          </Card>
+
+          <Card className="bg-[#1a1f2e] border-cyan-500/30">
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium text-gray-400">
+                Eventi Confermati
+              </CardTitle>
+              <Calendar className="h-4 w-4 text-green-400" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-3xl font-bold text-white">{statsData.eventiConfermati}</div>
+              <p className="text-xs text-gray-500 mt-1">Quest'anno</p>
             </CardContent>
           </Card>
         </div>
