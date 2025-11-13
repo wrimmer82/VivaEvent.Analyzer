@@ -5,8 +5,9 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Skeleton } from "@/components/ui/skeleton";
+import BookingsTable from "@/components/dashboard/BookingsTable";
 import { 
-  LogOut, 
+  LogOut,
   ArrowRight, 
   Camera, 
   Briefcase, 
@@ -374,8 +375,11 @@ const ProfessionalDashboard = () => {
           </Card>
         </div>
 
+        {/* Bookings Table */}
+        <BookingsTable />
+
         {/* Recent Activity */}
-        <Card className="bg-[#1a1f2e] border-cyan-500/30">
+        <Card className="bg-[#1a1f2e] border-cyan-500/30 mt-8">
           <CardHeader>
             <CardTitle className="text-white">Attività Recente</CardTitle>
           </CardHeader>

@@ -1,6 +1,7 @@
+import { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   Table,
   TableBody,
@@ -9,102 +10,275 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { Eye } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
+import { Skeleton } from "@/components/ui/skeleton";
 
-// Mock data - will be replaced with real Supabase data
-const mockBookings = [
-  {
-    id: 1,
-    name: "The Blue Notes",
-    date: "2025-11-15",
-    status: "pending",
-  },
-  {
-    id: 2,
-    name: "Sunset Lounge",
-    date: "2025-11-20",
-    status: "accepted",
-  },
-  {
-    id: 3,
-    name: "Electric Dreams",
-    date: "2025-11-25",
-    status: "paid",
-  },
-  {
-    id: 4,
-    name: "Jazz Corner",
-    date: "2025-12-01",
-    status: "pending",
-  },
-];
+interface BookingRequest {
+  id: string;
+  event_date: string;
+  event_time: string;
+  status: string;
+  proposed_compensation: number;
+  sender_name: string;
+  receiver_name: string;
+  type: 'received' | 'sent';
+}
 
 const BookingsTable = () => {
+  const [loading, setLoading] = useState(true);
+  const [receivedBookings, setReceivedBookings] = useState<BookingRequest[]>([]);
+  const [sentBookings, setSentBookings] = useState<BookingRequest[]>([]);
+
+  useEffect(() => {
+    loadBookings();
+  }, []);
+
+  const loadBookings = async () => {
+    try {
+      setLoading(true);
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) return;
+
+      // Fetch received bookings
+      const { data: receivedData } = await supabase
+        .from("booking_requests")
+        .select(`
+          id,
+          event_date,
+          event_time,
+          status,
+          proposed_compensation,
+          sender_id
+        `)
+        .eq("receiver_id", session.user.id)
+        .order("created_at", { ascending: false });
+
+      // Fetch sent bookings
+      const { data: sentData } = await supabase
+        .from("booking_requests")
+        .select(`
+          id,
+          event_date,
+          event_time,
+          status,
+          proposed_compensation,
+          receiver_id
+        `)
+        .eq("sender_id", session.user.id)
+        .order("created_at", { ascending: false });
+
+      // Get sender names for received bookings
+      if (receivedData) {
+        const processedReceived = await Promise.all(
+          receivedData.map(async (booking) => {
+            const name = await getUserName(booking.sender_id);
+            return {
+              ...booking,
+              sender_name: name,
+              receiver_name: '',
+              type: 'received' as const
+            };
+          })
+        );
+        setReceivedBookings(processedReceived);
+      }
+
+      // Get receiver names for sent bookings
+      if (sentData) {
+        const processedSent = await Promise.all(
+          sentData.map(async (booking) => {
+            const name = await getUserName(booking.receiver_id);
+            return {
+              ...booking,
+              sender_name: '',
+              receiver_name: name,
+              type: 'sent' as const
+            };
+          })
+        );
+        setSentBookings(processedSent);
+      }
+    } catch (error) {
+      console.error("Error loading bookings:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const getUserName = async (userId: string): Promise<string> => {
+    // Try artists first
+    const { data: artistData } = await supabase
+      .from("artisti")
+      .select("nome_completo")
+      .eq("user_id", userId)
+      .maybeSingle();
+    
+    if (artistData) return artistData.nome_completo;
+
+    // Try venues
+    const { data: venueData } = await supabase
+      .from("venues")
+      .select("nome_locale")
+      .eq("user_id", userId)
+      .maybeSingle();
+    
+    if (venueData) return venueData.nome_locale;
+
+    // Try professionals
+    const { data: professionalData } = await supabase
+      .from("professionisti")
+      .select("nome_completo")
+      .eq("user_id", userId)
+      .maybeSingle();
+    
+    if (professionalData) return professionalData.nome_completo;
+
+    return "Unknown";
+  };
+
   const getStatusColor = (status: string) => {
     switch (status) {
       case "pending":
-        return "bg-muted text-muted-foreground";
+        return "bg-amber-500/20 text-amber-400 border-amber-500/30";
       case "accepted":
-        return "bg-accent/20 text-accent border-accent/30";
-      case "paid":
-        return "bg-primary/20 text-primary border-primary/30";
+        return "bg-green-500/20 text-green-400 border-green-500/30";
+      case "rejected":
+        return "bg-red-500/20 text-red-400 border-red-500/30";
       default:
-        return "bg-muted text-muted-foreground";
+        return "bg-gray-500/20 text-gray-400 border-gray-500/30";
     }
   };
 
   const getStatusLabel = (status: string) => {
     switch (status) {
       case "pending":
-        return "Pending";
+        return "In Attesa";
       case "accepted":
-        return "Accepted";
-      case "paid":
-        return "Paid";
+        return "Accettato";
+      case "rejected":
+        return "Rifiutato";
       default:
         return status;
     }
   };
 
+  const formatDate = (date: string, time: string) => {
+    const eventDate = new Date(date);
+    return `${eventDate.toLocaleDateString('it-IT')} - ${time.slice(0, 5)}`;
+  };
+
+  if (loading) {
+    return (
+      <Card className="bg-[#1a1f2e] border-cyan-500/30">
+        <CardHeader>
+          <Skeleton className="h-6 w-48" />
+        </CardHeader>
+        <CardContent>
+          <Skeleton className="h-64 w-full" />
+        </CardContent>
+      </Card>
+    );
+  }
+
   return (
-    <Card className="bg-card border-border">
+    <Card className="bg-[#1a1f2e] border-cyan-500/30">
       <CardHeader>
-        <CardTitle className="text-xl">My Bookings</CardTitle>
-        <p className="text-sm text-muted-foreground">Active bookings and proposals</p>
+        <CardTitle className="text-white">Proposte di Collaborazione</CardTitle>
+        <p className="text-sm text-gray-400">Gestisci le tue richieste ricevute e inviate</p>
       </CardHeader>
       <CardContent>
-        <div className="space-y-4">
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Name</TableHead>
-                <TableHead>Date</TableHead>
-                <TableHead>Status</TableHead>
-                <TableHead className="text-right">Action</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {mockBookings.map((booking) => (
-                <TableRow key={booking.id}>
-                  <TableCell className="font-medium">{booking.name}</TableCell>
-                  <TableCell className="text-sm text-muted-foreground">
-                    {new Date(booking.date).toLocaleDateString()}
-                  </TableCell>
-                  <TableCell>
-                    <Badge className={getStatusColor(booking.status)}>
-                      {getStatusLabel(booking.status)}
-                    </Badge>
-                  </TableCell>
-                  <TableCell className="text-right">
-                    <Button variant="ghost" size="sm">
-                      <Eye className="h-4 w-4" />
-                    </Button>
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </div>
+        <Tabs defaultValue="received" className="w-full">
+          <TabsList className="bg-[#0f1419] border border-cyan-500/20">
+            <TabsTrigger value="received" className="data-[state=active]:bg-cyan-500/20 data-[state=active]:text-cyan-400">
+              Ricevute ({receivedBookings.length})
+            </TabsTrigger>
+            <TabsTrigger value="sent" className="data-[state=active]:bg-cyan-500/20 data-[state=active]:text-cyan-400">
+              Inviate ({sentBookings.length})
+            </TabsTrigger>
+          </TabsList>
+
+          <TabsContent value="received" className="mt-4">
+            {receivedBookings.length === 0 ? (
+              <div className="text-center py-8 text-gray-400">
+                Nessuna proposta ricevuta
+              </div>
+            ) : (
+              <div className="overflow-x-auto">
+                <Table>
+                  <TableHeader>
+                    <TableRow className="border-cyan-500/20 hover:bg-transparent">
+                      <TableHead className="text-cyan-400">Da</TableHead>
+                      <TableHead className="text-cyan-400">Data Evento</TableHead>
+                      <TableHead className="text-cyan-400">Compenso</TableHead>
+                      <TableHead className="text-cyan-400">Stato</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {receivedBookings.map((booking) => (
+                      <TableRow key={booking.id} className="border-cyan-500/10 hover:bg-cyan-500/5">
+                        <TableCell className="font-medium text-white">
+                          {booking.sender_name}
+                        </TableCell>
+                        <TableCell className="text-gray-400">
+                          {formatDate(booking.event_date, booking.event_time)}
+                        </TableCell>
+                        <TableCell className="text-gray-400">
+                          €{booking.proposed_compensation}
+                        </TableCell>
+                        <TableCell>
+                          <Badge className={getStatusColor(booking.status)}>
+                            {getStatusLabel(booking.status)}
+                          </Badge>
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </div>
+            )}
+          </TabsContent>
+
+          <TabsContent value="sent" className="mt-4">
+            {sentBookings.length === 0 ? (
+              <div className="text-center py-8 text-gray-400">
+                Nessuna proposta inviata
+              </div>
+            ) : (
+              <div className="overflow-x-auto">
+                <Table>
+                  <TableHeader>
+                    <TableRow className="border-cyan-500/20 hover:bg-transparent">
+                      <TableHead className="text-cyan-400">A</TableHead>
+                      <TableHead className="text-cyan-400">Data Evento</TableHead>
+                      <TableHead className="text-cyan-400">Compenso</TableHead>
+                      <TableHead className="text-cyan-400">Stato</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {sentBookings.map((booking) => (
+                      <TableRow key={booking.id} className="border-cyan-500/10 hover:bg-cyan-500/5">
+                        <TableCell className="font-medium text-white">
+                          {booking.receiver_name}
+                        </TableCell>
+                        <TableCell className="text-gray-400">
+                          {formatDate(booking.event_date, booking.event_time)}
+                        </TableCell>
+                        <TableCell className="text-gray-400">
+                          €{booking.proposed_compensation}
+                        </TableCell>
+                        <TableCell>
+                          <Badge className={getStatusColor(booking.status)}>
+                            {getStatusLabel(booking.status)}
+                          </Badge>
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </div>
+            )}
+          </TabsContent>
+        </Tabs>
       </CardContent>
     </Card>
   );

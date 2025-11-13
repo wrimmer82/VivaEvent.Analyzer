@@ -6,6 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { toast } from "@/hooks/use-toast";
+import BookingsTable from "@/components/dashboard/BookingsTable";
 import {
   User,
   Mail,
@@ -461,8 +462,11 @@ const ProfileDashboard = () => {
           </Card>
         </div>
 
+        {/* Bookings Table */}
+        <BookingsTable />
+
         {/* Recent Activity */}
-        <Card className="bg-[#1a1f2e] border-cyan-500/30">
+        <Card className="bg-[#1a1f2e] border-cyan-500/30 mt-8">
           <CardHeader>
             <CardTitle className="text-white">Attività Recente</CardTitle>
           </CardHeader>
@@ -475,7 +479,7 @@ const ProfileDashboard = () => {
                   </div>
                   <div>
                     <p className="text-white font-medium">Nuova richiesta ricevuta</p>
-                    <p className="text-gray-400 text-sm">Club Alcatraz - Milano</p>
+                    <p className="text-gray-400 text-sm">Blue Note Milano - 15 Gennaio 2025</p>
                   </div>
                 </div>
                 <Badge className="bg-cyan-500/20 text-cyan-400">Nuovo</Badge>
@@ -487,11 +491,24 @@ const ProfileDashboard = () => {
                     <Calendar className="h-6 w-6 text-purple-400" />
                   </div>
                   <div>
-                    <p className="text-white font-medium">Booking confermato</p>
-                    <p className="text-gray-400 text-sm">Blue Note - 15 Dicembre 2025</p>
+                    <p className="text-white font-medium">Evento confermato</p>
+                    <p className="text-gray-400 text-sm">Santeria Social Club - 22 Dicembre 2025</p>
                   </div>
                 </div>
                 <Badge className="bg-green-500/20 text-green-400">Confermato</Badge>
+              </div>
+
+              <div className="flex items-center justify-between p-4 bg-[#0f1419] rounded-lg border border-amber-500/20">
+                <div className="flex items-center gap-4">
+                  <div className="h-12 w-12 rounded-full bg-amber-500/20 flex items-center justify-center">
+                    <TrendingUp className="h-6 w-6 text-amber-400" />
+                  </div>
+                  <div>
+                    <p className="text-white font-medium">Match suggerito</p>
+                    <p className="text-gray-400 text-sm">Fabrique cerca artisti indie</p>
+                  </div>
+                </div>
+                <Badge className="bg-amber-500/20 text-amber-400">Suggerito</Badge>
               </div>
             </div>
           </CardContent>
