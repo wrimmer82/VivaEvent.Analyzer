@@ -91,6 +91,7 @@ const VenueMatchingDashboard = () => {
         .filter((artista) => artista.user_id !== loggedUserId)
         .map((artista) => ({
           id: artista.id,
+          userId: artista.user_id,
           nome: artista.nome_completo,
           tipo: 'artista',
           genere: artista.genere_musicale,
@@ -106,6 +107,7 @@ const VenueMatchingDashboard = () => {
         .filter((prof) => prof.user_id !== loggedUserId)
         .map((prof) => ({
           id: prof.id,
+          userId: prof.user_id,
           nome: `${prof.nome_completo} (${prof.ruolo})`,
           tipo: 'professionista',
           genere: prof.ruolo,
@@ -332,7 +334,7 @@ const VenueMatchingDashboard = () => {
                     onBookingClick={() =>
                       setBookingModal({
                         open: true,
-                        receiverId: match.id,
+                        receiverId: match.userId || match.id,
                         receiverName: match.nome,
                         receiverType: match.tipo,
                       })
