@@ -12,6 +12,9 @@ import {
 } from "@/components/ui/table";
 import { supabase } from "@/integrations/supabase/client";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Button } from "@/components/ui/button";
+import { useToast } from "@/hooks/use-toast";
+import { Check, X } from "lucide-react";
 
 interface BookingRequest {
   id: string;
@@ -28,6 +31,8 @@ const BookingsTable = () => {
   const [loading, setLoading] = useState(true);
   const [receivedBookings, setReceivedBookings] = useState<BookingRequest[]>([]);
   const [sentBookings, setSentBookings] = useState<BookingRequest[]>([]);
+  const [updatingId, setUpdatingId] = useState<string | null>(null);
+  const { toast } = useToast();
 
   useEffect(() => {
     loadBookings();
@@ -167,6 +172,36 @@ const BookingsTable = () => {
     return `${eventDate.toLocaleDateString('it-IT')} - ${time.slice(0, 5)}`;
   };
 
+  const handleUpdateStatus = async (bookingId: string, newStatus: 'accepted' | 'rejected') => {
+    try {
+      setUpdatingId(bookingId);
+      
+      const { error } = await supabase
+        .from("booking_requests")
+        .update({ status: newStatus })
+        .eq("id", bookingId);
+
+      if (error) throw error;
+
+      toast({
+        title: newStatus === 'accepted' ? "Proposta accettata" : "Proposta rifiutata",
+        description: `La proposta è stata ${newStatus === 'accepted' ? 'accettata' : 'rifiutata'} con successo.`,
+      });
+
+      // Reload bookings to reflect the change
+      await loadBookings();
+    } catch (error) {
+      console.error("Error updating booking status:", error);
+      toast({
+        title: "Errore",
+        description: "Si è verificato un errore nell'aggiornamento della proposta.",
+        variant: "destructive",
+      });
+    } finally {
+      setUpdatingId(null);
+    }
+  };
+
   if (loading) {
     return (
       <Card className="bg-[#1a1f2e] border-cyan-500/30">
@@ -211,6 +246,7 @@ const BookingsTable = () => {
                       <TableHead className="text-cyan-400">Data Evento</TableHead>
                       <TableHead className="text-cyan-400">Compenso</TableHead>
                       <TableHead className="text-cyan-400">Stato</TableHead>
+                      <TableHead className="text-cyan-400 text-right">Azioni</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
@@ -229,6 +265,29 @@ const BookingsTable = () => {
                           <Badge className={getStatusColor(booking.status)}>
                             {getStatusLabel(booking.status)}
                           </Badge>
+                        </TableCell>
+                        <TableCell className="text-right">
+                          {booking.status === 'pending' && (
+                            <div className="flex gap-2 justify-end">
+                              <Button
+                                size="sm"
+                                variant="default"
+                                className="bg-green-600 hover:bg-green-700"
+                                onClick={() => handleUpdateStatus(booking.id, 'accepted')}
+                                disabled={updatingId === booking.id}
+                              >
+                                <Check className="h-4 w-4" />
+                              </Button>
+                              <Button
+                                size="sm"
+                                variant="destructive"
+                                onClick={() => handleUpdateStatus(booking.id, 'rejected')}
+                                disabled={updatingId === booking.id}
+                              >
+                                <X className="h-4 w-4" />
+                              </Button>
+                            </div>
+                          )}
                         </TableCell>
                       </TableRow>
                     ))}
