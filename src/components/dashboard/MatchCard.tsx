@@ -6,6 +6,7 @@ import { useNavigate } from "react-router-dom";
 
 export interface MatchCardProps {
   id: string;
+  userId?: string; // ID utente per le booking requests
   nome: string;
   tipo: 'artista' | 'venue' | 'professionista';
   genere: string;

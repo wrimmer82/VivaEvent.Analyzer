@@ -86,6 +86,7 @@ const Dashboard = () => {
       // Trasforma venues in MatchCardProps
       const venueMatches: MatchCardProps[] = (venues || []).map((venue) => ({
         id: venue.id,
+        userId: venue.user_id,
         nome: venue.nome_locale,
         tipo: 'venue',
         genere: Array.isArray(venue.generi_preferiti) ? venue.generi_preferiti.join(', ') : '',
@@ -99,6 +100,7 @@ const Dashboard = () => {
       // Trasforma professionisti in MatchCardProps
       const profMatches: MatchCardProps[] = (professionisti || []).map((prof) => ({
         id: prof.id,
+        userId: prof.user_id,
         nome: `${prof.nome_completo} (${prof.ruolo})`,
         tipo: 'professionista',
         genere: prof.ruolo,
@@ -325,7 +327,7 @@ const Dashboard = () => {
                     onBookingClick={() =>
                       setBookingModal({
                         open: true,
-                        receiverId: match.id,
+                        receiverId: match.userId || match.id,
                         receiverName: match.nome,
                         receiverType: match.tipo,
                       })
