@@ -1,10 +1,11 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
+import { Skeleton } from "@/components/ui/skeleton";
 import { Star, MapPin, Euro, Users, X, LogOut, Mail, Phone, ArrowRight } from "lucide-react";
 import StatsSidebar from "@/components/dashboard/StatsSidebar";
 import { BookingModal } from "@/components/dashboard/BookingModal";
@@ -28,128 +29,56 @@ interface ProfessionalMatch {
   lastUpdated: Date;
 }
 
-const mockMatches: ProfessionalMatch[] = [
+// Mock venues fittizie da mantenere
+const mockVenues: ProfessionalMatch[] = [
   {
-    id: '1',
-    nome: 'Club Alcatraz',
-    tipo: 'venue',
-    genere: 'Rock, Metal',
-    città: 'Milano',
-    email: 'info@alcatraz.it',
-    telefono: '+39 02 1234567',
-    capacity: 2000,
-    rating: 4.8,
-    avatarUrl: 'https://api.dicebear.com/7.x/identicon/svg?seed=alcatraz',
-    matchScore: 92,
-    matchReason: 'Alta richiesta di organizzazione eventi rock. Budget disponibile €3000-5000.',
-    lastUpdated: new Date('2025-01-15')
-  },
-  {
-    id: '2',
-    nome: 'The Rockers',
-    tipo: 'artista',
-    genere: 'Rock, Alternative',
-    città: 'Roma',
-    email: 'booking@therockers.it',
-    cachet: 2500,
-    rating: 4.7,
-    avatarUrl: 'https://api.dicebear.com/7.x/identicon/svg?seed=rockers',
-    matchScore: 88,
-    matchReason: 'Cercano management per tour italiano. Esperienza comprovata necessaria.',
-    lastUpdated: new Date('2025-01-14')
-  },
-  {
-    id: '3',
-    nome: 'Live Music Hall',
-    tipo: 'venue',
-    genere: 'Pop, Indie',
-    città: 'Torino',
-    email: 'eventi@livehall.it',
-    capacity: 500,
-    rating: 4.6,
-    avatarUrl: 'https://api.dicebear.com/7.x/identicon/svg?seed=livehall',
-    matchScore: 81,
-    matchReason: 'Venue emergente cerca collaborazione stabile per booking artisti indie.',
-    lastUpdated: new Date('2025-01-13')
-  },
-  {
-    id: '4',
-    nome: 'Jazz Fusion Band',
-    tipo: 'artista',
-    genere: 'Jazz, Fusion',
-    città: 'Milano',
-    email: 'contact@jazzfusion.it',
-    telefono: '+39 335 9876543',
-    cachet: 1800,
-    rating: 4.9,
-    avatarUrl: 'https://api.dicebear.com/7.x/identicon/svg?seed=jazzfusion',
-    matchScore: 85,
-    matchReason: 'Band jazz affermata cerca collaborazione per eventi corporate e privati.',
-    lastUpdated: new Date('2025-01-12')
-  },
-  {
-    id: '5',
-    nome: 'Blue Note Milano',
-    tipo: 'venue',
-    genere: 'Jazz, Blues',
-    città: 'Milano',
-    email: 'booking@bluenote.it',
-    capacity: 400,
-    rating: 4.9,
-    avatarUrl: 'https://api.dicebear.com/7.x/identicon/svg?seed=bluenote',
-    matchScore: 90,
-    matchReason: 'Locale prestigioso cerca professionista per gestione artisti internazionali.',
-    lastUpdated: new Date('2025-01-11')
-  },
-  {
-    id: '6',
+    id: 'mock-1',
     nome: 'Electronic Waves',
-    tipo: 'artista',
+    tipo: 'venue',
     genere: 'Electronic, House',
     città: 'Bologna',
     email: 'info@electronicwaves.it',
-    cachet: 3000,
+    capacity: 800,
     rating: 4.5,
     avatarUrl: 'https://api.dicebear.com/7.x/identicon/svg?seed=electronic',
     matchScore: 79,
-    matchReason: 'DJ emergente con fanbase 50k+ cerca booking agent per festival estivi.',
+    matchReason: 'Locale specializzato in musica elettronica, cerca collaborazioni per eventi EDM e techno.',
     lastUpdated: new Date('2025-01-10')
   },
   {
-    id: '7',
-    nome: 'Teatro Ariston',
+    id: 'mock-2',
+    nome: 'Indie Star',
     tipo: 'venue',
-    genere: 'Rock, Pop',
-    città: 'Roma',
-    email: 'direzione@ariston.it',
-    telefono: '+39 06 7654321',
-    capacity: 1500,
+    genere: 'Indie, Alternative',
+    città: 'Firenze',
+    email: 'booking@indiestar.it',
+    capacity: 350,
     rating: 4.7,
-    avatarUrl: 'https://api.dicebear.com/7.x/identicon/svg?seed=ariston',
+    avatarUrl: 'https://api.dicebear.com/7.x/identicon/svg?seed=indiestar',
     matchScore: 83,
-    matchReason: 'Teatro storico cerca consulente per programmazione stagione 2025-2026.',
+    matchReason: 'Venue emergente per artisti indie e alternative, aperto a nuove collaborazioni.',
     lastUpdated: new Date('2025-01-09')
   },
   {
-    id: '8',
-    nome: 'Indie Stars',
-    tipo: 'artista',
-    genere: 'Indie, Alternative',
-    città: 'Firenze',
-    email: 'management@indiestars.it',
-    cachet: 2200,
-    rating: 4.6,
-    avatarUrl: 'https://api.dicebear.com/7.x/identicon/svg?seed=indiestars',
-    matchScore: 77,
-    matchReason: 'Band indie cerca supporto per lancio nuovo album e tour promozionale.',
+    id: 'mock-3',
+    nome: 'Jazz Corner',
+    tipo: 'venue',
+    genere: 'Jazz, Blues',
+    città: 'Napoli',
+    email: 'info@jazzcorner.it',
+    capacity: 200,
+    rating: 4.8,
+    avatarUrl: 'https://api.dicebear.com/7.x/identicon/svg?seed=jazzcorner',
+    matchScore: 86,
+    matchReason: 'Locale jazz storico, cerca booking agent per artisti jazz e blues contemporanei.',
     lastUpdated: new Date('2025-01-08')
-  }
+  },
 ];
 
 interface FilterState {
   genres: string[];
   city: string;
-  tipo: string; // 'tutti', 'venue', 'artista'
+  tipo: string;
   newMatch: boolean;
   minRating: number;
 }
@@ -166,6 +95,72 @@ const ProfessionalMatchingDashboard = () => {
   });
   const [bookingModalOpen, setBookingModalOpen] = useState(false);
   const [selectedMatch, setSelectedMatch] = useState<ProfessionalMatch | null>(null);
+  const [matches, setMatches] = useState<ProfessionalMatch[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchMatches = async () => {
+      try {
+        setLoading(true);
+        
+        const { data: artisti, error: artistiError } = await supabase
+          .from('artisti')
+          .select('*');
+        
+        if (artistiError) throw artistiError;
+        
+        const { data: venues, error: venuesError } = await supabase
+          .from('venues')
+          .select('*');
+        
+        if (venuesError) throw venuesError;
+        
+        const artistiMatches: ProfessionalMatch[] = (artisti || []).map(artista => ({
+          id: artista.id,
+          nome: artista.nome_completo,
+          tipo: 'artista' as const,
+          genere: artista.genere_musicale,
+          città: artista.citta,
+          email: artista.email,
+          cachet: artista.cachet_desiderato,
+          rating: 4.5 + Math.random() * 0.5,
+          avatarUrl: artista.avatar_url || `https://api.dicebear.com/7.x/identicon/svg?seed=${artista.id}`,
+          matchScore: Math.floor(75 + Math.random() * 20),
+          matchReason: `Artista ${artista.genere_musicale} da ${artista.citta}. Cerca opportunità di collaborazione professionale.`,
+          lastUpdated: new Date(artista.created_at)
+        }));
+        
+        const venuesMatches: ProfessionalMatch[] = (venues || []).map(venue => ({
+          id: venue.id,
+          nome: venue.nome_locale,
+          tipo: 'venue' as const,
+          genere: venue.generi_preferiti.join(', '),
+          città: venue.citta,
+          email: venue.email,
+          capacity: venue.capacita,
+          rating: 4.3 + Math.random() * 0.6,
+          avatarUrl: venue.avatar_url || `https://api.dicebear.com/7.x/identicon/svg?seed=${venue.id}`,
+          matchScore: Math.floor(70 + Math.random() * 25),
+          matchReason: `Venue con capacità ${venue.capacita} persone, budget medio €${venue.budget_medio}. Cerca artisti per eventi.`,
+          lastUpdated: new Date(venue.created_at)
+        }));
+        
+        setMatches([...artistiMatches, ...venuesMatches, ...mockVenues]);
+      } catch (error) {
+        console.error('Errore nel caricamento dei match:', error);
+        toast({
+          variant: "destructive",
+          title: "Errore",
+          description: "Impossibile caricare i match"
+        });
+        setMatches(mockVenues);
+      } finally {
+        setLoading(false);
+      }
+    };
+    
+    fetchMatches();
+  }, []);
 
   const handleLogout = async () => {
     const { error } = await supabase.auth.signOut();
@@ -184,16 +179,14 @@ const ProfessionalMatchingDashboard = () => {
     }
   };
 
-  // Apply filters
   const applyFilters = () => {
-    return mockMatches.filter((match) => {
+    return matches.filter((match) => {
       const genreMatch = filters.genres.length === 0 || 
                          filters.genres.some(g => match.genere.toLowerCase().includes(g.toLowerCase()));
       const cityMatch = filters.city === 'Tutte' || match.città === filters.city;
       const tipoMatch = filters.tipo === 'tutti' || match.tipo === filters.tipo;
       const ratingMatch = match.rating >= filters.minRating;
       
-      // New match = last 7 days
       const newMatchFilter = !filters.newMatch || 
         (new Date().getTime() - match.lastUpdated.getTime()) < 7 * 24 * 60 * 60 * 1000;
       
@@ -203,7 +196,6 @@ const ProfessionalMatchingDashboard = () => {
 
   const filteredMatches = applyFilters();
 
-  // Sort matches
   const sortedMatches = [...filteredMatches].sort((a, b) => {
     if (sortBy === "match") return b.matchScore - a.matchScore;
     if (sortBy === "rating") return b.rating - a.rating;
@@ -228,15 +220,11 @@ const ProfessionalMatchingDashboard = () => {
   return (
     <div className="min-h-screen bg-[#0f1419]">
       <div className="container mx-auto px-4 py-8">
-        {/* Header with User Badge */}
         <div className="mb-6 flex items-center justify-between">
           <div className="flex items-center gap-2">
             <Badge className="bg-cyan-500/20 text-cyan-400 px-4 py-2 text-sm">
               <Users className="h-4 w-4 mr-2" />
               Dashboard Matching Professionista
-            </Badge>
-            <Badge variant="secondary" className="bg-amber-500/20 text-amber-400 px-3 py-2 text-xs">
-              DEMO MODE
             </Badge>
           </div>
           <Button 
@@ -251,326 +239,313 @@ const ProfessionalMatchingDashboard = () => {
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-          {/* Filter Sidebar - Left */}
           <aside className="hidden lg:block lg:col-span-2">
             <Card className="bg-[#1a1f2e] border-cyan-500/30 sticky top-4 p-6">
               <h3 className="text-white text-xl font-bold mb-6">🔍 Filtra</h3>
               
-              {/* Tipo */}
               <div className="mb-6">
-                <label className="text-gray-300 text-sm font-semibold mb-3 block">Tipo ▼</label>
-                <select
-                  value={filters.tipo}
-                  onChange={(e) => setFilters({ ...filters, tipo: e.target.value })}
-                  className="w-full bg-slate-800 border border-slate-600 text-white rounded-lg px-3 py-2 
-                           focus:ring-2 focus:ring-cyan-500 focus:outline-none text-sm"
-                >
-                  <option value="tutti">Tutti</option>
-                  <option value="venue">Solo Venue</option>
-                  <option value="artista">Solo Artisti</option>
-                </select>
+                <label className="text-cyan-400 text-sm font-semibold mb-2 block">Tipo</label>
+                <Select value={filters.tipo} onValueChange={(value) => setFilters({...filters, tipo: value})}>
+                  <SelectTrigger className="bg-[#0f1419] border-cyan-500/50 text-white">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent className="bg-[#1a1f2e] border-cyan-500/50">
+                    <SelectItem value="tutti">Tutti</SelectItem>
+                    <SelectItem value="artista">Artisti</SelectItem>
+                    <SelectItem value="venue">Venues</SelectItem>
+                  </SelectContent>
+                </Select>
               </div>
 
-              {/* Genere */}
               <div className="mb-6">
-                <label className="text-gray-300 text-sm font-semibold mb-3 block">Genere ▼</label>
-                <div className="space-y-2">
+                <label className="text-cyan-400 text-sm font-semibold mb-2 block">Genere</label>
+                <div className="space-y-2 max-h-48 overflow-y-auto">
                   {genres.map(genre => (
-                    <label key={genre} className="flex items-center space-x-2 cursor-pointer group">
-                      <input
-                        type="checkbox"
+                    <label key={genre} className="flex items-center gap-2 cursor-pointer text-white hover:text-cyan-400">
+                      <input 
+                        type="checkbox" 
                         checked={filters.genres.includes(genre)}
                         onChange={(e) => {
-                          const newGenres = e.target.checked
-                            ? [...filters.genres, genre]
-                            : filters.genres.filter(g => g !== genre);
-                          setFilters({ ...filters, genres: newGenres });
+                          if (e.target.checked) {
+                            setFilters({...filters, genres: [...filters.genres, genre]});
+                          } else {
+                            setFilters({...filters, genres: filters.genres.filter(g => g !== genre)});
+                          }
                         }}
-                        className="w-4 h-4 rounded border-slate-600 bg-slate-800 text-cyan-500 
-                                 focus:ring-2 focus:ring-cyan-500 focus:ring-offset-0 cursor-pointer"
+                        className="accent-cyan-500"
                       />
-                      <span className="text-gray-300 text-sm group-hover:text-cyan-400 transition-colors">
-                        {genre}
-                      </span>
+                      <span className="text-sm">{genre}</span>
                     </label>
                   ))}
                 </div>
               </div>
 
-              {/* Città */}
               <div className="mb-6">
-                <label className="text-gray-300 text-sm font-semibold mb-3 block">Città ▼</label>
-                <select
-                  value={filters.city}
-                  onChange={(e) => setFilters({ ...filters, city: e.target.value })}
-                  className="w-full bg-slate-800 border border-slate-600 text-white rounded-lg px-3 py-2 
-                           focus:ring-2 focus:ring-cyan-500 focus:outline-none text-sm"
-                >
-                  {cities.map(city => (
-                    <option key={city} value={city}>{city}</option>
-                  ))}
-                </select>
+                <label className="text-cyan-400 text-sm font-semibold mb-2 block">Città</label>
+                <Select value={filters.city} onValueChange={(value) => setFilters({...filters, city: value})}>
+                  <SelectTrigger className="bg-[#0f1419] border-cyan-500/50 text-white">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent className="bg-[#1a1f2e] border-cyan-500/50">
+                    {cities.map(city => (
+                      <SelectItem key={city} value={city}>{city}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
               </div>
 
-              {/* Nuovi Match Toggle */}
               <div className="mb-6">
-                <label className="flex items-center space-x-2 cursor-pointer group">
-                  <input
+                <label className="flex items-center gap-2 cursor-pointer text-white hover:text-cyan-400">
+                  <input 
                     type="checkbox"
                     checked={filters.newMatch}
-                    onChange={(e) => setFilters({ ...filters, newMatch: e.target.checked })}
-                    className="w-4 h-4 rounded border-slate-600 bg-slate-800 text-cyan-500 
-                             focus:ring-2 focus:ring-cyan-500 focus:ring-offset-0 cursor-pointer"
+                    onChange={(e) => setFilters({...filters, newMatch: e.target.checked})}
+                    className="accent-cyan-500"
                   />
-                  <span className="text-gray-300 text-sm group-hover:text-cyan-400 transition-colors">
-                    Solo nuovi match (7gg)
-                  </span>
+                  <span className="text-sm">Solo nuovi match</span>
                 </label>
               </div>
 
-              {/* Rating */}
-              <div className="mb-6">
-                <label className="text-gray-300 text-sm font-semibold mb-3 block">Rating Minimo ▼</label>
-                <select
-                  value={filters.minRating}
-                  onChange={(e) => setFilters({ ...filters, minRating: parseFloat(e.target.value) })}
-                  className="w-full bg-slate-800 border border-slate-600 text-white rounded-lg px-3 py-2 
-                           focus:ring-2 focus:ring-cyan-500 focus:outline-none text-sm"
-                >
-                  <option value="0">Tutti</option>
-                  <option value="4.0">4.0+ stelle</option>
-                  <option value="4.5">4.5+ stelle</option>
-                  <option value="4.8">4.8+ stelle</option>
-                </select>
+              <div className="mb-4">
+                <label className="text-cyan-400 text-sm font-semibold mb-2 block">Rating minimo</label>
+                <Select value={filters.minRating.toString()} onValueChange={(value) => setFilters({...filters, minRating: parseFloat(value)})}>
+                  <SelectTrigger className="bg-[#0f1419] border-cyan-500/50 text-white">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent className="bg-[#1a1f2e] border-cyan-500/50">
+                    <SelectItem value="0">Tutti</SelectItem>
+                    <SelectItem value="4.0">4.0+</SelectItem>
+                    <SelectItem value="4.5">4.5+</SelectItem>
+                    <SelectItem value="4.8">4.8+</SelectItem>
+                  </SelectContent>
+                </Select>
               </div>
 
-              {/* Reset */}
-              <button
-                onClick={() => setFilters({
-                  genres: [],
-                  city: 'Tutte',
-                  tipo: 'tutti',
-                  newMatch: false,
-                  minRating: 0
-                })}
-                className="w-full text-cyan-400 hover:text-cyan-300 font-medium py-2 px-4 
-                         transition-colors duration-200 flex items-center justify-center gap-2 text-sm"
-              >
-                Reset Filtri
-              </button>
+              {(filters.genres.length > 0 || filters.city !== 'Tutte' || filters.tipo !== 'tutti' || filters.newMatch || filters.minRating > 0) && (
+                <Button 
+                  variant="outline" 
+                  size="sm" 
+                  className="w-full border-cyan-500/50 text-cyan-400 hover:bg-cyan-500/10"
+                  onClick={() => setFilters({genres: [], city: 'Tutte', tipo: 'tutti', newMatch: false, minRating: 0})}
+                >
+                  Reset Filtri
+                </Button>
+              )}
             </Card>
           </aside>
 
-          {/* Main Content - Center */}
-          <main className="lg:col-span-7">
-            {/* Header */}
-            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
-              <div>
-                <h1 className="text-white text-2xl font-bold">Match Suggeriti per Te</h1>
-                <p className="text-gray-400 text-sm mt-1">
-                  {sortedMatches.length} opportunità trovate
-                </p>
-              </div>
-              <Select value={sortBy} onValueChange={setSortBy}>
-                <SelectTrigger className="w-[200px] bg-[#1a1f2e] border-cyan-500/30 text-white">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent className="bg-[#1a1f2e] border-cyan-500/30 text-white">
-                  <SelectItem value="match">Per Match Score</SelectItem>
-                  <SelectItem value="rating">Per Rating</SelectItem>
-                  <SelectItem value="recent">Più Recenti</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-
-            {/* Active Filters Tags */}
-            {(filters.genres.length > 0 || filters.city !== 'Tutte' || filters.tipo !== 'tutti' || filters.newMatch || filters.minRating > 0) && (
-              <div className="flex flex-wrap gap-2 mb-4">
-                {filters.tipo !== 'tutti' && (
-                  <Badge className="bg-cyan-500/20 text-cyan-400 px-3 py-1 cursor-pointer hover:bg-cyan-500/30">
-                    {filters.tipo === 'venue' ? 'Solo Venue' : 'Solo Artisti'}
-                    <X 
-                      className="h-3 w-3 ml-1 inline" 
-                      onClick={() => setFilters({...filters, tipo: 'tutti'})}
-                    />
-                  </Badge>
-                )}
-                {filters.genres.map(genre => (
-                  <Badge key={genre} className="bg-cyan-500/20 text-cyan-400 px-3 py-1 cursor-pointer hover:bg-cyan-500/30">
-                    {genre}
-                    <X 
-                      className="h-3 w-3 ml-1 inline" 
-                      onClick={() => setFilters({...filters, genres: filters.genres.filter(g => g !== genre)})}
-                    />
-                  </Badge>
+          <div className="lg:col-span-7 space-y-6">
+            {loading ? (
+              <div className="space-y-4">
+                {[1, 2, 3].map((i) => (
+                  <Card key={i} className="p-6 bg-[#1a1f2e] border-cyan-500/30">
+                    <div className="flex items-start gap-4">
+                      <Skeleton className="h-16 w-16 rounded-full" />
+                      <div className="flex-1 space-y-2">
+                        <Skeleton className="h-6 w-48" />
+                        <Skeleton className="h-4 w-64" />
+                        <Skeleton className="h-4 w-32" />
+                      </div>
+                    </div>
+                  </Card>
                 ))}
-                {filters.city !== 'Tutte' && (
-                  <Badge className="bg-cyan-500/20 text-cyan-400 px-3 py-1 cursor-pointer hover:bg-cyan-500/30">
-                    {filters.city}
-                    <X 
-                      className="h-3 w-3 ml-1 inline" 
-                      onClick={() => setFilters({...filters, city: 'Tutte'})}
-                    />
-                  </Badge>
-                )}
-                {filters.newMatch && (
-                  <Badge className="bg-cyan-500/20 text-cyan-400 px-3 py-1 cursor-pointer hover:bg-cyan-500/30">
-                    Nuovi Match
-                    <X 
-                      className="h-3 w-3 ml-1 inline" 
-                      onClick={() => setFilters({...filters, newMatch: false})}
-                    />
-                  </Badge>
-                )}
-                {filters.minRating > 0 && (
-                  <Badge className="bg-cyan-500/20 text-cyan-400 px-3 py-1 cursor-pointer hover:bg-cyan-500/30">
-                    Rating {filters.minRating}+
-                    <X 
-                      className="h-3 w-3 ml-1 inline" 
-                      onClick={() => setFilters({...filters, minRating: 0})}
-                    />
-                  </Badge>
-                )}
-              </div>
-            )}
-
-            {/* Match Grid */}
-            {sortedMatches.length === 0 ? (
-              <div className="bg-[#1a1f2e] border border-cyan-500/30 rounded-lg p-12 text-center">
-                <div className="text-6xl mb-4">😔</div>
-                <h3 className="text-white text-xl font-bold mb-2">Nessun match trovato</h3>
-                <p className="text-gray-400 mb-4">
-                  Nessuna opportunità corrisponde ai criteri di ricerca selezionati
-                </p>
-                <button
-                  onClick={() => setFilters({
-                    genres: [],
-                    city: 'Tutte',
-                    tipo: 'tutti',
-                    newMatch: false,
-                    minRating: 0
-                  })}
-                  className="bg-cyan-500 hover:bg-cyan-600 text-white px-6 py-2 rounded-lg transition-colors"
-                >
-                  Reset Filtri
-                </button>
               </div>
             ) : (
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                {sortedMatches.map((match) => (
-                  <div 
-                    key={match.id}
-                    className="relative bg-[#1a1f2e] border border-cyan-500/30 rounded-xl p-5 hover:shadow-[0_0_20px_rgba(6,182,212,0.3)] hover:scale-[1.02] transition-all duration-300"
-                  >
-                    {/* Match Score Badge */}
-                    <Badge 
-                      className={`absolute top-4 right-4 ${getMatchScoreColor(match.matchScore)} text-white font-bold text-sm`}
-                    >
-                      {match.matchScore}%
-                    </Badge>
-
-                    {/* Tipo Badge */}
-                    <Badge 
-                      className={`absolute top-4 left-4 ${match.tipo === 'venue' ? 'bg-purple-500/20 text-purple-400' : 'bg-blue-500/20 text-blue-400'} text-xs font-semibold`}
-                    >
-                      {match.tipo === 'venue' ? '🏛️ VENUE' : '🎸 ARTISTA'}
-                    </Badge>
-
-                    {/* Avatar and Name */}
-                    <div className="flex items-start gap-4 mb-4 mt-6">
-                      <Avatar className="h-20 w-20">
-                        <AvatarImage src={match.avatarUrl} alt={match.nome} />
-                        <AvatarFallback>{match.nome.charAt(0)}</AvatarFallback>
-                      </Avatar>
-                      <div className="flex-1">
-                        <h3 className="font-semibold text-lg text-white mb-1">{match.nome}</h3>
-                        <p className="text-sm text-gray-400">{match.genere}</p>
-                      </div>
-                    </div>
-
-                    {/* Info Section */}
-                    <div className="space-y-2 mb-4">
-                      <div className="flex items-center gap-2 text-sm text-gray-300">
-                        <Star className="h-4 w-4 text-yellow-500 fill-yellow-500" />
-                        <span>{match.rating} Rating</span>
-                      </div>
-                      <div className="flex items-center gap-2 text-sm text-gray-300">
-                        <MapPin className="h-4 w-4 text-cyan-500" />
-                        <span>{match.città}</span>
-                      </div>
-                      <div className="flex items-center gap-2 text-sm text-gray-300">
-                        <Mail className="h-4 w-4 text-cyan-500" />
-                        <span className="truncate">{match.email}</span>
-                      </div>
-                      {match.telefono && (
-                        <div className="flex items-center gap-2 text-sm text-gray-300">
-                          <Phone className="h-4 w-4 text-cyan-500" />
-                          <span>{match.telefono}</span>
-                        </div>
-                      )}
-                      {match.tipo === 'artista' && match.cachet && (
-                        <div className="flex items-center gap-2 text-sm text-gray-300">
-                          <Euro className="h-4 w-4 text-cyan-500" />
-                          <span>€{match.cachet.toLocaleString()} cachet</span>
-                        </div>
-                      )}
-                      {match.tipo === 'venue' && match.capacity && (
-                        <div className="flex items-center gap-2 text-sm text-gray-300">
-                          <Users className="h-4 w-4 text-cyan-500" />
-                          <span>{match.capacity} cap</span>
-                        </div>
-                      )}
-                    </div>
-
-                    {/* Match Reason */}
-                    <div className="bg-slate-800/50 rounded-lg p-3 mb-4">
-                      <p className="text-xs text-gray-300 leading-relaxed">
-                        <span className="text-cyan-400 font-semibold">Motivo match: </span>
-                        {match.matchReason}
-                      </p>
-                    </div>
-
-                    {/* Match Score Bar */}
-                    <div className="mb-4">
-                      <div className="w-full bg-slate-700 rounded-full h-2">
-                        <div 
-                          className={`h-2 rounded-full ${getMatchScoreColor(match.matchScore)}`}
-                          style={{ width: `${match.matchScore}%` }}
-                        />
-                      </div>
-                    </div>
-
-                    {/* Action Buttons */}
-                    <div className="flex gap-2">
-                      <Button 
-                        variant="outline" 
-                        className="flex-1 border-cyan-500 text-cyan-500 hover:bg-cyan-900/30"
-                        onClick={() => console.log('View profile:', match.id)}
-                      >
-                        Visualizza Profilo
-                      </Button>
-                      <Button 
-                        className="flex-1 bg-cyan-500 hover:bg-cyan-600 text-white gap-2"
-                        onClick={() => handleOpenBookingModal(match)}
-                      >
-                        {match.tipo === 'venue' ? 'Richiedi Collaborazione' : 'Proponi Collaborazione'}
-                        <ArrowRight className="h-4 w-4" />
-                      </Button>
-                    </div>
+              <>
+                <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+                  <div>
+                    <h2 className="text-2xl font-bold text-foreground">Match Suggeriti</h2>
+                    <p className="text-sm text-muted-foreground mt-1">
+                      {sortedMatches.length} opportunità trovate
+                    </p>
                   </div>
-                ))}
-              </div>
-            )}
-          </main>
 
-          {/* Stats Sidebar - Right */}
-          <aside className="hidden xl:block lg:col-span-3">
+                  <div className="flex items-center gap-2">
+                    <span className="text-sm text-muted-foreground">Ordina per:</span>
+                    <Select value={sortBy} onValueChange={setSortBy}>
+                      <SelectTrigger className="w-[180px] bg-[#1a1f2e] border-cyan-500/50 text-white">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent className="bg-[#1a1f2e] border-cyan-500/50">
+                        <SelectItem value="match">Match Score</SelectItem>
+                        <SelectItem value="rating">Rating</SelectItem>
+                        <SelectItem value="recent">Più recenti</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </div>
+
+                {(filters.genres.length > 0 || filters.city !== 'Tutte' || filters.tipo !== 'tutti' || filters.newMatch || filters.minRating > 0) && (
+                  <div className="flex flex-wrap gap-2">
+                    {filters.genres.map(genre => (
+                      <Badge key={genre} variant="secondary" className="bg-cyan-500/20 text-cyan-400">
+                        {genre}
+                        <X 
+                          className="h-3 w-3 ml-1 cursor-pointer" 
+                          onClick={() => setFilters({...filters, genres: filters.genres.filter(g => g !== genre)})}
+                        />
+                      </Badge>
+                    ))}
+                    {filters.city !== 'Tutte' && (
+                      <Badge variant="secondary" className="bg-cyan-500/20 text-cyan-400">
+                        {filters.city}
+                        <X 
+                          className="h-3 w-3 ml-1 cursor-pointer" 
+                          onClick={() => setFilters({...filters, city: 'Tutte'})}
+                        />
+                      </Badge>
+                    )}
+                    {filters.tipo !== 'tutti' && (
+                      <Badge variant="secondary" className="bg-cyan-500/20 text-cyan-400">
+                        {filters.tipo === 'artista' ? 'Artisti' : 'Venues'}
+                        <X 
+                          className="h-3 w-3 ml-1 cursor-pointer" 
+                          onClick={() => setFilters({...filters, tipo: 'tutti'})}
+                        />
+                      </Badge>
+                    )}
+                    {filters.newMatch && (
+                      <Badge variant="secondary" className="bg-cyan-500/20 text-cyan-400">
+                        Nuovi match
+                        <X 
+                          className="h-3 w-3 ml-1 cursor-pointer" 
+                          onClick={() => setFilters({...filters, newMatch: false})}
+                        />
+                      </Badge>
+                    )}
+                    {filters.minRating > 0 && (
+                      <Badge variant="secondary" className="bg-cyan-500/20 text-cyan-400">
+                        Rating {filters.minRating}+
+                        <X 
+                          className="h-3 w-3 ml-1 cursor-pointer" 
+                          onClick={() => setFilters({...filters, minRating: 0})}
+                        />
+                      </Badge>
+                    )}
+                  </div>
+                )}
+
+                <div className="grid gap-6">
+                  {sortedMatches.map((match) => (
+                    <Card key={match.id} className="bg-[#1a1f2e] border-cyan-500/30 hover:border-cyan-500/60 transition-all duration-300">
+                      <div className="p-6">
+                        <div className="flex flex-col md:flex-row gap-6">
+                          <div className="flex items-start gap-4 flex-1">
+                            <Avatar className="h-16 w-16 border-2 border-cyan-500/50">
+                              <AvatarImage src={match.avatarUrl} alt={match.nome} />
+                              <AvatarFallback className="bg-cyan-500/20 text-cyan-400">
+                                {match.nome.substring(0, 2).toUpperCase()}
+                              </AvatarFallback>
+                            </Avatar>
+                            
+                            <div className="flex-1">
+                              <div className="flex items-center gap-2 mb-2">
+                                <h3 className="text-lg font-bold text-white">{match.nome}</h3>
+                                <Badge className={match.tipo === 'artista' ? 'bg-purple-500/20 text-purple-400' : 'bg-amber-500/20 text-amber-400'}>
+                                  {match.tipo === 'artista' ? '🎤 Artista' : '🏛️ Venue'}
+                                </Badge>
+                              </div>
+                              
+                              <p className="text-cyan-400 text-sm mb-2">{match.genere}</p>
+                              
+                              <div className="flex flex-wrap gap-4 text-sm text-muted-foreground">
+                                <div className="flex items-center gap-1">
+                                  <MapPin className="h-4 w-4" />
+                                  {match.città}
+                                </div>
+                                {match.tipo === 'artista' && match.cachet && (
+                                  <div className="flex items-center gap-1">
+                                    <Euro className="h-4 w-4" />
+                                    Cachet: €{match.cachet}
+                                  </div>
+                                )}
+                                {match.tipo === 'venue' && match.capacity && (
+                                  <div className="flex items-center gap-1">
+                                    <Users className="h-4 w-4" />
+                                    Capacità: {match.capacity}
+                                  </div>
+                                )}
+                                <div className="flex items-center gap-1">
+                                  <Star className="h-4 w-4 fill-yellow-400 text-yellow-400" />
+                                  {match.rating.toFixed(1)}
+                                </div>
+                              </div>
+
+                              <div className="mt-3 flex flex-wrap gap-3 text-xs text-muted-foreground">
+                                <div className="flex items-center gap-1">
+                                  <Mail className="h-3 w-3" />
+                                  {match.email}
+                                </div>
+                                {match.telefono && (
+                                  <div className="flex items-center gap-1">
+                                    <Phone className="h-3 w-3" />
+                                    {match.telefono}
+                                  </div>
+                                )}
+                              </div>
+                            </div>
+                          </div>
+
+                          <div className="flex flex-col justify-between md:w-64">
+                            <div className="mb-4">
+                              <div className="flex items-center justify-between mb-2">
+                                <span className="text-xs text-cyan-400 font-semibold">MATCH SCORE</span>
+                                <Badge className={`${getMatchScoreColor(match.matchScore)} text-white`}>
+                                  {match.matchScore}%
+                                </Badge>
+                              </div>
+                              
+                              <div className="bg-[#0f1419] p-3 rounded-lg border border-cyan-500/20">
+                                <p className="text-xs text-muted-foreground italic">
+                                  "{match.matchReason}"
+                                </p>
+                              </div>
+                            </div>
+
+                            <div className="flex flex-col gap-2">
+                              <Button 
+                                onClick={() => {
+                                  if (match.tipo === 'artista') {
+                                    navigate(`/artist-profile/${match.id}`);
+                                  } else {
+                                    navigate(`/venue-profile/${match.id}`);
+                                  }
+                                }}
+                                className="w-full bg-cyan-500 hover:bg-cyan-600 text-white"
+                              >
+                                Visualizza Profilo
+                                <ArrowRight className="h-4 w-4 ml-2" />
+                              </Button>
+                              <Button 
+                                variant="outline"
+                                onClick={() => handleOpenBookingModal(match)}
+                                className="w-full border-cyan-500/50 text-cyan-400 hover:bg-cyan-500/10"
+                              >
+                                Contatta
+                              </Button>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </Card>
+                  ))}
+
+                  {sortedMatches.length === 0 && (
+                    <Card className="bg-[#1a1f2e] border-cyan-500/30 p-12 text-center">
+                      <p className="text-muted-foreground">Nessun match trovato con i filtri selezionati</p>
+                    </Card>
+                  )}
+                </div>
+              </>
+            )}
+          </div>
+
+          <aside className="hidden lg:block lg:col-span-3">
             <StatsSidebar />
           </aside>
         </div>
       </div>
 
-      {/* Booking Modal */}
       {selectedMatch && (
         <BookingModal
           open={bookingModalOpen}
