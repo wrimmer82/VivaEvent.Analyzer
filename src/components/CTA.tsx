@@ -22,7 +22,7 @@ const CTA = () => {
       }
     };
   }, []);
-  return <section ref={sectionRef} className="py-24 relative overflow-hidden" style={{
+  return <section id="a-cosa-serve" ref={sectionRef} className="py-24 relative overflow-hidden" style={{
     background: 'linear-gradient(135deg, hsl(0, 0%, 0%), hsl(45, 100%, 12%), hsl(0, 0%, 5%), hsl(0, 0%, 0%))'
   }}>
       {/* Decorative elements */}

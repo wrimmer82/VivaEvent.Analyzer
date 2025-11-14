@@ -17,38 +17,59 @@ export type Database = {
       artisti: {
         Row: {
           avatar_url: string | null
+          avg_attendance_last_3_gigs: number | null
           biografia: string | null
           cachet_desiderato: number
           citta: string
           created_at: string
           email: string
+          epk_completed: boolean | null
+          fanbase_size: number | null
           genere_musicale: string
+          generi: string[] | null
           id: string
+          links: Json | null
           nome_completo: string
+          target_audience: string[] | null
+          updated_at: string | null
           user_id: string
         }
         Insert: {
           avatar_url?: string | null
+          avg_attendance_last_3_gigs?: number | null
           biografia?: string | null
           cachet_desiderato: number
           citta: string
           created_at?: string
           email: string
+          epk_completed?: boolean | null
+          fanbase_size?: number | null
           genere_musicale: string
+          generi?: string[] | null
           id?: string
+          links?: Json | null
           nome_completo: string
+          target_audience?: string[] | null
+          updated_at?: string | null
           user_id: string
         }
         Update: {
           avatar_url?: string | null
+          avg_attendance_last_3_gigs?: number | null
           biografia?: string | null
           cachet_desiderato?: number
           citta?: string
           created_at?: string
           email?: string
+          epk_completed?: boolean | null
+          fanbase_size?: number | null
           genere_musicale?: string
+          generi?: string[] | null
           id?: string
+          links?: Json | null
           nome_completo?: string
+          target_audience?: string[] | null
+          updated_at?: string | null
           user_id?: string
         }
         Relationships: [
