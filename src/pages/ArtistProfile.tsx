@@ -125,6 +125,30 @@ const ArtistProfile = () => {
     }
   };
 
+  const uploadFile = async (file: File, folder: string): Promise<string | null> => {
+    try {
+      const fileExt = file.name.split('.').pop();
+      const fileName = `${userId}/${folder}/${Date.now()}.${fileExt}`;
+      
+      const { error: uploadError, data } = await supabase.storage
+        .from('artist-media')
+        .upload(fileName, file, {
+          upsert: true
+        });
+
+      if (uploadError) throw uploadError;
+
+      const { data: { publicUrl } } = supabase.storage
+        .from('artist-media')
+        .getPublicUrl(fileName);
+
+      return publicUrl;
+    } catch (error) {
+      console.error(`Error uploading ${folder}:`, error);
+      return null;
+    }
+  };
+
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
     if (!userId) {
       toast({
@@ -144,6 +168,41 @@ const ArtistProfile = () => {
         return;
       }
 
+      // Upload files
+      let epkUrl: string | null = null;
+      const photoUrls: string[] = [];
+      const audioUrls: string[] = [];
+
+      // Upload EPK
+      if (epkFile) {
+        epkUrl = await uploadFile(epkFile, 'epk');
+      }
+
+      // Upload photos
+      for (const photo of photos) {
+        const url = await uploadFile(photo, 'photos');
+        if (url) photoUrls.push(url);
+      }
+
+      // Upload audio samples
+      for (const audio of audioSamples) {
+        const url = await uploadFile(audio, 'audio');
+        if (url) audioUrls.push(url);
+      }
+
+      // Prepare links object with social media and media files
+      const links = {
+        instagram: values.instagram || "",
+        facebook: values.facebook || "",
+        spotify: values.spotify || "",
+        youtube: values.youtube || "",
+        tiktok: values.tiktok || "",
+        video: videoLink || "",
+        epk: epkUrl || "",
+        photos: photoUrls,
+        audio: audioUrls,
+      };
+
       const artistPayload = {
         user_id: userId,
         nome_completo: values.artistName,
@@ -152,6 +211,7 @@ const ArtistProfile = () => {
         citta: values.localFanbase,
         email: session.user.email || "",
         cachet_desiderato: 0,
+        links: links,
       };
 
       if (artistId) {
@@ -184,7 +244,10 @@ const ArtistProfile = () => {
 
       toast({
         title: "Profilo Salvato! 🎵",
-        description: "Il tuo profilo artista è stato salvato con successo.",
+        description: "Il tuo profilo artista è stato salvato con successo. Media caricati: " + 
+          (epkUrl ? "EPK, " : "") + 
+          (photoUrls.length > 0 ? `${photoUrls.length} foto, ` : "") + 
+          (audioUrls.length > 0 ? `${audioUrls.length} audio` : ""),
       });
     } catch (error) {
       console.error("Error saving profile:", error);
