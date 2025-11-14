@@ -20,15 +20,9 @@ const Navbar = ({ logoLink = "/" }: NavbarProps) => {
 
           {/* Navigation links */}
           <div className="hidden md:flex items-center gap-8">
-            <Link to="/crea-profilo" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
-              Artisti
-            </Link>
-            <Link to="/profilo-professionista" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
-              Professionisti
-            </Link>
-            <Link to="/profilo-venue" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
-              Venue
-            </Link>
+            <a href="#a-cosa-serve" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
+              A Cosa Serve
+            </a>
             <a href="#features" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
               Features
             </a>
