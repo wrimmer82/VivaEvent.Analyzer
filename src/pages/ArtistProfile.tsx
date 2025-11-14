@@ -84,17 +84,21 @@ const ArtistProfile = () => {
 
       if (artistData) {
         setArtistId(artistData.id);
+        const existingLinks = (artistData as any).links || {};
         form.reset({
           artistName: artistData.nome_completo || "",
           genre: artistData.genere_musicale || "",
           bio: artistData.biografia || "",
           localFanbase: artistData.citta || "",
-          instagram: "",
-          facebook: "",
-          spotify: "",
-          youtube: "",
-          tiktok: "",
+          instagram: existingLinks.instagram || "",
+          facebook: existingLinks.facebook || "",
+          spotify: existingLinks.spotify || "",
+          youtube: existingLinks.youtube || "",
+          tiktok: existingLinks.tiktok || "",
         });
+        if (existingLinks.video) {
+          setVideoLink(existingLinks.video);
+        }
       }
     } catch (error) {
       console.error("Error checking auth:", error);
@@ -168,23 +172,37 @@ const ArtistProfile = () => {
         return;
       }
 
+      // Get existing links data
+      let existingLinks: any = {};
+      if (artistId) {
+        const { data: existingArtist } = await supabase
+          .from("artisti")
+          .select("links")
+          .eq("id", artistId)
+          .single();
+        
+        if (existingArtist) {
+          existingLinks = (existingArtist as any).links || {};
+        }
+      }
+
       // Upload files
       let epkUrl: string | null = null;
-      const photoUrls: string[] = [];
-      const audioUrls: string[] = [];
+      const photoUrls: string[] = [...(existingLinks.photos || [])];
+      const audioUrls: string[] = [...(existingLinks.audio || [])];
 
-      // Upload EPK
+      // Upload EPK (replace if new file provided)
       if (epkFile) {
         epkUrl = await uploadFile(epkFile, 'epk');
       }
 
-      // Upload photos
+      // Upload photos (append to existing)
       for (const photo of photos) {
         const url = await uploadFile(photo, 'photos');
         if (url) photoUrls.push(url);
       }
 
-      // Upload audio samples
+      // Upload audio samples (append to existing)
       for (const audio of audioSamples) {
         const url = await uploadFile(audio, 'audio');
         if (url) audioUrls.push(url);
@@ -197,8 +215,8 @@ const ArtistProfile = () => {
         spotify: values.spotify || "",
         youtube: values.youtube || "",
         tiktok: values.tiktok || "",
-        video: videoLink || "",
-        epk: epkUrl || "",
+        video: videoLink || existingLinks.video || "",
+        epk: epkUrl || existingLinks.epk || "",
         photos: photoUrls,
         audio: audioUrls,
       };
