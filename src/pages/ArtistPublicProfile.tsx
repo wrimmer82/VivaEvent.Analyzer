@@ -13,7 +13,10 @@ import {
   Music2,
   Image as ImageIcon,
   Link as LinkIcon,
-  Mail
+  Mail,
+  FileText,
+  Play,
+  Video
 } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
@@ -215,27 +218,153 @@ const ArtistPublicProfile = () => {
               {artist.biografia || "Biografia non disponibile"}
             </p>
 
-            {/* Links */}
-            {artist.links && Object.keys(artist.links).length > 0 && (
+            {/* Social Media Links */}
+            {artist.links && (
               <>
-                <Separator className="my-6" />
-                <h3 className="text-lg font-bold text-foreground mb-3 flex items-center gap-2">
-                  <LinkIcon className="h-5 w-5 text-primary" />
-                  Link
-                </h3>
-                <div className="flex flex-wrap gap-2">
-                  {Object.entries(artist.links).map(([platform, url]: [string, any]) => (
+                {(artist.links.instagram || artist.links.facebook || artist.links.spotify || artist.links.youtube || artist.links.tiktok) && (
+                  <>
+                    <Separator className="my-6" />
+                    <h3 className="text-lg font-bold text-foreground mb-3 flex items-center gap-2">
+                      <LinkIcon className="h-5 w-5 text-primary" />
+                      Social Media
+                    </h3>
+                    <div className="flex flex-wrap gap-2">
+                      {artist.links.instagram && (
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          className="border-primary/30 hover:bg-primary/10"
+                          onClick={() => window.open(artist.links.instagram, '_blank')}
+                        >
+                          Instagram
+                        </Button>
+                      )}
+                      {artist.links.facebook && (
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          className="border-primary/30 hover:bg-primary/10"
+                          onClick={() => window.open(artist.links.facebook, '_blank')}
+                        >
+                          Facebook
+                        </Button>
+                      )}
+                      {artist.links.spotify && (
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          className="border-primary/30 hover:bg-primary/10"
+                          onClick={() => window.open(artist.links.spotify, '_blank')}
+                        >
+                          Spotify
+                        </Button>
+                      )}
+                      {artist.links.youtube && (
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          className="border-primary/30 hover:bg-primary/10"
+                          onClick={() => window.open(artist.links.youtube, '_blank')}
+                        >
+                          YouTube
+                        </Button>
+                      )}
+                      {artist.links.tiktok && (
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          className="border-primary/30 hover:bg-primary/10"
+                          onClick={() => window.open(artist.links.tiktok, '_blank')}
+                        >
+                          TikTok
+                        </Button>
+                      )}
+                    </div>
+                  </>
+                )}
+
+                {/* EPK Download */}
+                {artist.links.epk && (
+                  <>
+                    <Separator className="my-6" />
+                    <h3 className="text-lg font-bold text-foreground mb-3 flex items-center gap-2">
+                      <FileText className="h-5 w-5 text-primary" />
+                      Electronic Press Kit (EPK)
+                    </h3>
                     <Button
-                      key={platform}
                       variant="outline"
-                      size="sm"
-                      className="border-primary/30 hover:bg-primary/10"
-                      onClick={() => window.open(url as string, '_blank')}
+                      className="w-full border-primary/30 hover:bg-primary/10 gap-2"
+                      onClick={() => window.open(artist.links.epk, '_blank')}
                     >
-                      {platform}
+                      <FileText className="h-4 w-4" />
+                      Scarica EPK
                     </Button>
-                  ))}
-                </div>
+                  </>
+                )}
+
+                {/* Photo Gallery */}
+                {artist.links.photos && artist.links.photos.length > 0 && (
+                  <>
+                    <Separator className="my-6" />
+                    <h3 className="text-lg font-bold text-foreground mb-3 flex items-center gap-2">
+                      <ImageIcon className="h-5 w-5 text-primary" />
+                      Foto Professionali
+                    </h3>
+                    <div className="grid grid-cols-2 gap-3">
+                      {artist.links.photos.map((photoUrl: string, index: number) => (
+                        <div key={index} className="aspect-square overflow-hidden rounded-lg border border-border">
+                          <img
+                            src={photoUrl}
+                            alt={`Foto ${index + 1}`}
+                            className="w-full h-full object-cover hover:scale-105 transition-transform cursor-pointer"
+                            onClick={() => window.open(photoUrl, '_blank')}
+                          />
+                        </div>
+                      ))}
+                    </div>
+                  </>
+                )}
+
+                {/* Audio Samples */}
+                {artist.links.audio && artist.links.audio.length > 0 && (
+                  <>
+                    <Separator className="my-6" />
+                    <h3 className="text-lg font-bold text-foreground mb-3 flex items-center gap-2">
+                      <Play className="h-5 w-5 text-primary" />
+                      Accenni di Brani
+                    </h3>
+                    <div className="space-y-3">
+                      {artist.links.audio.map((audioUrl: string, index: number) => (
+                        <div key={index} className="p-3 bg-muted rounded-lg border border-border">
+                          <p className="text-sm font-medium text-foreground mb-2">Brano {index + 1}</p>
+                          <audio controls className="w-full">
+                            <source src={audioUrl} type="audio/mpeg" />
+                            Il tuo browser non supporta l'elemento audio.
+                          </audio>
+                        </div>
+                      ))}
+                    </div>
+                  </>
+                )}
+
+                {/* Video */}
+                {artist.links.video && (
+                  <>
+                    <Separator className="my-6" />
+                    <h3 className="text-lg font-bold text-foreground mb-3 flex items-center gap-2">
+                      <Video className="h-5 w-5 text-primary" />
+                      Video
+                    </h3>
+                    <Button
+                      variant="outline"
+                      className="w-full border-primary/30 hover:bg-primary/10 gap-2"
+                      onClick={() => window.open(artist.links.video, '_blank')}
+                    >
+                      <Video className="h-4 w-4" />
+                      Guarda Video
+                    </Button>
+                  </>
+                )}
               </>
             )}
           </Card>
