@@ -7,6 +7,7 @@ import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { toast } from "@/hooks/use-toast";
 import BookingsTable from "@/components/dashboard/BookingsTable";
+import { Calendar as CalendarComponent } from "@/components/ui/calendar";
 import {
   User,
   Mail,
@@ -54,6 +55,7 @@ const ProfileDashboard = () => {
     tassoSuccesso: "0%",
     eventiConfermati: 0
   });
+  const [confirmedEvents, setConfirmedEvents] = useState<Date[]>([]);
 
   useEffect(() => {
     checkAuthAndLoadProfile();
@@ -96,6 +98,9 @@ const ProfileDashboard = () => {
       
       // Load statistics
       await loadStatistics(session.user.id);
+      
+      // Load confirmed events
+      await loadConfirmedEvents(session.user.id);
     } catch (error) {
       console.error("Error loading profile:", error);
       toast({
@@ -185,6 +190,23 @@ const ProfileDashboard = () => {
       });
     } catch (error) {
       console.error("Error loading statistics:", error);
+    }
+  };
+
+  const loadConfirmedEvents = async (userId: string) => {
+    try {
+      const { data: confirmedBookings } = await supabase
+        .from("booking_requests")
+        .select("event_date")
+        .eq("status", "accepted")
+        .or(`sender_id.eq.${userId},receiver_id.eq.${userId}`);
+
+      if (confirmedBookings) {
+        const eventDates = confirmedBookings.map(booking => new Date(booking.event_date));
+        setConfirmedEvents(eventDates);
+      }
+    } catch (error) {
+      console.error("Error loading confirmed events:", error);
     }
   };
 
@@ -461,6 +483,34 @@ const ProfileDashboard = () => {
             </CardContent>
           </Card>
         </div>
+
+        {/* Calendario Eventi Confermati */}
+        <Card className="bg-[#1a1f2e] border-cyan-500/30 mb-8">
+          <CardHeader>
+            <CardTitle className="text-white flex items-center gap-2">
+              <Calendar className="h-5 w-5 text-cyan-400" />
+              Calendario Eventi Confermati
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="flex justify-center">
+            <CalendarComponent
+              mode="multiple"
+              selected={confirmedEvents}
+              className="rounded-md border border-cyan-500/30 bg-[#0f1419]"
+              modifiers={{
+                confirmed: confirmedEvents
+              }}
+              modifiersStyles={{
+                confirmed: {
+                  backgroundColor: 'hsl(189, 80%, 50%, 0.3)',
+                  color: 'hsl(189, 80%, 70%)',
+                  fontWeight: 'bold',
+                  border: '2px solid hsl(189, 80%, 50%)'
+                }
+              }}
+            />
+          </CardContent>
+        </Card>
 
         {/* Bookings Table */}
         <BookingsTable />
