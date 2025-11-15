@@ -9,6 +9,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Star, MapPin, Euro, Users, X, LogOut, Mail, Phone, ArrowRight } from "lucide-react";
 import StatsSidebar from "@/components/dashboard/StatsSidebar";
 import { BookingModal } from "@/components/dashboard/BookingModal";
+import { ArtistMediaModal } from "@/components/dashboard/ArtistMediaModal";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
 
@@ -97,6 +98,16 @@ const ProfessionalMatchingDashboard = () => {
   const [selectedMatch, setSelectedMatch] = useState<ProfessionalMatch | null>(null);
   const [matches, setMatches] = useState<ProfessionalMatch[]>([]);
   const [loading, setLoading] = useState(true);
+  
+  const [artistMediaModal, setArtistMediaModal] = useState<{
+    open: boolean;
+    artistId: string;
+    artistName: string;
+  }>({
+    open: false,
+    artistId: "",
+    artistName: "",
+  });
 
   useEffect(() => {
     const fetchMatches = async () => {
@@ -506,7 +517,11 @@ const ProfessionalMatchingDashboard = () => {
                               <Button 
                                 onClick={() => {
                                   if (match.tipo === 'artista') {
-                                    navigate(`/artist-profile/${match.id}`);
+                                    setArtistMediaModal({
+                                      open: true,
+                                      artistId: match.id,
+                                      artistName: match.nome,
+                                    });
                                   } else {
                                     navigate(`/venue-profile/${match.id}`);
                                   }
@@ -555,6 +570,14 @@ const ProfessionalMatchingDashboard = () => {
           receiverType={selectedMatch.tipo}
         />
       )}
+
+      {/* Artist Media Modal */}
+      <ArtistMediaModal
+        open={artistMediaModal.open}
+        onOpenChange={(open) => setArtistMediaModal({ ...artistMediaModal, open })}
+        artistId={artistMediaModal.artistId}
+        artistName={artistMediaModal.artistName}
+      />
     </div>
   );
 };

@@ -17,6 +17,7 @@ export interface MatchCardProps {
   avatarUrl: string;
   matchScore: number;
   onBookingClick?: () => void;
+  onViewProfile?: () => void; // Custom handler per visualizzare profilo
 }
 
 const MatchCard = ({ 
@@ -30,7 +31,8 @@ const MatchCard = ({
   rating, 
   avatarUrl, 
   matchScore,
-  onBookingClick 
+  onBookingClick,
+  onViewProfile
 }: MatchCardProps) => {
   const navigate = useNavigate();
   const getMatchScoreColor = (score: number) => {
@@ -40,7 +42,9 @@ const MatchCard = ({
   };
 
   const handleViewProfile = () => {
-    if (tipo === 'artista') {
+    if (onViewProfile) {
+      onViewProfile();
+    } else if (tipo === 'artista') {
       navigate(`/artista/${id}`);
     } else if (tipo === 'professionista') {
       navigate(`/professionista/${id}`);

@@ -6,6 +6,7 @@ import MatchCard, { MatchCardProps } from "@/components/dashboard/MatchCard";
 import FilterSidebar, { FilterState } from "@/components/dashboard/FilterSidebar";
 import StatsSidebar from "@/components/dashboard/StatsSidebar";
 import { BookingModal } from "@/components/dashboard/BookingModal";
+import { ArtistMediaModal } from "@/components/dashboard/ArtistMediaModal";
 import { Badge } from "@/components/ui/badge";
 import { User, X, LogOut } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
@@ -40,6 +41,16 @@ const VenueMatchingDashboard = () => {
     receiverId: "",
     receiverName: "",
     receiverType: "",
+  });
+
+  const [artistMediaModal, setArtistMediaModal] = useState<{
+    open: boolean;
+    artistId: string;
+    artistName: string;
+  }>({
+    open: false,
+    artistId: "",
+    artistName: "",
   });
 
   useEffect(() => {
@@ -331,6 +342,13 @@ const VenueMatchingDashboard = () => {
                   <MatchCard 
                     key={match.id} 
                     {...match}
+                    onViewProfile={match.tipo === 'artista' ? () => {
+                      setArtistMediaModal({
+                        open: true,
+                        artistId: match.id,
+                        artistName: match.nome,
+                      });
+                    } : undefined}
                     onBookingClick={() =>
                       setBookingModal({
                         open: true,
@@ -359,6 +377,14 @@ const VenueMatchingDashboard = () => {
         receiverId={bookingModal.receiverId}
         receiverName={bookingModal.receiverName}
         receiverType={bookingModal.receiverType}
+      />
+
+      {/* Artist Media Modal */}
+      <ArtistMediaModal
+        open={artistMediaModal.open}
+        onOpenChange={(open) => setArtistMediaModal({ ...artistMediaModal, open })}
+        artistId={artistMediaModal.artistId}
+        artistName={artistMediaModal.artistName}
       />
     </div>
   );
