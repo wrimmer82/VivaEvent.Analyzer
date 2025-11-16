@@ -21,7 +21,6 @@ const artistSchema = z.object({
     .min(8, { message: "Minimo 8 caratteri" })
     .regex(/[A-Z]/, { message: "Almeno una maiuscola" })
     .regex(/[0-9]/, { message: "Almeno un numero" }),
-  genere: z.string().min(1, { message: "Seleziona un genere" }),
   citta: z.string().trim().min(1, { message: "Città richiesta" }),
 });
 
@@ -42,10 +41,10 @@ const SignupFormArtista = ({ onBack, onSwitchToLogin }: SignupFormArtistaProps) 
     email: "",
     password: "",
     confirmPassword: "",
-    genere: "",
     citta: "",
   });
   const [cachet, setCachet] = useState([500]);
+  const [selectedGenres, setSelectedGenres] = useState<string[]>([]);
   const [acceptTerms, setAcceptTerms] = useState(false);
   const [acceptCommunications, setAcceptCommunications] = useState(true);
   const [showPassword, setShowPassword] = useState(false);
@@ -65,6 +64,20 @@ const SignupFormArtista = ({ onBack, onSwitchToLogin }: SignupFormArtistaProps) 
   const passwordValidation = validatePassword(formData.password);
   const passwordsMatch = formData.password === formData.confirmPassword && formData.confirmPassword.length > 0;
 
+  const toggleGenre = (genre: string) => {
+    if (selectedGenres.includes(genre)) {
+      setSelectedGenres(selectedGenres.filter((g) => g !== genre));
+    } else if (selectedGenres.length < 3) {
+      setSelectedGenres([...selectedGenres, genre]);
+    } else {
+      toast({
+        title: "Limite raggiunto",
+        description: "Puoi selezionare massimo 3 generi",
+        variant: "destructive",
+      });
+    }
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setErrors({});
@@ -73,6 +86,15 @@ const SignupFormArtista = ({ onBack, onSwitchToLogin }: SignupFormArtistaProps) 
       toast({
         title: "Errore",
         description: "Devi accettare i termini di servizio",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (selectedGenres.length === 0) {
+      toast({
+        title: "Errore",
+        description: "Seleziona almeno un genere musicale",
         variant: "destructive",
       });
       return;
@@ -126,7 +148,8 @@ const SignupFormArtista = ({ onBack, onSwitchToLogin }: SignupFormArtistaProps) 
         user_id: authData.user.id,
         nome_completo: formData.nomeCompleto,
         email: formData.email.trim(),
-        genere_musicale: formData.genere,
+        genere_musicale: selectedGenres[0] || "altro",
+        generi: selectedGenres,
         citta: formData.citta,
         cachet_desiderato: cachet[0],
       });
@@ -259,20 +282,28 @@ const SignupFormArtista = ({ onBack, onSwitchToLogin }: SignupFormArtistaProps) 
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor="genere">Genere Musicale Principale *</Label>
-          <Select value={formData.genere} onValueChange={(value) => setFormData({ ...formData, genere: value })}>
-            <SelectTrigger className={errors.genere ? "border-red-500" : ""}>
-              <SelectValue placeholder="Seleziona un genere" />
-            </SelectTrigger>
-            <SelectContent>
-              {generi.map((genere) => (
-                <SelectItem key={genere} value={genere.toLowerCase()}>
+          <Label>Generi Musicali (max 3) *</Label>
+          <div className="grid grid-cols-2 md:grid-cols-3 gap-3 p-4 border rounded-lg bg-background/50">
+            {generi.map((genere) => (
+              <div key={genere} className="flex items-center space-x-2">
+                <Checkbox
+                  id={`genere-${genere}`}
+                  checked={selectedGenres.includes(genere.toLowerCase())}
+                  onCheckedChange={() => toggleGenre(genere.toLowerCase())}
+                  disabled={loading || (!selectedGenres.includes(genere.toLowerCase()) && selectedGenres.length >= 3)}
+                />
+                <Label
+                  htmlFor={`genere-${genere}`}
+                  className="text-sm font-normal cursor-pointer"
+                >
                   {genere}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-          {errors.genere && <p className="text-sm text-red-500">{errors.genere}</p>}
+                </Label>
+              </div>
+            ))}
+          </div>
+          <p className="text-sm text-muted-foreground">
+            Selezionati: {selectedGenres.length}/3
+          </p>
         </div>
 
         <div className="space-y-2">
