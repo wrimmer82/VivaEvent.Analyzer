@@ -18,6 +18,7 @@ interface ProfessionalMatch {
   nome: string;
   tipo: 'artista' | 'venue';
   genere: string;
+  generi?: string[]; // Array di generi multipli per artisti
   città: string;
   email: string;
   telefono?: string;
@@ -131,6 +132,7 @@ const ProfessionalMatchingDashboard = () => {
           nome: artista.nome_completo,
           tipo: 'artista' as const,
           genere: artista.genere_musicale,
+          generi: artista.generi || [artista.genere_musicale], // Array di generi multipli
           città: artista.citta,
           email: artista.email,
           cachet: artista.cachet_desiderato,
@@ -192,8 +194,18 @@ const ProfessionalMatchingDashboard = () => {
 
   const applyFilters = () => {
     return matches.filter((match) => {
+      // Filtro genere - controlla sia genere singolo che array generi
       const genreMatch = filters.genres.length === 0 || 
-                         filters.genres.some(g => match.genere.toLowerCase().includes(g.toLowerCase()));
+                         filters.genres.some(filterGenre => {
+                           // Se il match ha l'array generi (artisti), controlla nell'array
+                           if (match.generi && match.generi.length > 0) {
+                             return match.generi.some(matchGenre => 
+                               matchGenre.toLowerCase().includes(filterGenre.toLowerCase())
+                             );
+                           }
+                           // Altrimenti controlla nel campo genere singolo
+                           return match.genere.toLowerCase().includes(filterGenre.toLowerCase());
+                         });
       const cityMatch = filters.city === 'Tutte' || match.città === filters.city;
       const tipoMatch = filters.tipo === 'tutti' || match.tipo === filters.tipo;
       const ratingMatch = match.rating >= filters.minRating;
@@ -220,7 +232,7 @@ const ProfessionalMatchingDashboard = () => {
     return "bg-red-500";
   };
 
-  const genres = ['Rock', 'Pop', 'Jazz', 'Electronic', 'Indie', 'Metal', 'House', 'Alternative'];
+  const genres = ['Rock', 'Pop', 'Jazz', 'Electronic', 'Indie', 'Metal', 'House', 'Ambient', 'Techno', 'Alternative'];
   const cities = ['Tutte', 'Milano', 'Roma', 'Torino', 'Bologna', 'Napoli', 'Firenze'];
 
   const handleOpenBookingModal = (match: ProfessionalMatch) => {
