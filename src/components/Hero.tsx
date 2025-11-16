@@ -18,16 +18,10 @@ const Hero = () => {
 
       <div className="container relative z-10 px-4 mx-auto">
         <div className="max-w-4xl mx-auto text-center space-y-8">
-          {/* Logo badge */}
-          <div className="inline-flex items-center gap-2 px-4 py-2 bg-card/50 backdrop-blur-md border border-primary/30 rounded-full shadow-elegant animate-fade-in">
-            <Sparkles className="w-5 h-5 text-primary animate-pulse" />
-            <span className="text-sm font-semibold text-foreground">VivaEvent - Il Marketplace per Live Music</span>
-          </div>
-
           {/* Main heading */}
           <h1 className="text-5xl md:text-7xl font-bold tracking-tight animate-fade-in" style={{ animationDelay: '0.1s' }}>
-            <span className="bg-gradient-to-r from-primary via-accent to-primary bg-clip-text text-transparent animate-gradient bg-[length:200%_auto]">
-              Il Futuro del
+            <span className="text-primary drop-shadow-[0_0_30px_rgba(0,217,255,0.5)]">
+              VivaEvent
             </span>
             <br />
             <span className="text-foreground drop-shadow-[0_0_30px_rgba(0,217,255,0.5)]">Live Music Booking</span>
