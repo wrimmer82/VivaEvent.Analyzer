@@ -32,7 +32,8 @@ interface SignupFormArtistaProps {
 
 const generi = [
   "Rock", "Pop", "Jazz", "Reggae", "Hip Hop", "Electronic",
-  "Classical", "Metal", "Funk", "Blues", "Soul", "Altro"
+  "Classical", "Metal", "Funk", "Blues", "Soul", 
+  "House", "Ambient", "Techno", "Altro"
 ];
 
 const SignupFormArtista = ({ onBack, onSwitchToLogin }: SignupFormArtistaProps) => {
