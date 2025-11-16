@@ -24,7 +24,7 @@ const FilterSidebar = ({ filters, onFilterChange }: FilterSidebarProps) => {
   // Local state for filters before applying
   const [localFilters, setLocalFilters] = useState<FilterState>(filters);
 
-  const genres = ['Rock', 'Pop', 'Jazz', 'Electronic', 'Indie', 'Metal', 'Reggaeton', 'Hip Hop'];
+  const genres = ['Rock', 'Pop', 'Jazz', 'Electronic', 'Indie', 'Metal', 'Reggaeton', 'Hip Hop', 'House', 'Ambient', 'Techno'];
   const cities = ['Tutte', 'Milano', 'Roma', 'Torino', 'Bologna', 'Napoli', 'Firenze'];
 
   const handleGenreToggle = (genre: string) => {

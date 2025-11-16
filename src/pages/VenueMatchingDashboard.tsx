@@ -106,6 +106,7 @@ const VenueMatchingDashboard = () => {
           nome: artista.nome_completo,
           tipo: 'artista',
           genere: artista.genere_musicale,
+          generi: artista.generi || [artista.genere_musicale], // Array di generi multipli
           città: artista.citta,
           cachet: artista.cachet_desiderato,
           rating: 4.0 + Math.random() * 1,
@@ -163,9 +164,18 @@ const VenueMatchingDashboard = () => {
   // Apply filters function
   const applyFilters = () => {
     return matches.filter((match) => {
-      // 1. Filtro genere
+      // 1. Filtro genere - controlla sia genere singolo che array generi
       const genreMatch = filters.genres.length === 0 || 
-                         filters.genres.some(g => match.genere.toLowerCase().includes(g.toLowerCase()));
+                         filters.genres.some(filterGenre => {
+                           // Se il match ha l'array generi (artisti), controlla nell'array
+                           if (match.generi && match.generi.length > 0) {
+                             return match.generi.some(matchGenre => 
+                               matchGenre.toLowerCase().includes(filterGenre.toLowerCase())
+                             );
+                           }
+                           // Altrimenti controlla nel campo genere singolo
+                           return match.genere.toLowerCase().includes(filterGenre.toLowerCase());
+                         });
       
       // 2. Filtro città
       const cityMatch = filters.city === 'Tutte' || match.città === filters.city;

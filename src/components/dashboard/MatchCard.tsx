@@ -10,6 +10,7 @@ export interface MatchCardProps {
   nome: string;
   tipo: 'artista' | 'venue' | 'professionista';
   genere: string;
+  generi?: string[]; // Array di generi multipli per artisti
   città: string;
   cachet?: number;
   capacity?: number;
