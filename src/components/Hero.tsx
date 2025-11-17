@@ -21,7 +21,7 @@ const Hero = () => {
             <span style={{
             animationDelay: '0.2s',
             animation: 'fade-in 1s ease-out 0.2s both'
-          }} className="inline-block drop-shadow-[0_0_30px_rgba(0,217,255,0.5)] animate-fade-in font-sans font-bold text-7xl text-slate-50 my-px mx-0">
+          }} className="inline-block drop-shadow-[0_0_30px_rgba(0,217,255,0.5)] animate-fade-in font-sans text-slate-50 my-px mx-0 text-7xl font-bold">
               VivaEvent Live Music Booking
             </span>
           </h1>
