@@ -133,6 +133,30 @@ export type Database = {
         }
         Relationships: []
       }
+      landing_logs: {
+        Row: {
+          content: string
+          content_type: string
+          created_at: string
+          id: string
+          timestamp: string
+        }
+        Insert: {
+          content: string
+          content_type: string
+          created_at?: string
+          id?: string
+          timestamp?: string
+        }
+        Update: {
+          content?: string
+          content_type?: string
+          created_at?: string
+          id?: string
+          timestamp?: string
+        }
+        Relationships: []
+      }
       professionisti: {
         Row: {
           avatar_url: string | null
