@@ -31,9 +31,9 @@ Live Music Booking</span>
           </h1>
 
           {/* Subheading */}
-          <p className="text-xl md:text-2xl text-muted-foreground max-w-2xl mx-auto leading-relaxed animate-fade-in" style={{
+          <p style={{
           animationDelay: '0.2s'
-        }}>
+        }} className="text-xl text-muted-foreground max-w-2xl mx-auto leading-relaxed animate-fade-in md:text-4xl font-semibold">
             Piattaforma intelligente che connette <span className="text-primary font-semibold">artisti</span>, <span className="text-accent font-semibold">professionisti</span> e <span className="text-accent font-semibold">venue</span> automatizzando booking, contratti e pagamenti
           </p>
 
