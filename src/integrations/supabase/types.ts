@@ -16,6 +16,7 @@ export type Database = {
     Tables: {
       artisti: {
         Row: {
+          accenni_brani: string[] | null
           avatar_url: string | null
           avg_attendance_last_3_gigs: number | null
           biografia: string | null
@@ -24,7 +25,9 @@ export type Database = {
           created_at: string
           email: string
           epk_completed: boolean | null
+          epk_pdf: string[] | null
           fanbase_size: number | null
+          foto_professionali: string[] | null
           genere_musicale: string
           generi: string[] | null
           id: string
@@ -33,8 +36,10 @@ export type Database = {
           target_audience: string[] | null
           updated_at: string | null
           user_id: string
+          video_artistici: string[] | null
         }
         Insert: {
+          accenni_brani?: string[] | null
           avatar_url?: string | null
           avg_attendance_last_3_gigs?: number | null
           biografia?: string | null
@@ -43,7 +48,9 @@ export type Database = {
           created_at?: string
           email: string
           epk_completed?: boolean | null
+          epk_pdf?: string[] | null
           fanbase_size?: number | null
+          foto_professionali?: string[] | null
           genere_musicale: string
           generi?: string[] | null
           id?: string
@@ -52,8 +59,10 @@ export type Database = {
           target_audience?: string[] | null
           updated_at?: string | null
           user_id: string
+          video_artistici?: string[] | null
         }
         Update: {
+          accenni_brani?: string[] | null
           avatar_url?: string | null
           avg_attendance_last_3_gigs?: number | null
           biografia?: string | null
@@ -62,7 +71,9 @@ export type Database = {
           created_at?: string
           email?: string
           epk_completed?: boolean | null
+          epk_pdf?: string[] | null
           fanbase_size?: number | null
+          foto_professionali?: string[] | null
           genere_musicale?: string
           generi?: string[] | null
           id?: string
@@ -71,6 +82,7 @@ export type Database = {
           target_audience?: string[] | null
           updated_at?: string | null
           user_id?: string
+          video_artistici?: string[] | null
         }
         Relationships: [
           {
