@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
 import MatchCard, { MatchCardProps } from "@/components/dashboard/MatchCard";
-import FilterSidebar, { FilterState, EntityOption } from "@/components/dashboard/FilterSidebar";
+import FilterSidebar, { FilterState } from "@/components/dashboard/FilterSidebar";
 import StatsSidebar from "@/components/dashboard/StatsSidebar";
 import { BookingModal } from "@/components/dashboard/BookingModal";
 import { Badge } from "@/components/ui/badge";
@@ -142,13 +142,6 @@ const Dashboard = () => {
     }
   };
 
-  // Custom entity options for artist dashboard
-  const artistEntityOptions: EntityOption[] = [
-    { value: 'tutti', label: 'Tutti' },
-    { value: 'venue', label: 'Venue' },
-    { value: 'professionista', label: 'Professionista' }
-  ];
-
   // Apply filters function
   const applyFilters = () => {
     return matches.filter((match) => {
@@ -169,7 +162,7 @@ const Dashboard = () => {
       // 5. Date: per ora sempre true (TODO)
       const dateMatch = true;
 
-      // 6. Filtro tipo entità (venue/professionista) - updated for artist dashboard
+      // 6. Filtro tipo entità (venue/professionista)
       const entityTypeMatch = filters.entityType === 'tutti' || match.tipo === filters.entityType;
       
       return genreMatch && cityMatch && budgetMatch && ratingMatch && dateMatch && entityTypeMatch;
@@ -220,11 +213,7 @@ const Dashboard = () => {
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
           {/* Filter Sidebar - Left */}
           <aside className="hidden lg:block lg:col-span-2">
-            <FilterSidebar 
-              filters={filters} 
-              onFilterChange={setFilters} 
-              entityOptions={artistEntityOptions}
-            />
+            <FilterSidebar filters={filters} onFilterChange={setFilters} />
           </aside>
 
           {/* Main Content - Center */}
@@ -290,7 +279,7 @@ const Dashboard = () => {
                 )}
                 {filters.entityType !== 'tutti' && (
                   <Badge className="bg-cyan-500/20 text-cyan-400 px-3 py-1 cursor-pointer hover:bg-cyan-500/30">
-                    {filters.entityType === 'venue' ? 'Solo Venue' : filters.entityType === 'professionista' ? 'Solo Professionista' : 'Filtro Attivo'}
+                    {filters.entityType === 'venue' ? 'Solo Venue' : 'Solo Professionisti'}
                     <X 
                       className="h-3 w-3 ml-1 inline" 
                       onClick={() => setFilters({...filters, entityType: 'tutti'})}

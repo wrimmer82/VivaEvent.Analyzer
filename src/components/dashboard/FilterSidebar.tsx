@@ -15,32 +15,17 @@ export interface FilterState {
   entityType: string; // Flexible type for different contexts
 }
 
-export interface EntityOption {
-  value: string;
-  label: string;
-}
-
 interface FilterSidebarProps {
   filters: FilterState;
   onFilterChange: (filters: FilterState) => void;
-  entityOptions?: EntityOption[]; // Optional custom entity options
 }
 
-const FilterSidebar = ({ filters, onFilterChange, entityOptions }: FilterSidebarProps) => {
+const FilterSidebar = ({ filters, onFilterChange }: FilterSidebarProps) => {
   // Local state for filters before applying
   const [localFilters, setLocalFilters] = useState<FilterState>(filters);
 
   const genres = ['Rock', 'Pop', 'Jazz', 'Electronic', 'Indie', 'Metal', 'Reggaeton', 'Hip Hop', 'House', 'Ambient', 'Techno'];
   const cities = ['Tutte', 'Milano', 'Roma', 'Torino', 'Bologna', 'Napoli', 'Firenze'];
-  
-  // Default entity options if not provided
-  const defaultEntityOptions: EntityOption[] = [
-    { value: 'tutti', label: 'Tutti' },
-    { value: 'professionista', label: 'Solo Professionisti' },
-    { value: 'artista', label: 'Solo Artisti' }
-  ];
-  
-  const effectiveEntityOptions = entityOptions || defaultEntityOptions;
 
   const handleGenreToggle = (genre: string) => {
     const newGenres = localFilters.genres.includes(genre)
@@ -92,11 +77,9 @@ const FilterSidebar = ({ filters, onFilterChange, entityOptions }: FilterSidebar
             className="w-full bg-slate-800 border border-slate-600 text-white rounded-lg px-3 py-2 
                      focus:ring-2 focus:ring-cyan-500 focus:outline-none text-sm"
           >
-            {effectiveEntityOptions.map(option => (
-              <option key={option.value} value={option.value}>
-                {option.label}
-              </option>
-            ))}
+            <option value="tutti">Tutti</option>
+            <option value="professionista">Solo Professionisti</option>
+            <option value="artista">Solo Artisti</option>
           </select>
         </div>
 

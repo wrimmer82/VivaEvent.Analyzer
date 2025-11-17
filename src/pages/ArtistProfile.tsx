@@ -11,7 +11,8 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
-import { Upload, Music, Image as ImageIcon, Video, LogOut, ArrowRight, Loader2, X, FileText } from "lucide-react";
+import { ArrowLeft, Upload, Music, Image as ImageIcon, Video, Users, TrendingUp, LogOut, ArrowRight, Loader2 } from "lucide-react";
+import { Link } from "react-router-dom";
 import Navbar from "@/components/Navbar";
 
 const formSchema = z.object({
@@ -33,18 +34,10 @@ const ArtistProfile = () => {
   const [saving, setSaving] = useState(false);
   const [userId, setUserId] = useState<string | null>(null);
   const [artistId, setArtistId] = useState<string | null>(null);
-  
-  // State for existing files
-  const [existingEpk, setExistingEpk] = useState<string[]>([]);
-  const [existingPhotos, setExistingPhotos] = useState<string[]>([]);
-  const [existingAudio, setExistingAudio] = useState<string[]>([]);
-  const [existingVideos, setExistingVideos] = useState<string[]>([]);
-  
-  // State for new files to upload
-  const [newEpkFiles, setNewEpkFiles] = useState<File[]>([]);
-  const [newPhotoFiles, setNewPhotoFiles] = useState<File[]>([]);
-  const [newAudioFiles, setNewAudioFiles] = useState<File[]>([]);
-  const [videoLinks, setVideoLinks] = useState<string>("");
+  const [epkFile, setEpkFile] = useState<File | null>(null);
+  const [photos, setPhotos] = useState<File[]>([]);
+  const [audioSamples, setAudioSamples] = useState<File[]>([]);
+  const [videoLink, setVideoLink] = useState("");
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -92,13 +85,6 @@ const ArtistProfile = () => {
       if (artistData) {
         setArtistId(artistData.id);
         const existingLinks = (artistData as any).links || {};
-        
-        // Load existing media files
-        setExistingEpk((artistData as any).epk_pdf || []);
-        setExistingPhotos((artistData as any).foto_professionali || []);
-        setExistingAudio((artistData as any).accenni_brani || []);
-        setExistingVideos((artistData as any).video_artistici || []);
-        
         form.reset({
           artistName: artistData.nome_completo || "",
           genre: artistData.genere_musicale || "",
@@ -110,10 +96,8 @@ const ArtistProfile = () => {
           youtube: existingLinks.youtube || "",
           tiktok: existingLinks.tiktok || "",
         });
-        
-        // Join existing video links
-        if ((artistData as any).video_artistici && (artistData as any).video_artistici.length > 0) {
-          setVideoLinks((artistData as any).video_artistici.join("\n"));
+        if (existingLinks.video) {
+          setVideoLink(existingLinks.video);
         }
       }
     } catch (error) {
@@ -148,9 +132,9 @@ const ArtistProfile = () => {
   const uploadFile = async (file: File, folder: string): Promise<string | null> => {
     try {
       const fileExt = file.name.split('.').pop();
-      const fileName = `${userId}/${folder}/${Date.now()}-${Math.random().toString(36).substring(7)}.${fileExt}`;
+      const fileName = `${userId}/${folder}/${Date.now()}.${fileExt}`;
       
-      const { error: uploadError } = await supabase.storage
+      const { error: uploadError, data } = await supabase.storage
         .from('artist-media')
         .upload(fileName, file, {
           upsert: true
@@ -167,53 +151,6 @@ const ArtistProfile = () => {
       console.error(`Error uploading ${folder}:`, error);
       return null;
     }
-  };
-
-  const deleteFile = async (url: string, type: 'epk' | 'photo' | 'audio') => {
-    try {
-      // Extract file path from URL
-      const urlParts = url.split('/artist-media/');
-      if (urlParts.length < 2) return;
-      
-      const filePath = urlParts[1];
-      
-      const { error } = await supabase.storage
-        .from('artist-media')
-        .remove([filePath]);
-
-      if (error) throw error;
-
-      // Update state based on type
-      if (type === 'epk') {
-        setExistingEpk(existingEpk.filter(u => u !== url));
-      } else if (type === 'photo') {
-        setExistingPhotos(existingPhotos.filter(u => u !== url));
-      } else if (type === 'audio') {
-        setExistingAudio(existingAudio.filter(u => u !== url));
-      }
-
-      toast({
-        title: "File eliminato",
-        description: "Il file è stato rimosso con successo",
-      });
-    } catch (error) {
-      console.error("Error deleting file:", error);
-      toast({
-        title: "Errore",
-        description: "Impossibile eliminare il file",
-        variant: "destructive",
-      });
-    }
-  };
-
-  const deleteVideoLink = (index: number) => {
-    const links = videoLinks.split("\n").filter(l => l.trim());
-    links.splice(index, 1);
-    setVideoLinks(links.join("\n"));
-    
-    const updatedVideos = [...existingVideos];
-    updatedVideos.splice(index, 1);
-    setExistingVideos(updatedVideos);
   };
 
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
@@ -235,40 +172,53 @@ const ArtistProfile = () => {
         return;
       }
 
-      // Upload new EPK files
-      const newEpkUrls: string[] = [];
-      for (const file of newEpkFiles) {
-        const url = await uploadFile(file, 'epk');
-        if (url) newEpkUrls.push(url);
+      // Get existing links data
+      let existingLinks: any = {};
+      if (artistId) {
+        const { data: existingArtist } = await supabase
+          .from("artisti")
+          .select("links")
+          .eq("id", artistId)
+          .single();
+        
+        if (existingArtist) {
+          existingLinks = (existingArtist as any).links || {};
+        }
       }
 
-      // Upload new photos
-      const newPhotoUrls: string[] = [];
-      for (const file of newPhotoFiles) {
-        const url = await uploadFile(file, 'photos');
-        if (url) newPhotoUrls.push(url);
+      // Upload files
+      let epkUrl: string | null = null;
+      const photoUrls: string[] = [...(existingLinks.photos || [])];
+      const audioUrls: string[] = [...(existingLinks.audio || [])];
+
+      // Upload EPK (replace if new file provided)
+      if (epkFile) {
+        epkUrl = await uploadFile(epkFile, 'epk');
       }
 
-      // Upload new audio
-      const newAudioUrls: string[] = [];
-      for (const file of newAudioFiles) {
-        const url = await uploadFile(file, 'audio');
-        if (url) newAudioUrls.push(url);
+      // Upload photos (append to existing)
+      for (const photo of photos) {
+        const url = await uploadFile(photo, 'photos');
+        if (url) photoUrls.push(url);
       }
 
-      // Process video links
-      const videoLinkArray = videoLinks
-        .split("\n")
-        .map(link => link.trim())
-        .filter(link => link.length > 0);
+      // Upload audio samples (append to existing)
+      for (const audio of audioSamples) {
+        const url = await uploadFile(audio, 'audio');
+        if (url) audioUrls.push(url);
+      }
 
-      // Prepare links object for social media
+      // Prepare links object with social media and media files
       const links = {
         instagram: values.instagram || "",
         facebook: values.facebook || "",
         spotify: values.spotify || "",
         youtube: values.youtube || "",
         tiktok: values.tiktok || "",
+        video: videoLink || existingLinks.video || "",
+        epk: epkUrl || existingLinks.epk || "",
+        photos: photoUrls,
+        audio: audioUrls,
       };
 
       const artistPayload = {
@@ -280,10 +230,6 @@ const ArtistProfile = () => {
         email: session.user.email || "",
         cachet_desiderato: 0,
         links: links,
-        epk_pdf: [...existingEpk, ...newEpkUrls],
-        foto_professionali: [...existingPhotos, ...newPhotoUrls],
-        accenni_brani: [...existingAudio, ...newAudioUrls],
-        video_artistici: videoLinkArray,
       };
 
       if (artistId) {
@@ -294,48 +240,38 @@ const ArtistProfile = () => {
           .eq("id", artistId);
 
         if (updateError) throw updateError;
-
-        toast({
-          title: "Profilo aggiornato",
-          description: "Le modifiche sono state salvate con successo",
-        });
       } else {
         // Insert new profile
         const { data: newArtist, error: insertError } = await supabase
           .from("artisti")
-          .insert([artistPayload])
+          .insert(artistPayload)
           .select()
           .single();
 
         if (insertError) throw insertError;
-
-        setArtistId(newArtist.id);
-
-        toast({
-          title: "Profilo creato",
-          description: "Il tuo profilo artista è stato creato con successo",
-        });
+        if (newArtist) setArtistId(newArtist.id);
       }
 
-      // Mark profile as completed
-      await supabase
+      // Update profile_completed flag in users table
+      const { error: userError } = await supabase
         .from("users")
         .update({ profile_completed: true })
         .eq("id", userId);
 
-      // Clear new files state
-      setNewEpkFiles([]);
-      setNewPhotoFiles([]);
-      setNewAudioFiles([]);
+      if (userError) throw userError;
 
-      // Reload profile to update existing files
-      await checkAuthAndLoadProfile();
-
+      toast({
+        title: "Profilo Salvato! 🎵",
+        description: "Il tuo profilo artista è stato salvato con successo. Media caricati: " + 
+          (epkUrl ? "EPK, " : "") + 
+          (photoUrls.length > 0 ? `${photoUrls.length} foto, ` : "") + 
+          (audioUrls.length > 0 ? `${audioUrls.length} audio` : ""),
+      });
     } catch (error) {
       console.error("Error saving profile:", error);
       toast({
         title: "Errore",
-        description: "Si è verificato un errore durante il salvataggio",
+        description: "Impossibile salvare il profilo",
         variant: "destructive",
       });
     } finally {
@@ -343,427 +279,383 @@ const ArtistProfile = () => {
     }
   };
 
+  const handlePhotoUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files) {
+      setPhotos([...photos, ...Array.from(e.target.files)]);
+    }
+  };
+
+  const handleAudioUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files) {
+      setAudioSamples([...audioSamples, ...Array.from(e.target.files)]);
+    }
+  };
+
   const isProfileComplete = () => {
     const values = form.getValues();
-    return values.artistName && values.genre && values.localFanbase;
+    return values.artistName && values.genre && values.bio && values.localFanbase;
   };
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-[#0a0f1e] via-[#1a1f2e] to-[#0a0f1e] flex items-center justify-center">
-        <Loader2 className="h-8 w-8 animate-spin text-cyan-500" />
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <div className="text-foreground text-xl flex items-center gap-2">
+          <Loader2 className="w-5 h-5 animate-spin" />
+          Caricamento...
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-[#0a0f1e] via-[#1a1f2e] to-[#0a0f1e]">
-      <Navbar />
+    <div className="min-h-screen bg-background">
+      <Navbar logoLink="/profile-dashboard" />
       
-      <div className="container mx-auto px-4 py-8">
-        <div className="flex justify-between items-center mb-8">
-          <div>
-            <h1 className="text-3xl font-bold text-white mb-2">
-              Ciao, {artistName || "Artista"}! 👋
-            </h1>
-            <p className="text-gray-400">Completa il tuo profilo per iniziare a ricevere proposte</p>
-          </div>
-          <Button
-            onClick={handleLogout}
-            variant="outline"
-            className="border-cyan-500/30 text-cyan-400 hover:bg-cyan-500/10"
-          >
-            <LogOut className="h-4 w-4 mr-2" />
-            Logout
-          </Button>
-        </div>
-
-        <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-            {/* Basic Information */}
-            <Card className="bg-[#1a1f2e] border-cyan-500/30">
-              <CardHeader>
-                <CardTitle className="text-white">Informazioni Base</CardTitle>
-                <CardDescription className="text-gray-400">
-                  Compila le informazioni principali del tuo profilo
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <FormField
-                  control={form.control}
-                  name="artistName"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel className="text-white">Nome Artista *</FormLabel>
-                      <FormControl>
-                        <Input {...field} className="bg-[#0a0f1e] border-cyan-500/30 text-white" />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-                <FormField
-                  control={form.control}
-                  name="genre"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel className="text-white">Genere Musicale *</FormLabel>
-                      <FormControl>
-                        <Input {...field} className="bg-[#0a0f1e] border-cyan-500/30 text-white" />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-                <FormField
-                  control={form.control}
-                  name="bio"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel className="text-white">Biografia</FormLabel>
-                      <FormControl>
-                        <Textarea {...field} className="bg-[#0a0f1e] border-cyan-500/30 text-white" rows={4} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-                <FormField
-                  control={form.control}
-                  name="localFanbase"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel className="text-white">Città *</FormLabel>
-                      <FormControl>
-                        <Input {...field} className="bg-[#0a0f1e] border-cyan-500/30 text-white" />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-              </CardContent>
-            </Card>
-
-            {/* EPK Section */}
-            <Card className="bg-[#1a1f2e] border-cyan-500/30">
-              <CardHeader>
-                <CardTitle className="text-white flex items-center gap-2">
-                  <FileText className="h-5 w-5 text-cyan-400" />
-                  Electronic Press Kit (EPK)
-                </CardTitle>
-                <CardDescription className="text-gray-400">
-                  Carica il tuo EPK in formato PDF
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                {existingEpk.length > 0 && (
-                  <div className="space-y-2">
-                    <Label className="text-white">File esistenti:</Label>
-                    <div className="space-y-2">
-                      {existingEpk.map((url, index) => (
-                        <div key={index} className="flex items-center gap-2 p-2 bg-[#0a0f1e] rounded border border-cyan-500/30">
-                          <FileText className="h-4 w-4 text-cyan-400" />
-                          <span className="text-sm text-gray-300 flex-1 truncate">EPK {index + 1}</span>
-                          <Button
-                            type="button"
-                            size="sm"
-                            variant="ghost"
-                            onClick={() => window.open(url, '_blank')}
-                            className="text-cyan-400 hover:text-cyan-300"
-                          >
-                            Apri
-                          </Button>
-                          <Button
-                            type="button"
-                            size="sm"
-                            variant="ghost"
-                            onClick={() => deleteFile(url, 'epk')}
-                            className="text-red-400 hover:text-red-300"
-                          >
-                            <X className="h-4 w-4" />
-                          </Button>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                )}
-                
-                <div>
-                  <Label className="text-white">Carica nuovo EPK:</Label>
-                  <Input
-                    type="file"
-                    accept=".pdf"
-                    multiple
-                    onChange={(e) => setNewEpkFiles(Array.from(e.target.files || []))}
-                    className="bg-[#0a0f1e] border-cyan-500/30 text-white"
-                  />
-                  {newEpkFiles.length > 0 && (
-                    <p className="text-sm text-cyan-400 mt-2">{newEpkFiles.length} file selezionato/i</p>
-                  )}
-                </div>
-              </CardContent>
-            </Card>
-
-            {/* Photos Section */}
-            <Card className="bg-[#1a1f2e] border-cyan-500/30">
-              <CardHeader>
-                <CardTitle className="text-white flex items-center gap-2">
-                  <ImageIcon className="h-5 w-5 text-cyan-400" />
-                  Foto Professionali
-                </CardTitle>
-                <CardDescription className="text-gray-400">
-                  Carica le tue foto professionali
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                {existingPhotos.length > 0 && (
-                  <div className="space-y-2">
-                    <Label className="text-white">Foto esistenti:</Label>
-                    <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-                      {existingPhotos.map((url, index) => (
-                        <div key={index} className="relative group">
-                          <img
-                            src={url}
-                            alt={`Foto ${index + 1}`}
-                            className="w-full h-32 object-cover rounded border border-cyan-500/30"
-                          />
-                          <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
-                            <Button
-                              type="button"
-                              size="sm"
-                              onClick={() => window.open(url, '_blank')}
-                              className="bg-cyan-500 hover:bg-cyan-600"
-                            >
-                              Apri
-                            </Button>
-                            <Button
-                              type="button"
-                              size="sm"
-                              variant="destructive"
-                              onClick={() => deleteFile(url, 'photo')}
-                            >
-                              <X className="h-4 w-4" />
-                            </Button>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                )}
-                
-                <div>
-                  <Label className="text-white">Carica nuove foto:</Label>
-                  <Input
-                    type="file"
-                    accept="image/*"
-                    multiple
-                    onChange={(e) => setNewPhotoFiles(Array.from(e.target.files || []))}
-                    className="bg-[#0a0f1e] border-cyan-500/30 text-white"
-                  />
-                  {newPhotoFiles.length > 0 && (
-                    <p className="text-sm text-cyan-400 mt-2">{newPhotoFiles.length} file selezionato/i</p>
-                  )}
-                </div>
-              </CardContent>
-            </Card>
-
-            {/* Audio Section */}
-            <Card className="bg-[#1a1f2e] border-cyan-500/30">
-              <CardHeader>
-                <CardTitle className="text-white flex items-center gap-2">
-                  <Music className="h-5 w-5 text-cyan-400" />
-                  Accenni di Brani
-                </CardTitle>
-                <CardDescription className="text-gray-400">
-                  Carica estratti audio dei tuoi brani
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                {existingAudio.length > 0 && (
-                  <div className="space-y-2">
-                    <Label className="text-white">Audio esistenti:</Label>
-                    <div className="space-y-2">
-                      {existingAudio.map((url, index) => (
-                        <div key={index} className="flex items-center gap-2 p-2 bg-[#0a0f1e] rounded border border-cyan-500/30">
-                          <Music className="h-4 w-4 text-cyan-400" />
-                          <audio controls className="flex-1 h-8">
-                            <source src={url} />
-                          </audio>
-                          <Button
-                            type="button"
-                            size="sm"
-                            variant="ghost"
-                            onClick={() => deleteFile(url, 'audio')}
-                            className="text-red-400 hover:text-red-300"
-                          >
-                            <X className="h-4 w-4" />
-                          </Button>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                )}
-                
-                <div>
-                  <Label className="text-white">Carica nuovi audio:</Label>
-                  <Input
-                    type="file"
-                    accept="audio/*"
-                    multiple
-                    onChange={(e) => setNewAudioFiles(Array.from(e.target.files || []))}
-                    className="bg-[#0a0f1e] border-cyan-500/30 text-white"
-                  />
-                  {newAudioFiles.length > 0 && (
-                    <p className="text-sm text-cyan-400 mt-2">{newAudioFiles.length} file selezionato/i</p>
-                  )}
-                </div>
-              </CardContent>
-            </Card>
-
-            {/* Video Section */}
-            <Card className="bg-[#1a1f2e] border-cyan-500/30">
-              <CardHeader>
-                <CardTitle className="text-white flex items-center gap-2">
-                  <Video className="h-5 w-5 text-cyan-400" />
-                  Video
-                </CardTitle>
-                <CardDescription className="text-gray-400">
-                  Aggiungi link ai tuoi video (uno per riga)
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                {existingVideos.length > 0 && (
-                  <div className="space-y-2">
-                    <Label className="text-white">Video esistenti:</Label>
-                    <div className="space-y-2">
-                      {existingVideos.map((url, index) => (
-                        <div key={index} className="flex items-center gap-2 p-2 bg-[#0a0f1e] rounded border border-cyan-500/30">
-                          <Video className="h-4 w-4 text-cyan-400" />
-                          <span className="text-sm text-gray-300 flex-1 truncate">{url}</span>
-                          <Button
-                            type="button"
-                            size="sm"
-                            variant="ghost"
-                            onClick={() => window.open(url, '_blank')}
-                            className="text-cyan-400 hover:text-cyan-300"
-                          >
-                            Apri
-                          </Button>
-                          <Button
-                            type="button"
-                            size="sm"
-                            variant="ghost"
-                            onClick={() => deleteVideoLink(index)}
-                            className="text-red-400 hover:text-red-300"
-                          >
-                            <X className="h-4 w-4" />
-                          </Button>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                )}
-                
-                <div>
-                  <Label className="text-white">Aggiungi nuovi link video:</Label>
-                  <Textarea
-                    value={videoLinks}
-                    onChange={(e) => setVideoLinks(e.target.value)}
-                    placeholder="https://youtube.com/watch?v=..."
-                    className="bg-[#0a0f1e] border-cyan-500/30 text-white"
-                    rows={4}
-                  />
-                </div>
-              </CardContent>
-            </Card>
-
-            {/* Social Media */}
-            <Card className="bg-[#1a1f2e] border-cyan-500/30">
-              <CardHeader>
-                <CardTitle className="text-white">Social Media</CardTitle>
-                <CardDescription className="text-gray-400">
-                  Collega i tuoi profili social
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <FormField
-                  control={form.control}
-                  name="instagram"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel className="text-white">Instagram</FormLabel>
-                      <FormControl>
-                        <Input {...field} placeholder="https://instagram.com/..." className="bg-[#0a0f1e] border-cyan-500/30 text-white" />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-                <FormField
-                  control={form.control}
-                  name="spotify"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel className="text-white">Spotify</FormLabel>
-                      <FormControl>
-                        <Input {...field} placeholder="https://open.spotify.com/..." className="bg-[#0a0f1e] border-cyan-500/30 text-white" />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-                <FormField
-                  control={form.control}
-                  name="youtube"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel className="text-white">YouTube</FormLabel>
-                      <FormControl>
-                        <Input {...field} placeholder="https://youtube.com/..." className="bg-[#0a0f1e] border-cyan-500/30 text-white" />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-              </CardContent>
-            </Card>
-
-            {/* Submit */}
-            <div className="flex gap-4">
-              <Button
-                type="submit"
-                disabled={saving}
-                className="flex-1 bg-cyan-500 hover:bg-cyan-600 text-white"
-              >
-                {saving ? (
-                  <>
-                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                    Salvataggio...
-                  </>
-                ) : (
-                  "Salva Profilo"
-                )}
+      {/* Header with greeting and logout */}
+      <div className="border-b border-border bg-card">
+        <div className="container mx-auto px-4 py-4 flex justify-between items-center">
+          <div className="flex-1"></div>
+          {userId && artistName && (
+            <div className="flex items-center gap-4">
+              <span className="text-foreground text-lg">
+                Ciao, <Link to="/profile-dashboard" className="font-bold text-primary hover:text-primary/80 transition-colors cursor-pointer">{artistName}</Link>!
+              </span>
+              <Button variant="destructive" size="sm" onClick={handleLogout} className="gap-2">
+                <LogOut className="h-4 w-4" />
+                Logout
               </Button>
-
-              {isProfileComplete() && artistId && (
-                <Button
-                  type="button"
-                  onClick={() => navigate("/profile-dashboard")}
-                  variant="outline"
-                  className="border-cyan-500/30 text-cyan-400 hover:bg-cyan-500/10"
-                >
-                  Vai alla Dashboard
-                  <ArrowRight className="ml-2 h-4 w-4" />
-                </Button>
-              )}
             </div>
-          </form>
-        </Form>
+          )}
+        </div>
+      </div>
+
+      <div className="container mx-auto px-4 py-12">
+        <Button
+          variant="ghost"
+          onClick={() => navigate("/")}
+          className="mb-6"
+        >
+          <ArrowLeft className="w-4 h-4 mr-2" />
+          Torna alla Home
+        </Button>
+
+        <div className="max-w-4xl mx-auto">
+          <div className="text-center mb-12">
+            <h1 className="text-4xl md:text-5xl font-bold text-foreground mb-4">
+              {artistId ? "Il Tuo Profilo Artista" : "Crea il Tuo Profilo Artista"}
+            </h1>
+            <p className="text-xl text-muted-foreground">
+              {artistId ? "Modifica i tuoi contenuti e le tue informazioni" : "Carica i tuoi contenuti e inizia a trovare venue perfetti per te"}
+            </p>
+          </div>
+
+          <Form {...form}>
+            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+              {/* Informazioni Base */}
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <Music className="w-5 h-5 text-primary" />
+                    Informazioni Base
+                  </CardTitle>
+                  <CardDescription>Nome artista e dettagli musicali</CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <FormField
+                    control={form.control}
+                    name="artistName"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Nome Artista / Band</FormLabel>
+                        <FormControl>
+                          <Input placeholder="Es. The Midnight Stars" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  <FormField
+                    control={form.control}
+                    name="genre"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Genere Musicale</FormLabel>
+                        <FormControl>
+                          <Input placeholder="Es. Rock, Pop, Jazz, Electronic..." {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  <FormField
+                    control={form.control}
+                    name="bio"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Biografia Breve</FormLabel>
+                        <FormControl>
+                          <Textarea 
+                            placeholder="Racconta la tua storia musicale..."
+                            className="min-h-[120px]"
+                            {...field}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  <FormField
+                    control={form.control}
+                    name="localFanbase"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Fanbase Locale</FormLabel>
+                        <FormControl>
+                          <Input placeholder="Es. Milano, Roma, Torino..." {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </CardContent>
+              </Card>
+
+              {/* EPK Upload */}
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <Upload className="w-5 h-5 text-primary" />
+                    Electronic Press Kit (EPK)
+                  </CardTitle>
+                  <CardDescription>Carica il tuo EPK in formato PDF</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="border-2 border-dashed border-border rounded-lg p-6 text-center hover:border-primary transition-colors">
+                    <Input
+                      type="file"
+                      accept=".pdf"
+                      onChange={(e) => setEpkFile(e.target.files?.[0] || null)}
+                      className="hidden"
+                      id="epk-upload"
+                    />
+                    <Label htmlFor="epk-upload" className="cursor-pointer">
+                      <Upload className="w-8 h-8 mx-auto mb-2 text-muted-foreground" />
+                      <p className="text-sm text-muted-foreground">
+                        {epkFile ? epkFile.name : "Clicca per caricare EPK (PDF)"}
+                      </p>
+                    </Label>
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* Foto */}
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <ImageIcon className="w-5 h-5 text-primary" />
+                    Foto Professionali
+                  </CardTitle>
+                  <CardDescription>Carica foto promozionali e live (max 10)</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="border-2 border-dashed border-border rounded-lg p-6 text-center hover:border-primary transition-colors">
+                    <Input
+                      type="file"
+                      accept="image/*"
+                      multiple
+                      onChange={handlePhotoUpload}
+                      className="hidden"
+                      id="photo-upload"
+                    />
+                    <Label htmlFor="photo-upload" className="cursor-pointer">
+                      <ImageIcon className="w-8 h-8 mx-auto mb-2 text-muted-foreground" />
+                      <p className="text-sm text-muted-foreground">
+                        {photos.length > 0 ? `${photos.length} foto caricate` : "Clicca per caricare foto"}
+                      </p>
+                    </Label>
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* Audio Samples */}
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <Music className="w-5 h-5 text-primary" />
+                    Accenni di Brani
+                  </CardTitle>
+                  <CardDescription>Carica sample audio delle tue migliori canzoni (max 5)</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="border-2 border-dashed border-border rounded-lg p-6 text-center hover:border-primary transition-colors">
+                    <Input
+                      type="file"
+                      accept="audio/*"
+                      multiple
+                      onChange={handleAudioUpload}
+                      className="hidden"
+                      id="audio-upload"
+                    />
+                    <Label htmlFor="audio-upload" className="cursor-pointer">
+                      <Music className="w-8 h-8 mx-auto mb-2 text-muted-foreground" />
+                      <p className="text-sm text-muted-foreground">
+                        {audioSamples.length > 0 ? `${audioSamples.length} brani caricati` : "Clicca per caricare audio"}
+                      </p>
+                    </Label>
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* Video Live */}
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <Video className="w-5 h-5 text-primary" />
+                    Video Live
+                  </CardTitle>
+                  <CardDescription>Inserisci link YouTube o Vimeo dei tuoi live</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-2">
+                    <Label htmlFor="video-link">Link Video</Label>
+                    <Input
+                      id="video-link"
+                      placeholder="https://youtube.com/watch?v=..."
+                      value={videoLink}
+                      onChange={(e) => setVideoLink(e.target.value)}
+                    />
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* Statistiche Social */}
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <TrendingUp className="w-5 h-5 text-primary" />
+                    Statistiche Social
+                  </CardTitle>
+                  <CardDescription>Link ai tuoi profili social e piattaforme streaming</CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <FormField
+                    control={form.control}
+                    name="instagram"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Instagram</FormLabel>
+                        <FormControl>
+                          <Input placeholder="https://instagram.com/..." {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  <FormField
+                    control={form.control}
+                    name="spotify"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Spotify</FormLabel>
+                        <FormControl>
+                          <Input placeholder="https://open.spotify.com/artist/..." {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  <FormField
+                    control={form.control}
+                    name="youtube"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>YouTube</FormLabel>
+                        <FormControl>
+                          <Input placeholder="https://youtube.com/@..." {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  <FormField
+                    control={form.control}
+                    name="facebook"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Facebook</FormLabel>
+                        <FormControl>
+                          <Input placeholder="https://facebook.com/..." {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  <FormField
+                    control={form.control}
+                    name="tiktok"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>TikTok</FormLabel>
+                        <FormControl>
+                          <Input placeholder="https://tiktok.com/@..." {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </CardContent>
+              </Card>
+
+              <div className="flex flex-col gap-4 pt-6">
+                <div className="flex justify-center">
+                  <Button 
+                    type="submit" 
+                    size="lg" 
+                    className="w-full md:w-auto px-12"
+                    disabled={saving}
+                  >
+                    {saving ? (
+                      <>
+                        <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                        Salvataggio...
+                      </>
+                    ) : (
+                      "Salva Profilo Artista"
+                    )}
+                  </Button>
+                </div>
+
+                {/* Button to Dashboard - Gold/Warning color */}
+                <div className="flex justify-center">
+                  <Button
+                    type="button"
+                    variant="warning"
+                    size="lg"
+                    className="w-full md:w-auto px-12 text-lg font-bold"
+                    onClick={() => navigate("/dashboard")}
+                    disabled={!isProfileComplete()}
+                  >
+                    <ArrowRight className="w-5 h-5 mr-2" />
+                    Vai alla Dashboard di Matching
+                  </Button>
+                </div>
+                
+                {!isProfileComplete() && (
+                  <p className="text-center text-sm text-muted-foreground">
+                    Completa il profilo per accedere al matching
+                  </p>
+                )}
+              </div>
+            </form>
+          </Form>
+        </div>
       </div>
     </div>
   );

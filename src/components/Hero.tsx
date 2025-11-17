@@ -2,8 +2,10 @@ import { Button } from "@/components/ui/button";
 import { Music, ArrowRight, Sparkles } from "lucide-react";
 import MatrixRain from "./MatrixRain";
 import { Link } from "react-router-dom";
+
 const Hero = () => {
-  return <section className="relative min-h-[90vh] flex items-center justify-center overflow-hidden bg-background">
+  return (
+    <section className="relative min-h-[90vh] flex items-center justify-center overflow-hidden bg-background">
       {/* Matrix Rain Effect */}
       <MatrixRain />
       
@@ -17,26 +19,21 @@ const Hero = () => {
       <div className="container relative z-10 px-4 mx-auto">
         <div className="max-w-4xl mx-auto text-center space-y-8">
           {/* Main heading */}
-          <h1 className="text-5xl md:text-7xl font-bold tracking-tight">
-            <span style={{
-            animationDelay: '0.2s',
-            animation: 'fade-in 1s ease-out 0.2s both'
-          }} className="inline-block drop-shadow-[0_0_30px_rgba(0,217,255,0.5)] animate-fade-in font-sans text-slate-50 my-px mx-0 text-7xl font-bold">
-              VivaEvent Live Music Booking
+          <h1 className="text-5xl md:text-7xl font-bold tracking-tight animate-fade-in" style={{ animationDelay: '0.1s' }}>
+            <span className="text-primary drop-shadow-[0_0_30px_rgba(0,217,255,0.5)]">
+              VivaEvent
             </span>
+            <br />
+            <span className="text-foreground drop-shadow-[0_0_30px_rgba(0,217,255,0.5)]">Live Music Booking</span>
           </h1>
 
           {/* Subheading */}
-          <p style={{
-          animationDelay: '0.2s'
-        }} className="text-xl text-muted-foreground max-w-2xl mx-auto leading-relaxed animate-fade-in md:text-4xl font-semibold">
+          <p className="text-xl md:text-2xl text-muted-foreground max-w-2xl mx-auto leading-relaxed animate-fade-in" style={{ animationDelay: '0.2s' }}>
             Piattaforma intelligente che connette <span className="text-primary font-semibold">artisti</span>, <span className="text-accent font-semibold">professionisti</span> e <span className="text-accent font-semibold">venue</span> automatizzando booking, contratti e pagamenti
           </p>
 
           {/* CTA buttons */}
-          <div className="flex flex-col sm:flex-row gap-4 justify-center items-center pt-4 animate-fade-in" style={{
-          animationDelay: '0.3s'
-        }}>
+          <div className="flex flex-col sm:flex-row gap-4 justify-center items-center pt-4 animate-fade-in" style={{ animationDelay: '0.3s' }}>
             <Button size="lg" className="group text-lg px-8 py-6 bg-primary text-primary-foreground hover:bg-primary/90 shadow-elegant hover:shadow-[0_0_40px_rgba(0,217,255,0.6)] transition-all" asChild>
               <Link to="/inizia-ora">
                 Inizia Gratis
@@ -51,9 +48,7 @@ const Hero = () => {
           </div>
 
           {/* Stats */}
-          <div className="grid grid-cols-3 gap-8 pt-12 max-w-2xl mx-auto animate-fade-in" style={{
-          animationDelay: '0.4s'
-        }}>
+          <div className="grid grid-cols-3 gap-8 pt-12 max-w-2xl mx-auto animate-fade-in" style={{ animationDelay: '0.4s' }}>
             <div className="space-y-1 p-4 rounded-lg bg-card/30 backdrop-blur-sm border border-primary/20 hover:border-primary/50 transition-all hover:shadow-card">
               <div className="text-3xl md:text-4xl font-bold text-primary drop-shadow-[0_0_10px_rgba(0,217,255,0.5)]">300+</div>
               <div className="text-sm text-muted-foreground">Artisti</div>
@@ -69,6 +64,8 @@ const Hero = () => {
           </div>
         </div>
       </div>
-    </section>;
+    </section>
+  );
 };
+
 export default Hero;

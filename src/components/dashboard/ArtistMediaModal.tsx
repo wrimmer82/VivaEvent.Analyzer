@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
-import { FileText, Image as ImageIcon, Music, Video, ExternalLink, Loader2, Instagram, Youtube } from "lucide-react";
+import { FileText, Image as ImageIcon, Music, Video, ExternalLink, Loader2 } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -21,11 +21,11 @@ interface ArtistData {
   citta: string;
   biografia: string;
   avatar_url: string;
-  epk_pdf: string[];
-  foto_professionali: string[];
-  accenni_brani: string[];
-  video_artistici: string[];
   links: {
+    epk?: string;
+    photos?: string[];
+    audio?: string[];
+    video?: string;
     instagram?: string;
     facebook?: string;
     spotify?: string;
@@ -85,11 +85,6 @@ export const ArtistMediaModal = ({ open, onOpenChange, artistId, artistName }: A
   }
 
   const links = artistData?.links || {};
-  const hasEpk = artistData?.epk_pdf && artistData.epk_pdf.length > 0;
-  const hasPhotos = artistData?.foto_professionali && artistData.foto_professionali.length > 0;
-  const hasAudio = artistData?.accenni_brani && artistData.accenni_brani.length > 0;
-  const hasVideos = artistData?.video_artistici && artistData.video_artistici.length > 0;
-  const hasAnyMedia = hasEpk || hasPhotos || hasAudio || hasVideos;
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -122,171 +117,176 @@ export const ArtistMediaModal = ({ open, onOpenChange, artistId, artistName }: A
               </Card>
             )}
 
-            {!hasAnyMedia && (
-              <Card className="bg-[#1a1f2e] border-cyan-500/30">
-                <CardContent className="p-6">
-                  <p className="text-gray-400 text-center">Nessun file disponibile</p>
-                </CardContent>
-              </Card>
-            )}
-
             {/* EPK PDF */}
-            {hasEpk && (
-              <Card className="bg-[#1a1f2e] border-cyan-500/30">
-                <CardHeader>
-                  <CardTitle className="text-lg text-white flex items-center gap-2">
-                    <FileText className="h-5 w-5 text-cyan-400" />
-                    Electronic Press Kit (EPK)
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-2">
-                  {artistData.epk_pdf.map((url, index) => (
-                    <Button
-                      key={index}
-                      onClick={() => openInNewTab(url)}
-                      variant="outline"
-                      className="w-full justify-between border-cyan-500/30 text-white hover:bg-cyan-500/10"
-                    >
-                      <span className="flex items-center gap-2">
-                        <FileText className="h-4 w-4 text-cyan-400" />
-                        EPK {index + 1}
-                      </span>
-                      <ExternalLink className="h-4 w-4 text-cyan-400" />
-                    </Button>
-                  ))}
-                </CardContent>
-              </Card>
-            )}
+            <Card className="bg-[#1a1f2e] border-cyan-500/30">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2 text-lg text-white">
+                  <FileText className="h-5 w-5 text-cyan-500" />
+                  Electronic Press Kit (EPK)
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                {links.epk ? (
+                  <Button
+                    onClick={() => openInNewTab(links.epk!)}
+                    className="w-full bg-cyan-500/20 hover:bg-cyan-500/30 text-cyan-400 border border-cyan-500/30"
+                  >
+                    <ExternalLink className="h-4 w-4 mr-2" />
+                    Visualizza EPK PDF
+                  </Button>
+                ) : (
+                  <p className="text-gray-500 text-sm text-center py-4">Nessun file disponibile</p>
+                )}
+              </CardContent>
+            </Card>
 
             {/* Foto Professionali */}
-            {hasPhotos && (
-              <Card className="bg-[#1a1f2e] border-cyan-500/30">
-                <CardHeader>
-                  <CardTitle className="text-lg text-white flex items-center gap-2">
-                    <ImageIcon className="h-5 w-5 text-cyan-400" />
-                    Foto Professionali
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
+            <Card className="bg-[#1a1f2e] border-cyan-500/30">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2 text-lg text-white">
+                  <ImageIcon className="h-5 w-5 text-cyan-500" />
+                  Foto Professionali
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                {links.photos && links.photos.length > 0 ? (
                   <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-                    {artistData.foto_professionali.map((url, index) => (
-                      <div 
+                    {links.photos.map((photo, index) => (
+                      <div
                         key={index}
-                        onClick={() => openInNewTab(url)}
-                        className="relative group cursor-pointer overflow-hidden rounded-lg border border-cyan-500/30 hover:border-cyan-500 transition-all"
+                        className="relative group cursor-pointer rounded-lg overflow-hidden border border-cyan-500/30 hover:border-cyan-500 transition-all"
+                        onClick={() => openInNewTab(photo)}
                       >
                         <img
-                          src={url}
+                          src={photo}
                           alt={`Foto ${index + 1}`}
-                          className="w-full h-32 object-cover group-hover:scale-110 transition-transform"
+                          className="w-full h-32 object-cover"
                         />
-                        <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                        <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity">
                           <ExternalLink className="h-6 w-6 text-white" />
                         </div>
                       </div>
                     ))}
                   </div>
-                </CardContent>
-              </Card>
-            )}
+                ) : (
+                  <p className="text-gray-500 text-sm text-center py-4">Nessun file disponibile</p>
+                )}
+              </CardContent>
+            </Card>
 
             {/* Accenni di Brani */}
-            {hasAudio && (
-              <Card className="bg-[#1a1f2e] border-cyan-500/30">
-                <CardHeader>
-                  <CardTitle className="text-lg text-white flex items-center gap-2">
-                    <Music className="h-5 w-5 text-cyan-400" />
-                    Accenni di Brani
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-3">
-                  {artistData.accenni_brani.map((url, index) => (
-                    <div key={index} className="p-3 bg-[#0a0f1e] rounded-lg border border-cyan-500/30">
-                      <p className="text-sm text-gray-400 mb-2">Brano {index + 1}</p>
-                      <audio controls className="w-full">
-                        <source src={url} />
-                        Il tuo browser non supporta l'elemento audio.
-                      </audio>
-                    </div>
-                  ))}
-                </CardContent>
-              </Card>
-            )}
+            <Card className="bg-[#1a1f2e] border-cyan-500/30">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2 text-lg text-white">
+                  <Music className="h-5 w-5 text-cyan-500" />
+                  Accenni di Brani
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                {links.audio && links.audio.length > 0 ? (
+                  <div className="space-y-3">
+                    {links.audio.map((audio, index) => (
+                      <div
+                        key={index}
+                        className="flex items-center gap-3 p-3 bg-[#0a0f1e] rounded-lg border border-cyan-500/30"
+                      >
+                        <Music className="h-5 w-5 text-cyan-500 flex-shrink-0" />
+                        <audio controls className="flex-1 h-10" style={{ maxWidth: '100%' }}>
+                          <source src={audio} />
+                          Your browser does not support the audio element.
+                        </audio>
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          onClick={() => openInNewTab(audio)}
+                          className="border-cyan-500/30 text-cyan-400 hover:bg-cyan-500/20"
+                        >
+                          <ExternalLink className="h-4 w-4" />
+                        </Button>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <p className="text-gray-500 text-sm text-center py-4">Nessun file disponibile</p>
+                )}
+              </CardContent>
+            </Card>
 
             {/* Video */}
-            {hasVideos && (
+            {links.video && (
               <Card className="bg-[#1a1f2e] border-cyan-500/30">
                 <CardHeader>
-                  <CardTitle className="text-lg text-white flex items-center gap-2">
-                    <Video className="h-5 w-5 text-cyan-400" />
+                  <CardTitle className="flex items-center gap-2 text-lg text-white">
+                    <Video className="h-5 w-5 text-cyan-500" />
                     Video
                   </CardTitle>
                 </CardHeader>
-                <CardContent className="space-y-2">
-                  {artistData.video_artistici.map((url, index) => (
-                    <Button
-                      key={index}
-                      onClick={() => openInNewTab(url)}
-                      variant="outline"
-                      className="w-full justify-between border-cyan-500/30 text-white hover:bg-cyan-500/10"
-                    >
-                      <span className="flex items-center gap-2 truncate">
-                        <Video className="h-4 w-4 text-cyan-400 flex-shrink-0" />
-                        <span className="truncate">{url}</span>
-                      </span>
-                      <ExternalLink className="h-4 w-4 text-cyan-400 flex-shrink-0" />
-                    </Button>
-                  ))}
+                <CardContent>
+                  <Button
+                    onClick={() => openInNewTab(links.video!)}
+                    className="w-full bg-cyan-500/20 hover:bg-cyan-500/30 text-cyan-400 border border-cyan-500/30"
+                  >
+                    <ExternalLink className="h-4 w-4 mr-2" />
+                    Guarda Video
+                  </Button>
                 </CardContent>
               </Card>
             )}
 
-            {/* Social Media Links */}
-            {(links.instagram || links.spotify || links.youtube) && (
+            {/* Social Links */}
+            {(links.instagram || links.facebook || links.spotify || links.youtube || links.tiktok) && (
               <Card className="bg-[#1a1f2e] border-cyan-500/30">
                 <CardHeader>
-                  <CardTitle className="text-lg text-white">Social Media</CardTitle>
+                  <CardTitle className="text-lg text-white">Link Social</CardTitle>
                 </CardHeader>
-                <CardContent className="space-y-2">
-                  {links.instagram && (
-                    <Button
-                      onClick={() => openInNewTab(links.instagram!)}
-                      variant="outline"
-                      className="w-full justify-between border-cyan-500/30 text-white hover:bg-cyan-500/10"
-                    >
-                      <span className="flex items-center gap-2">
-                        <Instagram className="h-4 w-4 text-cyan-400" />
+                <CardContent>
+                  <div className="flex flex-wrap gap-2">
+                    {links.instagram && (
+                      <Button
+                        size="sm"
+                        onClick={() => openInNewTab(links.instagram!)}
+                        className="bg-pink-500/20 hover:bg-pink-500/30 text-pink-400 border border-pink-500/30"
+                      >
                         Instagram
-                      </span>
-                      <ExternalLink className="h-4 w-4 text-cyan-400" />
-                    </Button>
-                  )}
-                  {links.spotify && (
-                    <Button
-                      onClick={() => openInNewTab(links.spotify!)}
-                      variant="outline"
-                      className="w-full justify-between border-cyan-500/30 text-white hover:bg-cyan-500/10"
-                    >
-                      <span className="flex items-center gap-2">
-                        <Music className="h-4 w-4 text-cyan-400" />
+                      </Button>
+                    )}
+                    {links.facebook && (
+                      <Button
+                        size="sm"
+                        onClick={() => openInNewTab(links.facebook!)}
+                        className="bg-blue-500/20 hover:bg-blue-500/30 text-blue-400 border border-blue-500/30"
+                      >
+                        Facebook
+                      </Button>
+                    )}
+                    {links.spotify && (
+                      <Button
+                        size="sm"
+                        onClick={() => openInNewTab(links.spotify!)}
+                        className="bg-green-500/20 hover:bg-green-500/30 text-green-400 border border-green-500/30"
+                      >
                         Spotify
-                      </span>
-                      <ExternalLink className="h-4 w-4 text-cyan-400" />
-                    </Button>
-                  )}
-                  {links.youtube && (
-                    <Button
-                      onClick={() => openInNewTab(links.youtube!)}
-                      variant="outline"
-                      className="w-full justify-between border-cyan-500/30 text-white hover:bg-cyan-500/10"
-                    >
-                      <span className="flex items-center gap-2">
-                        <Youtube className="h-4 w-4 text-cyan-400" />
+                      </Button>
+                    )}
+                    {links.youtube && (
+                      <Button
+                        size="sm"
+                        onClick={() => openInNewTab(links.youtube!)}
+                        className="bg-red-500/20 hover:bg-red-500/30 text-red-400 border border-red-500/30"
+                      >
                         YouTube
-                      </span>
-                      <ExternalLink className="h-4 w-4 text-cyan-400" />
-                    </Button>
-                  )}
+                      </Button>
+                    )}
+                    {links.tiktok && (
+                      <Button
+                        size="sm"
+                        onClick={() => openInNewTab(links.tiktok!)}
+                        className="bg-purple-500/20 hover:bg-purple-500/30 text-purple-400 border border-purple-500/30"
+                      >
+                        TikTok
+                      </Button>
+                    )}
+                  </div>
                 </CardContent>
               </Card>
             )}
