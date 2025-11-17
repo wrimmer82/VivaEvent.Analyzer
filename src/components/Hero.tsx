@@ -21,13 +21,9 @@ const Hero = () => {
             <span style={{
             animationDelay: '0.2s',
             animation: 'fade-in 1s ease-out 0.2s both'
-          }} className="inline-block drop-shadow-[0_0_30px_rgba(0,217,255,0.5)] animate-fade-in font-sans font-bold text-7xl text-slate-50">VivaEvent
-Live Music Booking</span>
-            <br />
-            <span className="inline-block text-foreground drop-shadow-[0_0_30px_rgba(0,217,255,0.5)] animate-fade-in" style={{
-            animationDelay: '0.5s',
-            animation: 'fade-in 1s ease-out 0.5s both'
-          }}>Live Music Booking</span>
+          }} className="inline-block drop-shadow-[0_0_30px_rgba(0,217,255,0.5)] animate-fade-in font-sans font-bold text-7xl text-slate-50">
+              VivaEvent Live Music Booking
+            </span>
           </h1>
 
           {/* Subheading */}
