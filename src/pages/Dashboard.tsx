@@ -7,9 +7,14 @@ import FilterSidebar, { FilterState } from "@/components/dashboard/FilterSidebar
 import StatsSidebar from "@/components/dashboard/StatsSidebar";
 import { BookingModal } from "@/components/dashboard/BookingModal";
 import { Badge } from "@/components/ui/badge";
-import { User, X, LogOut } from "lucide-react";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { User, X, LogOut, Calendar, Clock, Euro } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
+import { format } from "date-fns";
+import { it } from "date-fns/locale";
 
 const Dashboard = () => {
   const navigate = useNavigate();
@@ -41,9 +46,13 @@ const Dashboard = () => {
     receiverType: "",
   });
 
+  const [sentBookings, setSentBookings] = useState<any[]>([]);
+  const [loadingBookings, setLoadingBookings] = useState(false);
+
   useEffect(() => {
     loadUserData();
     loadMatches();
+    loadSentBookings();
   }, []);
 
   const loadUserData = async () => {
@@ -122,6 +131,85 @@ const Dashboard = () => {
       });
     } finally {
       setLoading(false);
+    }
+  };
+
+  const loadSentBookings = async () => {
+    try {
+      setLoadingBookings(true);
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) return;
+
+      const { data: bookings, error } = await supabase
+        .from('booking_requests')
+        .select('*')
+        .eq('sender_id', session.user.id)
+        .order('created_at', { ascending: false });
+
+      if (error) throw error;
+
+      // Carica i nomi dei receiver
+      const bookingsWithNames = await Promise.all(
+        (bookings || []).map(async (booking) => {
+          const receiverName = await getReceiverName(booking.receiver_id);
+          return { ...booking, receiver_name: receiverName };
+        })
+      );
+
+      setSentBookings(bookingsWithNames);
+    } catch (error) {
+      console.error('Error loading bookings:', error);
+      toast({
+        title: "Errore",
+        description: "Impossibile caricare le proposte inviate",
+        variant: "destructive",
+      });
+    } finally {
+      setLoadingBookings(false);
+    }
+  };
+
+  const getReceiverName = async (userId: string): Promise<string> => {
+    // Cerca in venues
+    const { data: venue } = await supabase
+      .from('venues')
+      .select('nome_locale')
+      .eq('user_id', userId)
+      .maybeSingle();
+    
+    if (venue) return venue.nome_locale;
+
+    // Cerca in professionisti
+    const { data: prof } = await supabase
+      .from('professionisti')
+      .select('nome_completo')
+      .eq('user_id', userId)
+      .maybeSingle();
+    
+    if (prof) return prof.nome_completo;
+
+    return 'Sconosciuto';
+  };
+
+  const getStatusColor = (status: string) => {
+    switch (status) {
+      case 'accepted':
+        return 'bg-green-500/10 text-green-500 border-green-500/20';
+      case 'rejected':
+        return 'bg-red-500/10 text-red-500 border-red-500/20';
+      default:
+        return 'bg-yellow-500/10 text-yellow-500 border-yellow-500/20';
+    }
+  };
+
+  const getStatusLabel = (status: string) => {
+    switch (status) {
+      case 'accepted':
+        return 'Accettata';
+      case 'rejected':
+        return 'Rifiutata';
+      default:
+        return 'In Attesa';
     }
   };
 
@@ -226,124 +314,200 @@ const Dashboard = () => {
 
           {/* Main Content - Center */}
           <main className="lg:col-span-7">
-            {/* Header */}
-            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
-              <div>
-                <h1 className="text-white text-2xl font-bold">Match Suggeriti per Te</h1>
-                <p className="text-gray-400 text-sm mt-1">
-                  {loading ? 'Caricamento...' : `${sortedMatches.length} match trovati`}
-                </p>
-              </div>
-              <Select value={sortBy} onValueChange={setSortBy}>
-                <SelectTrigger className="w-[200px] bg-[#1a1f2e] border-cyan-500/30 text-white">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent className="bg-[#1a1f2e] border-cyan-500/30 text-white">
-                  <SelectItem value="match">Per Match Score</SelectItem>
-                  <SelectItem value="rating">Per Rating</SelectItem>
-                  <SelectItem value="recent">Più Recenti</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
+            <Tabs defaultValue="matches" className="w-full">
+              <TabsList className="w-full mb-6">
+                <TabsTrigger value="matches" className="flex-1">Match Suggeriti</TabsTrigger>
+                <TabsTrigger value="bookings" className="flex-1">Proposte Inviate</TabsTrigger>
+              </TabsList>
 
-            {/* Active Filters Tags */}
-            {(filters.genres.length > 0 || filters.city !== 'Tutte' || filters.budgetMin > 0 || filters.budgetMax < 5000 || filters.minRating > 0 || filters.entityType !== 'tutti') && (
-              <div className="flex flex-wrap gap-2 mb-4">
-                {filters.genres.map(genre => (
-                  <Badge key={genre} className="bg-cyan-500/20 text-cyan-400 px-3 py-1 cursor-pointer hover:bg-cyan-500/30">
-                    {genre}
-                    <X 
-                      className="h-3 w-3 ml-1 inline" 
-                      onClick={() => setFilters({...filters, genres: filters.genres.filter(g => g !== genre)})}
-                    />
-                  </Badge>
-                ))}
-                {filters.city !== 'Tutte' && (
-                  <Badge className="bg-cyan-500/20 text-cyan-400 px-3 py-1 cursor-pointer hover:bg-cyan-500/30">
-                    {filters.city}
-                    <X 
-                      className="h-3 w-3 ml-1 inline" 
-                      onClick={() => setFilters({...filters, city: 'Tutte'})}
-                    />
-                  </Badge>
-                )}
-                {(filters.budgetMin > 0 || filters.budgetMax < 5000) && (
-                  <Badge className="bg-cyan-500/20 text-cyan-400 px-3 py-1 cursor-pointer hover:bg-cyan-500/30">
-                    €{filters.budgetMin} - €{filters.budgetMax}
-                    <X 
-                      className="h-3 w-3 ml-1 inline" 
-                      onClick={() => setFilters({...filters, budgetMin: 0, budgetMax: 5000})}
-                    />
-                  </Badge>
-                )}
-                {filters.minRating > 0 && (
-                  <Badge className="bg-cyan-500/20 text-cyan-400 px-3 py-1 cursor-pointer hover:bg-cyan-500/30">
-                    Rating {filters.minRating}+
-                    <X 
-                      className="h-3 w-3 ml-1 inline" 
-                      onClick={() => setFilters({...filters, minRating: 0})}
-                    />
-                  </Badge>
-                )}
-                {filters.entityType !== 'tutti' && (
-                  <Badge className="bg-cyan-500/20 text-cyan-400 px-3 py-1 cursor-pointer hover:bg-cyan-500/30">
-                    {filters.entityType === 'venue' ? 'Solo Venue' : 'Solo Professionisti'}
-                    <X 
-                      className="h-3 w-3 ml-1 inline" 
-                      onClick={() => setFilters({...filters, entityType: 'tutti'})}
-                    />
-                  </Badge>
-                )}
-              </div>
-            )}
+              <TabsContent value="matches">
+                {/* Header */}
+                <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
+                  <div>
+                    <h1 className="text-white text-2xl font-bold">Match Suggeriti per Te</h1>
+                    <p className="text-gray-400 text-sm mt-1">
+                      {loading ? 'Caricamento...' : `${sortedMatches.length} match trovati`}
+                    </p>
+                  </div>
+                  <Select value={sortBy} onValueChange={setSortBy}>
+                    <SelectTrigger className="w-[200px] bg-[#1a1f2e] border-cyan-500/30 text-white">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent className="bg-[#1a1f2e] border-cyan-500/30 text-white">
+                      <SelectItem value="match">Per Match Score</SelectItem>
+                      <SelectItem value="rating">Per Rating</SelectItem>
+                      <SelectItem value="recent">Più Recenti</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
 
-            {/* Match Grid or Empty State */}
-            {loading ? (
-              <div className="bg-[#1a1f2e] border border-cyan-500/30 rounded-lg p-12 text-center">
-                <div className="text-white text-xl">Caricamento match...</div>
-              </div>
-            ) : sortedMatches.length === 0 ? (
-              <div className="bg-[#1a1f2e] border border-cyan-500/30 rounded-lg p-12 text-center">
-                <div className="text-6xl mb-4">😔</div>
-                <h3 className="text-white text-xl font-bold mb-2">Nessun match trovato</h3>
-                <p className="text-gray-400 mb-4">
-                  Nessun venue corrisponde ai criteri di ricerca selezionati
-                </p>
-                <button
-                  onClick={() => setFilters({
-                    genres: [],
-                    city: 'Tutte',
-                    radius: 50,
-                    budgetMin: 0,
-                    budgetMax: 5000,
-                    minRating: 0,
-                    dateStart: null,
-                    dateEnd: null,
-                    entityType: 'tutti'
-                  })}
-                  className="bg-cyan-500 hover:bg-cyan-600 text-white px-6 py-2 rounded-lg transition-colors"
-                >
-                  Reset Filtri
-                </button>
-              </div>
-            ) : (
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                {sortedMatches.map((match) => (
-                  <MatchCard 
-                    key={match.id} 
-                    {...match}
-                    onBookingClick={() =>
-                      setBookingModal({
-                        open: true,
-                        receiverId: match.userId || match.id,
-                        receiverName: match.nome,
-                        receiverType: match.tipo,
-                      })
-                    }
-                  />
-                ))}
-              </div>
-            )}
+                {/* Active Filters Tags */}
+                {(filters.genres.length > 0 || filters.city !== 'Tutte' || filters.budgetMin > 0 || filters.budgetMax < 5000 || filters.minRating > 0 || filters.entityType !== 'tutti') && (
+                  <div className="flex flex-wrap gap-2 mb-4">
+                    {filters.genres.map(genre => (
+                      <Badge key={genre} className="bg-cyan-500/20 text-cyan-400 px-3 py-1 cursor-pointer hover:bg-cyan-500/30">
+                        {genre}
+                        <X 
+                          className="h-3 w-3 ml-1 inline" 
+                          onClick={() => setFilters({...filters, genres: filters.genres.filter(g => g !== genre)})}
+                        />
+                      </Badge>
+                    ))}
+                    {filters.city !== 'Tutte' && (
+                      <Badge className="bg-cyan-500/20 text-cyan-400 px-3 py-1 cursor-pointer hover:bg-cyan-500/30">
+                        {filters.city}
+                        <X 
+                          className="h-3 w-3 ml-1 inline" 
+                          onClick={() => setFilters({...filters, city: 'Tutte'})}
+                        />
+                      </Badge>
+                    )}
+                    {(filters.budgetMin > 0 || filters.budgetMax < 5000) && (
+                      <Badge className="bg-cyan-500/20 text-cyan-400 px-3 py-1 cursor-pointer hover:bg-cyan-500/30">
+                        €{filters.budgetMin} - €{filters.budgetMax}
+                        <X 
+                          className="h-3 w-3 ml-1 inline" 
+                          onClick={() => setFilters({...filters, budgetMin: 0, budgetMax: 5000})}
+                        />
+                      </Badge>
+                    )}
+                    {filters.minRating > 0 && (
+                      <Badge className="bg-cyan-500/20 text-cyan-400 px-3 py-1 cursor-pointer hover:bg-cyan-500/30">
+                        Rating {filters.minRating}+
+                        <X 
+                          className="h-3 w-3 ml-1 inline" 
+                          onClick={() => setFilters({...filters, minRating: 0})}
+                        />
+                      </Badge>
+                    )}
+                    {filters.entityType !== 'tutti' && (
+                      <Badge className="bg-cyan-500/20 text-cyan-400 px-3 py-1 cursor-pointer hover:bg-cyan-500/30">
+                        {filters.entityType === 'venue' ? 'Solo Venue' : 'Solo Professionisti'}
+                        <X 
+                          className="h-3 w-3 ml-1 inline" 
+                          onClick={() => setFilters({...filters, entityType: 'tutti'})}
+                        />
+                      </Badge>
+                    )}
+                  </div>
+                )}
+
+                {/* Match Grid or Empty State */}
+                {loading ? (
+                  <div className="bg-[#1a1f2e] border border-cyan-500/30 rounded-lg p-12 text-center">
+                    <div className="text-white text-xl">Caricamento match...</div>
+                  </div>
+                ) : sortedMatches.length === 0 ? (
+                  <div className="bg-[#1a1f2e] border border-cyan-500/30 rounded-lg p-12 text-center">
+                    <div className="text-6xl mb-4">😔</div>
+                    <h3 className="text-white text-xl font-bold mb-2">Nessun match trovato</h3>
+                    <p className="text-gray-400 mb-4">
+                      Nessun venue corrisponde ai criteri di ricerca selezionati
+                    </p>
+                    <button
+                      onClick={() => setFilters({
+                        genres: [],
+                        city: 'Tutte',
+                        radius: 50,
+                        budgetMin: 0,
+                        budgetMax: 5000,
+                        minRating: 0,
+                        dateStart: null,
+                        dateEnd: null,
+                        entityType: 'tutti'
+                      })}
+                      className="bg-cyan-500 hover:bg-cyan-600 text-white px-6 py-2 rounded-lg transition-colors"
+                    >
+                      Reset Filtri
+                    </button>
+                  </div>
+                ) : (
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    {sortedMatches.map((match) => (
+                      <MatchCard 
+                        key={match.id} 
+                        {...match}
+                        onBookingClick={() =>
+                          setBookingModal({
+                            open: true,
+                            receiverId: match.userId || match.id,
+                            receiverName: match.nome,
+                            receiverType: match.tipo,
+                          })
+                        }
+                      />
+                    ))}
+                  </div>
+                )}
+              </TabsContent>
+
+              <TabsContent value="bookings">
+                <Card className="bg-[#1a1f2e] border-cyan-500/30">
+                  <CardHeader>
+                    <CardTitle className="text-white">Le Tue Proposte Inviate</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    {loadingBookings ? (
+                      <div className="text-center py-8">
+                        <p className="text-gray-400">Caricamento...</p>
+                      </div>
+                    ) : sentBookings.length === 0 ? (
+                      <div className="text-center py-8">
+                        <p className="text-gray-400">
+                          Non hai ancora inviato nessuna proposta
+                        </p>
+                      </div>
+                    ) : (
+                      <div className="overflow-x-auto">
+                        <Table>
+                          <TableHeader>
+                            <TableRow className="border-cyan-500/30">
+                              <TableHead className="text-cyan-400">Destinatario</TableHead>
+                              <TableHead className="text-cyan-400">Data Evento</TableHead>
+                              <TableHead className="text-cyan-400">Orario</TableHead>
+                              <TableHead className="text-cyan-400">Compenso</TableHead>
+                              <TableHead className="text-cyan-400">Stato</TableHead>
+                            </TableRow>
+                          </TableHeader>
+                          <TableBody>
+                            {sentBookings.map((booking) => (
+                              <TableRow key={booking.id} className="border-cyan-500/30">
+                                <TableCell className="font-medium text-white">
+                                  {booking.receiver_name}
+                                </TableCell>
+                                <TableCell className="text-gray-300">
+                                  <div className="flex items-center gap-2">
+                                    <Calendar className="h-4 w-4 text-cyan-400" />
+                                    {format(new Date(booking.event_date), "dd MMM yyyy", { locale: it })}
+                                  </div>
+                                </TableCell>
+                                <TableCell className="text-gray-300">
+                                  <div className="flex items-center gap-2">
+                                    <Clock className="h-4 w-4 text-cyan-400" />
+                                    {booking.event_time}
+                                  </div>
+                                </TableCell>
+                                <TableCell className="text-gray-300">
+                                  <div className="flex items-center gap-2">
+                                    <Euro className="h-4 w-4 text-cyan-400" />
+                                    {booking.proposed_compensation}€
+                                  </div>
+                                </TableCell>
+                                <TableCell>
+                                  <Badge className={getStatusColor(booking.status)}>
+                                    {getStatusLabel(booking.status)}
+                                  </Badge>
+                                </TableCell>
+                              </TableRow>
+                            ))}
+                          </TableBody>
+                        </Table>
+                      </div>
+                    )}
+                  </CardContent>
+                </Card>
+              </TabsContent>
+            </Tabs>
           </main>
 
           {/* Stats Sidebar - Right */}
@@ -356,7 +520,12 @@ const Dashboard = () => {
       {/* Booking Modal */}
       <BookingModal
         open={bookingModal.open}
-        onOpenChange={(open) => setBookingModal({ ...bookingModal, open })}
+        onOpenChange={(open) => {
+          setBookingModal({ ...bookingModal, open });
+          if (!open) {
+            loadSentBookings();
+          }
+        }}
         receiverId={bookingModal.receiverId}
         receiverName={bookingModal.receiverName}
         receiverType={bookingModal.receiverType}
