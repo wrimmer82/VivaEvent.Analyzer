@@ -213,7 +213,15 @@ const Dashboard = () => {
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
           {/* Filter Sidebar - Left */}
           <aside className="hidden lg:block lg:col-span-2">
-            <FilterSidebar filters={filters} onFilterChange={setFilters} />
+            <FilterSidebar 
+              filters={filters} 
+              onFilterChange={setFilters}
+              entityOptions={[
+                { value: 'tutti', label: 'Tutti' },
+                { value: 'venue', label: 'Venue' },
+                { value: 'professionista', label: 'Professionista' }
+              ]}
+            />
           </aside>
 
           {/* Main Content - Center */}
