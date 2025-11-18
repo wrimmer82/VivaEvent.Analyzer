@@ -38,6 +38,11 @@ const ArtistProfile = () => {
   const [photos, setPhotos] = useState<File[]>([]);
   const [audioSamples, setAudioSamples] = useState<File[]>([]);
   const [videoLink, setVideoLink] = useState("");
+  
+  // Stati per i file esistenti già salvati
+  const [existingEpkUrl, setExistingEpkUrl] = useState<string>("");
+  const [existingPhotoUrls, setExistingPhotoUrls] = useState<string[]>([]);
+  const [existingAudioUrls, setExistingAudioUrls] = useState<string[]>([]);
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -98,6 +103,16 @@ const ArtistProfile = () => {
         });
         if (existingLinks.video) {
           setVideoLink(existingLinks.video);
+        }
+        // Carica i file media esistenti
+        if (existingLinks.epk) {
+          setExistingEpkUrl(existingLinks.epk);
+        }
+        if (existingLinks.photos && Array.isArray(existingLinks.photos)) {
+          setExistingPhotoUrls(existingLinks.photos);
+        }
+        if (existingLinks.audio && Array.isArray(existingLinks.audio)) {
+          setExistingAudioUrls(existingLinks.audio);
         }
       }
     } catch (error) {
@@ -432,7 +447,21 @@ const ArtistProfile = () => {
                   </CardTitle>
                   <CardDescription>Carica il tuo EPK in formato PDF</CardDescription>
                 </CardHeader>
-                <CardContent>
+                <CardContent className="space-y-4">
+                  {existingEpkUrl && (
+                    <div className="p-4 bg-muted rounded-lg">
+                      <p className="text-sm font-medium mb-2">EPK attuale:</p>
+                      <a 
+                        href={existingEpkUrl} 
+                        target="_blank" 
+                        rel="noopener noreferrer"
+                        className="text-primary hover:underline text-sm flex items-center gap-2"
+                      >
+                        <Upload className="w-4 h-4" />
+                        Visualizza EPK salvato
+                      </a>
+                    </div>
+                  )}
                   <div className="border-2 border-dashed border-border rounded-lg p-6 text-center hover:border-primary transition-colors">
                     <Input
                       type="file"
@@ -444,7 +473,7 @@ const ArtistProfile = () => {
                     <Label htmlFor="epk-upload" className="cursor-pointer">
                       <Upload className="w-8 h-8 mx-auto mb-2 text-muted-foreground" />
                       <p className="text-sm text-muted-foreground">
-                        {epkFile ? epkFile.name : "Clicca per caricare EPK (PDF)"}
+                        {epkFile ? epkFile.name : existingEpkUrl ? "Clicca per sostituire EPK" : "Clicca per caricare EPK (PDF)"}
                       </p>
                     </Label>
                   </div>
@@ -460,7 +489,25 @@ const ArtistProfile = () => {
                   </CardTitle>
                   <CardDescription>Carica foto promozionali e live (max 10)</CardDescription>
                 </CardHeader>
-                <CardContent>
+                <CardContent className="space-y-4">
+                  {existingPhotoUrls.length > 0 && (
+                    <div className="p-4 bg-muted rounded-lg">
+                      <p className="text-sm font-medium mb-3">Foto salvate ({existingPhotoUrls.length}):</p>
+                      <div className="grid grid-cols-3 gap-2">
+                        {existingPhotoUrls.map((url, index) => (
+                          <a 
+                            key={index} 
+                            href={url} 
+                            target="_blank" 
+                            rel="noopener noreferrer"
+                            className="aspect-square rounded-lg overflow-hidden hover:opacity-80 transition-opacity"
+                          >
+                            <img src={url} alt={`Foto ${index + 1}`} className="w-full h-full object-cover" />
+                          </a>
+                        ))}
+                      </div>
+                    </div>
+                  )}
                   <div className="border-2 border-dashed border-border rounded-lg p-6 text-center hover:border-primary transition-colors">
                     <Input
                       type="file"
@@ -473,7 +520,7 @@ const ArtistProfile = () => {
                     <Label htmlFor="photo-upload" className="cursor-pointer">
                       <ImageIcon className="w-8 h-8 mx-auto mb-2 text-muted-foreground" />
                       <p className="text-sm text-muted-foreground">
-                        {photos.length > 0 ? `${photos.length} foto caricate` : "Clicca per caricare foto"}
+                        {photos.length > 0 ? `${photos.length} nuove foto da caricare` : existingPhotoUrls.length > 0 ? "Clicca per aggiungere altre foto" : "Clicca per caricare foto"}
                       </p>
                     </Label>
                   </div>
@@ -489,7 +536,22 @@ const ArtistProfile = () => {
                   </CardTitle>
                   <CardDescription>Carica sample audio delle tue migliori canzoni (max 5)</CardDescription>
                 </CardHeader>
-                <CardContent>
+                <CardContent className="space-y-4">
+                  {existingAudioUrls.length > 0 && (
+                    <div className="p-4 bg-muted rounded-lg">
+                      <p className="text-sm font-medium mb-3">Brani salvati ({existingAudioUrls.length}):</p>
+                      <div className="space-y-2">
+                        {existingAudioUrls.map((url, index) => (
+                          <div key={index} className="flex items-center gap-2 p-2 bg-background rounded">
+                            <Music className="w-4 h-4 text-primary flex-shrink-0" />
+                            <audio controls className="flex-1 h-8" src={url}>
+                              Il tuo browser non supporta l'elemento audio.
+                            </audio>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
                   <div className="border-2 border-dashed border-border rounded-lg p-6 text-center hover:border-primary transition-colors">
                     <Input
                       type="file"
@@ -502,7 +564,7 @@ const ArtistProfile = () => {
                     <Label htmlFor="audio-upload" className="cursor-pointer">
                       <Music className="w-8 h-8 mx-auto mb-2 text-muted-foreground" />
                       <p className="text-sm text-muted-foreground">
-                        {audioSamples.length > 0 ? `${audioSamples.length} brani caricati` : "Clicca per caricare audio"}
+                        {audioSamples.length > 0 ? `${audioSamples.length} nuovi brani da caricare` : existingAudioUrls.length > 0 ? "Clicca per aggiungere altri brani" : "Clicca per caricare audio"}
                       </p>
                     </Label>
                   </div>
