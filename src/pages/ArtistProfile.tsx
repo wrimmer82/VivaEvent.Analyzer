@@ -14,6 +14,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { ArrowLeft, Upload, Music, Image as ImageIcon, Video, Users, TrendingUp, LogOut, ArrowRight, Loader2 } from "lucide-react";
 import { Link } from "react-router-dom";
 import Navbar from "@/components/Navbar";
+import MatrixRain from "@/components/MatrixRain";
 
 const formSchema = z.object({
   artistName: z.string().min(2, "Nome artista richiesto").max(100),
@@ -34,13 +35,11 @@ const ArtistProfile = () => {
   const [saving, setSaving] = useState(false);
   const [userId, setUserId] = useState<string | null>(null);
   const [artistId, setArtistId] = useState<string | null>(null);
-  const [epkFile, setEpkFile] = useState<File | null>(null);
   const [photos, setPhotos] = useState<File[]>([]);
   const [audioSamples, setAudioSamples] = useState<File[]>([]);
   const [videoLink, setVideoLink] = useState("");
   
   // Stati per i file esistenti già salvati
-  const [existingEpkUrl, setExistingEpkUrl] = useState<string>("");
   const [existingPhotoUrls, setExistingPhotoUrls] = useState<string[]>([]);
   const [existingAudioUrls, setExistingAudioUrls] = useState<string[]>([]);
 
@@ -105,9 +104,6 @@ const ArtistProfile = () => {
           setVideoLink(existingLinks.video);
         }
         // Carica i file media esistenti
-        if (existingLinks.epk) {
-          setExistingEpkUrl(existingLinks.epk);
-        }
         if (existingLinks.photos && Array.isArray(existingLinks.photos)) {
           setExistingPhotoUrls(existingLinks.photos);
         }
@@ -202,14 +198,8 @@ const ArtistProfile = () => {
       }
 
       // Upload files
-      let epkUrl: string | null = null;
       const photoUrls: string[] = [...(existingLinks.photos || [])];
       const audioUrls: string[] = [...(existingLinks.audio || [])];
-
-      // Upload EPK (replace if new file provided)
-      if (epkFile) {
-        epkUrl = await uploadFile(epkFile, 'epk');
-      }
 
       // Upload photos (append to existing)
       for (const photo of photos) {
@@ -231,7 +221,6 @@ const ArtistProfile = () => {
         youtube: values.youtube || "",
         tiktok: values.tiktok || "",
         video: videoLink || existingLinks.video || "",
-        epk: epkUrl || existingLinks.epk || "",
         photos: photoUrls,
         audio: audioUrls,
       };
@@ -278,7 +267,6 @@ const ArtistProfile = () => {
       toast({
         title: "Profilo Salvato! 🎵",
         description: "Il tuo profilo artista è stato salvato con successo. Media caricati: " + 
-          (epkUrl ? "EPK, " : "") + 
           (photoUrls.length > 0 ? `${photoUrls.length} foto, ` : "") + 
           (audioUrls.length > 0 ? `${audioUrls.length} audio` : ""),
       });
@@ -323,8 +311,12 @@ const ArtistProfile = () => {
   }
 
   return (
-    <div className="min-h-screen bg-background">
-      <Navbar logoLink="/profile-dashboard" />
+    <div className="relative min-h-screen bg-background overflow-hidden">
+      {/* Matrix Rain Effect */}
+      <MatrixRain />
+      
+      <div className="relative z-10">
+        <Navbar logoLink="/profile-dashboard" />
       
       {/* Header with greeting and logout */}
       <div className="border-b border-border bg-card">
@@ -438,49 +430,7 @@ const ArtistProfile = () => {
                 </CardContent>
               </Card>
 
-              {/* EPK Upload */}
-              <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <Upload className="w-5 h-5 text-primary" />
-                    Electronic Press Kit (EPK)
-                  </CardTitle>
-                  <CardDescription>Carica il tuo EPK in formato PDF</CardDescription>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  {existingEpkUrl && (
-                    <div className="p-4 bg-muted rounded-lg">
-                      <p className="text-sm font-medium mb-2">EPK attuale:</p>
-                      <a 
-                        href={existingEpkUrl} 
-                        target="_blank" 
-                        rel="noopener noreferrer"
-                        className="text-primary hover:underline text-sm flex items-center gap-2"
-                      >
-                        <Upload className="w-4 h-4" />
-                        Visualizza EPK salvato
-                      </a>
-                    </div>
-                  )}
-                  <div className="border-2 border-dashed border-border rounded-lg p-6 text-center hover:border-primary transition-colors">
-                    <Input
-                      type="file"
-                      accept=".pdf"
-                      onChange={(e) => setEpkFile(e.target.files?.[0] || null)}
-                      className="hidden"
-                      id="epk-upload"
-                    />
-                    <Label htmlFor="epk-upload" className="cursor-pointer">
-                      <Upload className="w-8 h-8 mx-auto mb-2 text-muted-foreground" />
-                      <p className="text-sm text-muted-foreground">
-                        {epkFile ? epkFile.name : existingEpkUrl ? "Clicca per sostituire EPK" : "Clicca per caricare EPK (PDF)"}
-                      </p>
-                    </Label>
-                  </div>
-                </CardContent>
-              </Card>
-
-              {/* Foto */}
+              {/* Foto Professionali */}
               <Card>
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">
@@ -718,6 +668,7 @@ const ArtistProfile = () => {
             </form>
           </Form>
         </div>
+      </div>
       </div>
     </div>
   );
