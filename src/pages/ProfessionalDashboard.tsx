@@ -21,6 +21,7 @@ import {
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
+import MatrixRain from "@/components/MatrixRain";
 
 interface Professional {
   id: string;
@@ -218,8 +219,9 @@ const ProfessionalDashboard = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-[#0f1419]">
-        <div className="container mx-auto px-4 py-8">
+      <div className="relative min-h-screen bg-[#0f1419] overflow-hidden">
+        <MatrixRain />
+        <div className="relative z-10 container mx-auto px-4 py-8">
           <Skeleton className="h-12 w-64 mb-6" />
           <Skeleton className="h-32 w-full mb-8" />
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -232,8 +234,11 @@ const ProfessionalDashboard = () => {
   }
 
   return (
-    <div className="min-h-screen bg-[#0f1419]">
-      <div className="container mx-auto px-4 py-8">
+    <div className="relative min-h-screen bg-[#0f1419] overflow-hidden">
+      {/* Matrix Rain Effect */}
+      <MatrixRain />
+      
+      <div className="relative z-10 container mx-auto px-4 py-8">
         {/* Header with Profile and Logout */}
         <div className="flex justify-between items-center mb-6">
           <Button 
