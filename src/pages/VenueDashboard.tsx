@@ -22,6 +22,7 @@ import {
   TrendingUp,
   CheckCircle
 } from "lucide-react";
+import MatrixRain from "@/components/MatrixRain";
 
 interface Venue {
   id: string;
@@ -255,15 +256,19 @@ const VenueDashboard = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-[#0f1419] flex items-center justify-center">
-        <div className="text-white text-xl">Caricamento...</div>
+      <div className="relative min-h-screen bg-[#0f1419] overflow-hidden flex items-center justify-center">
+        <MatrixRain />
+        <div className="relative z-10 text-white text-xl">Caricamento...</div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-[#0f1419]">
-      <div className="container mx-auto px-4 py-8">
+    <div className="relative min-h-screen bg-[#0f1419] overflow-hidden">
+      {/* Matrix Rain Effect */}
+      <MatrixRain />
+      
+      <div className="relative z-10 container mx-auto px-4 py-8">
         {/* Header with Profile and Logout */}
         <div className="flex justify-between items-center mb-6">
           <Button 
