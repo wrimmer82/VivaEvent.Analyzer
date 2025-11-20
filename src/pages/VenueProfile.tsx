@@ -14,6 +14,7 @@ import { ArrowLeft, Building2, Users, Music, Euro, Calendar, MapPin, ExternalLin
 import { Checkbox } from "@/components/ui/checkbox";
 import { supabase } from "@/integrations/supabase/client";
 import Navbar from "@/components/Navbar";
+import MatrixRain from "@/components/MatrixRain";
 
 const musicGenres = [
   "Rock",
@@ -234,7 +235,9 @@ const VenueProfile = () => {
   }
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="relative min-h-screen bg-background overflow-hidden">
+      <MatrixRain />
+      <div className="relative z-10">
       <Navbar logoLink="/profile-dashboard" />
       
       {/* Header with greeting and logout */}
@@ -626,6 +629,7 @@ const VenueProfile = () => {
             </form>
           </Form>
         </div>
+      </div>
       </div>
     </div>
   );

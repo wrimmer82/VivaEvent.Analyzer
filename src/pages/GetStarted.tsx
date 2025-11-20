@@ -5,6 +5,7 @@ import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { Link } from "react-router-dom";
 import { Music, Building2, Briefcase, CheckCircle2, ArrowRight, Users, Calendar, TrendingUp, Shield } from "lucide-react";
+import MatrixRain from "@/components/MatrixRain";
 const GetStarted = () => {
   const userTypes = [{
     icon: Music,
@@ -50,7 +51,9 @@ const GetStarted = () => {
     icon: TrendingUp
   }];
   const benefits = ["Matching AI intelligente per artisti e venue", "Pagamenti sicuri e tracciati", "Contratti digitali automatici", "Calendario e gestione eventi", "Analytics e statistiche dettagliate", "Supporto clienti dedicato"];
-  return <div className="min-h-screen flex flex-col bg-background">
+  return <div className="relative min-h-screen flex flex-col bg-background overflow-hidden">
+      <MatrixRain />
+      <div className="relative z-10">
       <Navbar />
       
       {/* Hero Section */}
@@ -220,6 +223,7 @@ const GetStarted = () => {
       </section>
 
       <Footer />
+      </div>
     </div>;
 };
 export default GetStarted;
