@@ -12,6 +12,7 @@ import { useNavigate, Link } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import Navbar from "@/components/Navbar";
 import { Briefcase, LogOut, Loader2 } from "lucide-react";
+import MatrixRain from "@/components/MatrixRain";
 
 const formSchema = z.object({
   fullName: z.string().min(2, "Il nome deve contenere almeno 2 caratteri"),
@@ -146,7 +147,9 @@ const ProfessionalProfile = () => {
   }
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="relative min-h-screen bg-background overflow-hidden">
+      <MatrixRain />
+      <div className="relative z-10">
       <Navbar logoLink="/profile-dashboard" />
       
       {/* Header with greeting and logout */}
@@ -401,6 +404,7 @@ const ProfessionalProfile = () => {
             </form>
           </Form>
         </div>
+      </div>
       </div>
     </div>
   );

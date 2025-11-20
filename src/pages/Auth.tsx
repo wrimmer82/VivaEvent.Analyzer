@@ -7,6 +7,7 @@ import SignupStepOne from "@/components/auth/SignupStepOne";
 import SignupFormArtista from "@/components/auth/SignupFormArtista";
 import SignupFormVenue from "@/components/auth/SignupFormVenue";
 import SignupFormProfessionista from "@/components/auth/SignupFormProfessionista";
+import MatrixRain from "@/components/MatrixRain";
 
 type UserType = "artista" | "venue" | "professionista" | null;
 
@@ -120,8 +121,10 @@ const Auth = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-background via-background to-primary/5 p-4">
-      <div className="w-full max-w-2xl">
+    <div className="relative min-h-screen flex items-center justify-center bg-gradient-to-br from-background via-background to-primary/5 p-4 overflow-hidden">
+      <MatrixRain />
+      
+      <div className="relative z-10 w-full max-w-2xl">
         {/* Logo */}
         <div className="flex justify-center mb-8">
           <div className="flex items-center gap-2">

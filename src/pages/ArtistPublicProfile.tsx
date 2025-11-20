@@ -20,6 +20,7 @@ import {
 } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
+import MatrixRain from "@/components/MatrixRain";
 
 const ArtistPublicProfile = () => {
   const { id } = useParams();
@@ -100,7 +101,9 @@ const ArtistPublicProfile = () => {
   }
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="relative min-h-screen bg-background overflow-hidden">
+      <MatrixRain />
+      <div className="relative z-10">
       {/* Header Navigation */}
       <div className="bg-card border-b border-border">
         <div className="container mx-auto px-4 py-4">
@@ -442,6 +445,7 @@ const ArtistPublicProfile = () => {
             )}
           </Card>
         </div>
+      </div>
       </div>
     </div>
   );

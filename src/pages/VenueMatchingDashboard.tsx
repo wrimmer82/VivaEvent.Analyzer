@@ -11,6 +11,7 @@ import { Badge } from "@/components/ui/badge";
 import { User, X, LogOut } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
+import MatrixRain from "@/components/MatrixRain";
 
 const VenueMatchingDashboard = () => {
   const navigate = useNavigate();
@@ -208,8 +209,9 @@ const VenueMatchingDashboard = () => {
   });
 
   return (
-    <div className="min-h-screen bg-[#0f1419]">
-      <div className="container mx-auto px-4 py-8">
+    <div className="relative min-h-screen bg-[#0f1419] overflow-hidden">
+      <MatrixRain />
+      <div className="relative z-10 container mx-auto px-4 py-8">
         {/* User Badge */}
         <div className="mb-6 flex items-center justify-between">
           <div className="flex items-center gap-2">
