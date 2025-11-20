@@ -395,6 +395,15 @@ const VenueMatchingDashboard = () => {
         onOpenChange={(open) => setArtistMediaModal({ ...artistMediaModal, open })}
         artistId={artistMediaModal.artistId}
         artistName={artistMediaModal.artistName}
+        onBookingClick={() => {
+          setArtistMediaModal({ ...artistMediaModal, open: false });
+          setBookingModal({
+            open: true,
+            receiverId: artistMediaModal.artistId,
+            receiverName: artistMediaModal.artistName,
+            receiverType: 'artista',
+          });
+        }}
       />
     </div>
   );

@@ -593,6 +593,14 @@ const ProfessionalMatchingDashboard = () => {
         onOpenChange={(open) => setArtistMediaModal({ ...artistMediaModal, open })}
         artistId={artistMediaModal.artistId}
         artistName={artistMediaModal.artistName}
+        onBookingClick={() => {
+          const match = sortedMatches.find(m => m.id === artistMediaModal.artistId);
+          if (match) {
+            setArtistMediaModal({ ...artistMediaModal, open: false });
+            setSelectedMatch(match);
+            setBookingModalOpen(true);
+          }
+        }}
       />
     </div>
   );
