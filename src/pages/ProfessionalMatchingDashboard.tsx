@@ -32,51 +32,6 @@ interface ProfessionalMatch {
   lastUpdated: Date;
 }
 
-// Mock venues fittizie da mantenere
-const mockVenues: ProfessionalMatch[] = [
-  {
-    id: 'mock-1',
-    nome: 'Electronic Waves',
-    tipo: 'venue',
-    genere: 'Electronic, House',
-    città: 'Bologna',
-    email: 'info@electronicwaves.it',
-    capacity: 800,
-    rating: 4.5,
-    avatarUrl: 'https://api.dicebear.com/7.x/identicon/svg?seed=electronic',
-    matchScore: 79,
-    matchReason: 'Locale specializzato in musica elettronica, cerca collaborazioni per eventi EDM e techno.',
-    lastUpdated: new Date('2025-01-10')
-  },
-  {
-    id: 'mock-2',
-    nome: 'Indie Star',
-    tipo: 'venue',
-    genere: 'Indie, Alternative',
-    città: 'Firenze',
-    email: 'booking@indiestar.it',
-    capacity: 350,
-    rating: 4.7,
-    avatarUrl: 'https://api.dicebear.com/7.x/identicon/svg?seed=indiestar',
-    matchScore: 83,
-    matchReason: 'Venue emergente per artisti indie e alternative, aperto a nuove collaborazioni.',
-    lastUpdated: new Date('2025-01-09')
-  },
-  {
-    id: 'mock-3',
-    nome: 'Jazz Corner',
-    tipo: 'venue',
-    genere: 'Jazz, Blues',
-    città: 'Napoli',
-    email: 'info@jazzcorner.it',
-    capacity: 200,
-    rating: 4.8,
-    avatarUrl: 'https://api.dicebear.com/7.x/identicon/svg?seed=jazzcorner',
-    matchScore: 86,
-    matchReason: 'Locale jazz storico, cerca booking agent per artisti jazz e blues contemporanei.',
-    lastUpdated: new Date('2025-01-08')
-  },
-];
 
 interface FilterState {
   genres: string[];
@@ -159,7 +114,7 @@ const ProfessionalMatchingDashboard = () => {
           lastUpdated: new Date(venue.created_at)
         }));
         
-        setMatches([...artistiMatches, ...venuesMatches, ...mockVenues]);
+        setMatches([...artistiMatches, ...venuesMatches]);
       } catch (error) {
         console.error('Errore nel caricamento dei match:', error);
         toast({
@@ -167,7 +122,7 @@ const ProfessionalMatchingDashboard = () => {
           title: "Errore",
           description: "Impossibile caricare i match"
         });
-        setMatches(mockVenues);
+        setMatches([]);
       } finally {
         setLoading(false);
       }
