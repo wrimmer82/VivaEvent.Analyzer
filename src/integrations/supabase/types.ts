@@ -252,6 +252,7 @@ export type Database = {
       venues: {
         Row: {
           avatar_url: string | null
+          biografia: string | null
           budget_medio: number
           capacita: number
           citta: string
@@ -262,10 +263,13 @@ export type Database = {
           indirizzo: string
           links: Json | null
           nome_locale: string
+          sito_web: string | null
+          telefono: string | null
           user_id: string
         }
         Insert: {
           avatar_url?: string | null
+          biografia?: string | null
           budget_medio: number
           capacita: number
           citta: string
@@ -276,10 +280,13 @@ export type Database = {
           indirizzo: string
           links?: Json | null
           nome_locale: string
+          sito_web?: string | null
+          telefono?: string | null
           user_id: string
         }
         Update: {
           avatar_url?: string | null
+          biografia?: string | null
           budget_medio?: number
           capacita?: number
           citta?: string
@@ -290,6 +297,8 @@ export type Database = {
           indirizzo?: string
           links?: Json | null
           nome_locale?: string
+          sito_web?: string | null
+          telefono?: string | null
           user_id?: string
         }
         Relationships: [

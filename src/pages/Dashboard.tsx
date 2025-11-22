@@ -16,6 +16,7 @@ import { toast } from "@/hooks/use-toast";
 import { format } from "date-fns";
 import { it } from "date-fns/locale";
 import MatrixRain from "@/components/MatrixRain";
+import VenueMediaModal from "@/components/dashboard/VenueMediaModal";
 
 const Dashboard = () => {
   const navigate = useNavigate();
@@ -45,6 +46,16 @@ const Dashboard = () => {
     receiverId: "",
     receiverName: "",
     receiverType: "",
+  });
+
+  const [venueModal, setVenueModal] = useState<{
+    open: boolean;
+    venueId: string;
+    venueName: string;
+  }>({
+    open: false,
+    venueId: "",
+    venueName: "",
   });
 
   const [sentBookings, setSentBookings] = useState<any[]>([]);
@@ -431,6 +442,13 @@ const Dashboard = () => {
                       <MatchCard 
                         key={match.id} 
                         {...match}
+                        onViewProfile={match.tipo === 'venue' ? () =>
+                          setVenueModal({
+                            open: true,
+                            venueId: match.id,
+                            venueName: match.nome,
+                          })
+                        : undefined}
                         onBookingClick={() =>
                           setBookingModal({
                             open: true,
@@ -533,6 +551,25 @@ const Dashboard = () => {
         receiverId={bookingModal.receiverId}
         receiverName={bookingModal.receiverName}
         receiverType={bookingModal.receiverType}
+      />
+
+      {/* Venue Profile Modal */}
+      <VenueMediaModal
+        open={venueModal.open}
+        onOpenChange={(open) =>
+          setVenueModal({ ...venueModal, open })
+        }
+        venueId={venueModal.venueId}
+        venueName={venueModal.venueName}
+        onBookingClick={() => {
+          setVenueModal({ open: false, venueId: "", venueName: "" });
+          setBookingModal({
+            open: true,
+            receiverId: venueModal.venueId,
+            receiverName: venueModal.venueName,
+            receiverType: "venue",
+          });
+        }}
       />
     </div>
   );
