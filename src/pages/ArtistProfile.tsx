@@ -11,7 +11,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
-import { ArrowLeft, Upload, Music, Image as ImageIcon, Video, Users, TrendingUp, LogOut, ArrowRight, Loader2 } from "lucide-react";
+import { ArrowLeft, Music, TrendingUp, LogOut, ArrowRight, Loader2 } from "lucide-react";
 import { Link } from "react-router-dom";
 import Navbar from "@/components/Navbar";
 import MatrixRain from "@/components/MatrixRain";
@@ -26,6 +26,8 @@ const formSchema = z.object({
   spotify: z.string().optional(),
   youtube: z.string().optional(),
   tiktok: z.string().optional(),
+  bandcamp: z.string().optional(),
+  soundcloud: z.string().optional(),
 });
 
 const ArtistProfile = () => {
@@ -35,13 +37,6 @@ const ArtistProfile = () => {
   const [saving, setSaving] = useState(false);
   const [userId, setUserId] = useState<string | null>(null);
   const [artistId, setArtistId] = useState<string | null>(null);
-  const [photos, setPhotos] = useState<File[]>([]);
-  const [audioSamples, setAudioSamples] = useState<File[]>([]);
-  const [videoLink, setVideoLink] = useState("");
-  
-  // Stati per i file esistenti già salvati
-  const [existingPhotoUrls, setExistingPhotoUrls] = useState<string[]>([]);
-  const [existingAudioUrls, setExistingAudioUrls] = useState<string[]>([]);
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -55,6 +50,8 @@ const ArtistProfile = () => {
       spotify: "",
       youtube: "",
       tiktok: "",
+      bandcamp: "",
+      soundcloud: "",
     },
   });
 
@@ -99,17 +96,9 @@ const ArtistProfile = () => {
           spotify: existingLinks.spotify || "",
           youtube: existingLinks.youtube || "",
           tiktok: existingLinks.tiktok || "",
+          bandcamp: existingLinks.bandcamp || "",
+          soundcloud: existingLinks.soundcloud || "",
         });
-        if (existingLinks.video) {
-          setVideoLink(existingLinks.video);
-        }
-        // Carica i file media esistenti
-        if (existingLinks.photos && Array.isArray(existingLinks.photos)) {
-          setExistingPhotoUrls(existingLinks.photos);
-        }
-        if (existingLinks.audio && Array.isArray(existingLinks.audio)) {
-          setExistingAudioUrls(existingLinks.audio);
-        }
       }
     } catch (error) {
       console.error("Error checking auth:", error);
@@ -140,29 +129,6 @@ const ArtistProfile = () => {
     }
   };
 
-  const uploadFile = async (file: File, folder: string): Promise<string | null> => {
-    try {
-      const fileExt = file.name.split('.').pop();
-      const fileName = `${userId}/${folder}/${Date.now()}.${fileExt}`;
-      
-      const { error: uploadError, data } = await supabase.storage
-        .from('artist-media')
-        .upload(fileName, file, {
-          upsert: true
-        });
-
-      if (uploadError) throw uploadError;
-
-      const { data: { publicUrl } } = supabase.storage
-        .from('artist-media')
-        .getPublicUrl(fileName);
-
-      return publicUrl;
-    } catch (error) {
-      console.error(`Error uploading ${folder}:`, error);
-      return null;
-    }
-  };
 
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
     if (!userId) {
@@ -183,46 +149,15 @@ const ArtistProfile = () => {
         return;
       }
 
-      // Get existing links data
-      let existingLinks: any = {};
-      if (artistId) {
-        const { data: existingArtist } = await supabase
-          .from("artisti")
-          .select("links")
-          .eq("id", artistId)
-          .single();
-        
-        if (existingArtist) {
-          existingLinks = (existingArtist as any).links || {};
-        }
-      }
-
-      // Upload files
-      const photoUrls: string[] = [...(existingLinks.photos || [])];
-      const audioUrls: string[] = [...(existingLinks.audio || [])];
-
-      // Upload photos (append to existing)
-      for (const photo of photos) {
-        const url = await uploadFile(photo, 'photos');
-        if (url) photoUrls.push(url);
-      }
-
-      // Upload audio samples (append to existing)
-      for (const audio of audioSamples) {
-        const url = await uploadFile(audio, 'audio');
-        if (url) audioUrls.push(url);
-      }
-
-      // Prepare links object with social media and media files
+      // Prepare links object with social media
       const links = {
         instagram: values.instagram || "",
         facebook: values.facebook || "",
         spotify: values.spotify || "",
         youtube: values.youtube || "",
         tiktok: values.tiktok || "",
-        video: videoLink || existingLinks.video || "",
-        photos: photoUrls,
-        audio: audioUrls,
+        bandcamp: values.bandcamp || "",
+        soundcloud: values.soundcloud || "",
       };
 
       const artistPayload = {
@@ -266,9 +201,7 @@ const ArtistProfile = () => {
 
       toast({
         title: "Profilo Salvato! 🎵",
-        description: "Il tuo profilo artista è stato salvato con successo. Media caricati: " + 
-          (photoUrls.length > 0 ? `${photoUrls.length} foto, ` : "") + 
-          (audioUrls.length > 0 ? `${audioUrls.length} audio` : ""),
+        description: "Il tuo profilo artista è stato salvato con successo.",
       });
     } catch (error) {
       console.error("Error saving profile:", error);
@@ -282,17 +215,6 @@ const ArtistProfile = () => {
     }
   };
 
-  const handlePhotoUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files) {
-      setPhotos([...photos, ...Array.from(e.target.files)]);
-    }
-  };
-
-  const handleAudioUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files) {
-      setAudioSamples([...audioSamples, ...Array.from(e.target.files)]);
-    }
-  };
 
   const isProfileComplete = () => {
     const values = form.getValues();
@@ -430,118 +352,6 @@ const ArtistProfile = () => {
                 </CardContent>
               </Card>
 
-              {/* Foto Professionali */}
-              <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <ImageIcon className="w-5 h-5 text-primary" />
-                    Foto Professionali
-                  </CardTitle>
-                  <CardDescription>Carica foto promozionali e live (max 10)</CardDescription>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  {existingPhotoUrls.length > 0 && (
-                    <div className="p-4 bg-muted rounded-lg">
-                      <p className="text-sm font-medium mb-3">Foto salvate ({existingPhotoUrls.length}):</p>
-                      <div className="grid grid-cols-3 gap-2">
-                        {existingPhotoUrls.map((url, index) => (
-                          <a 
-                            key={index} 
-                            href={url} 
-                            target="_blank" 
-                            rel="noopener noreferrer"
-                            className="aspect-square rounded-lg overflow-hidden hover:opacity-80 transition-opacity"
-                          >
-                            <img src={url} alt={`Foto ${index + 1}`} className="w-full h-full object-cover" />
-                          </a>
-                        ))}
-                      </div>
-                    </div>
-                  )}
-                  <div className="border-2 border-dashed border-border rounded-lg p-6 text-center hover:border-primary transition-colors">
-                    <Input
-                      type="file"
-                      accept="image/*"
-                      multiple
-                      onChange={handlePhotoUpload}
-                      className="hidden"
-                      id="photo-upload"
-                    />
-                    <Label htmlFor="photo-upload" className="cursor-pointer">
-                      <ImageIcon className="w-8 h-8 mx-auto mb-2 text-muted-foreground" />
-                      <p className="text-sm text-muted-foreground">
-                        {photos.length > 0 ? `${photos.length} nuove foto da caricare` : existingPhotoUrls.length > 0 ? "Clicca per aggiungere altre foto" : "Clicca per caricare foto"}
-                      </p>
-                    </Label>
-                  </div>
-                </CardContent>
-              </Card>
-
-              {/* Audio Samples */}
-              <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <Music className="w-5 h-5 text-primary" />
-                    Accenni di Brani
-                  </CardTitle>
-                  <CardDescription>Carica sample audio delle tue migliori canzoni (max 5)</CardDescription>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  {existingAudioUrls.length > 0 && (
-                    <div className="p-4 bg-muted rounded-lg">
-                      <p className="text-sm font-medium mb-3">Brani salvati ({existingAudioUrls.length}):</p>
-                      <div className="space-y-2">
-                        {existingAudioUrls.map((url, index) => (
-                          <div key={index} className="flex items-center gap-2 p-2 bg-background rounded">
-                            <Music className="w-4 h-4 text-primary flex-shrink-0" />
-                            <audio controls className="flex-1 h-8" src={url}>
-                              Il tuo browser non supporta l'elemento audio.
-                            </audio>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                  )}
-                  <div className="border-2 border-dashed border-border rounded-lg p-6 text-center hover:border-primary transition-colors">
-                    <Input
-                      type="file"
-                      accept="audio/*"
-                      multiple
-                      onChange={handleAudioUpload}
-                      className="hidden"
-                      id="audio-upload"
-                    />
-                    <Label htmlFor="audio-upload" className="cursor-pointer">
-                      <Music className="w-8 h-8 mx-auto mb-2 text-muted-foreground" />
-                      <p className="text-sm text-muted-foreground">
-                        {audioSamples.length > 0 ? `${audioSamples.length} nuovi brani da caricare` : existingAudioUrls.length > 0 ? "Clicca per aggiungere altri brani" : "Clicca per caricare audio"}
-                      </p>
-                    </Label>
-                  </div>
-                </CardContent>
-              </Card>
-
-              {/* Video Live */}
-              <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <Video className="w-5 h-5 text-primary" />
-                    Video Live
-                  </CardTitle>
-                  <CardDescription>Inserisci link YouTube o Vimeo dei tuoi live</CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-2">
-                    <Label htmlFor="video-link">Link Video</Label>
-                    <Input
-                      id="video-link"
-                      placeholder="https://youtube.com/watch?v=..."
-                      value={videoLink}
-                      onChange={(e) => setVideoLink(e.target.value)}
-                    />
-                  </div>
-                </CardContent>
-              </Card>
 
               {/* Statistiche Social */}
               <Card>
@@ -617,6 +427,34 @@ const ArtistProfile = () => {
                         <FormLabel>TikTok</FormLabel>
                         <FormControl>
                           <Input placeholder="https://tiktok.com/@..." {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  <FormField
+                    control={form.control}
+                    name="bandcamp"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Bandcamp</FormLabel>
+                        <FormControl>
+                          <Input placeholder="https://bandcamp.com/..." {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  <FormField
+                    control={form.control}
+                    name="soundcloud"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>SoundCloud</FormLabel>
+                        <FormControl>
+                          <Input placeholder="https://soundcloud.com/..." {...field} />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
