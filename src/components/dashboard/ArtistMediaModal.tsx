@@ -34,6 +34,8 @@ interface ArtistData {
     youtube?: string;
     tiktok?: string;
     facebook?: string;
+    bandcamp?: string;
+    soundcloud?: string;
   };
   foto_professionali?: string[];
   accenni_brani?: string[];
@@ -254,7 +256,7 @@ export const ArtistMediaModal = ({
             </div>
 
             {/* Social Links */}
-            {(links.spotify || links.instagram || links.youtube || links.tiktok || links.facebook) && (
+            {(links.spotify || links.instagram || links.youtube || links.tiktok || links.facebook || links.bandcamp || links.soundcloud) && (
               <Card className="bg-[#1a1f2e] border-cyan-500/20 p-6 mb-6">
                 <h3 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
                   <ExternalLink className="h-5 w-5 text-cyan-400" />
@@ -314,6 +316,28 @@ export const ArtistMediaModal = ({
                     >
                       <Facebook className="h-4 w-4 mr-2" />
                       Facebook
+                    </Button>
+                  )}
+                  {links.bandcamp && (
+                    <Button
+                      onClick={() => openLink(links.bandcamp!)}
+                      variant="outline"
+                      size="sm"
+                      className="bg-[#629aa9]/10 text-[#629aa9] border-[#629aa9]/30 hover:bg-[#629aa9]/20"
+                    >
+                      <Music2 className="h-4 w-4 mr-2" />
+                      Bandcamp
+                    </Button>
+                  )}
+                  {links.soundcloud && (
+                    <Button
+                      onClick={() => openLink(links.soundcloud!)}
+                      variant="outline"
+                      size="sm"
+                      className="bg-[#ff8800]/10 text-[#ff8800] border-[#ff8800]/30 hover:bg-[#ff8800]/20"
+                    >
+                      <Music2 className="h-4 w-4 mr-2" />
+                      SoundCloud
                     </Button>
                   )}
                 </div>
