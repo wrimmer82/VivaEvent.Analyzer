@@ -46,11 +46,8 @@ const formSchema = z.object({
   website: z.string().optional(),
   instagram: z.string().optional(),
   facebook: z.string().optional(),
-  spotify: z.string().optional(),
   youtube: z.string().optional(),
   tiktok: z.string().optional(),
-  bandcamp: z.string().optional(),
-  soundcloud: z.string().optional(),
 });
 
 const VenueProfile = () => {
@@ -78,11 +75,8 @@ const VenueProfile = () => {
       website: "",
       instagram: "",
       facebook: "",
-      spotify: "",
       youtube: "",
       tiktok: "",
-      bandcamp: "",
-      soundcloud: "",
     },
   });
 
@@ -131,11 +125,8 @@ const VenueProfile = () => {
           website: "",
           instagram: links.instagram || "",
           facebook: links.facebook || "",
-          spotify: links.spotify || "",
           youtube: links.youtube || "",
           tiktok: links.tiktok || "",
-          bandcamp: links.bandcamp || "",
-          soundcloud: links.soundcloud || "",
         });
       }
     } catch (error) {
@@ -181,11 +172,8 @@ const VenueProfile = () => {
       const links = {
         instagram: values.instagram || undefined,
         facebook: values.facebook || undefined,
-        spotify: values.spotify || undefined,
         youtube: values.youtube || undefined,
         tiktok: values.tiktok || undefined,
-        bandcamp: values.bandcamp || undefined,
-        soundcloud: values.soundcloud || undefined,
       };
 
       const venueData = {
@@ -695,20 +683,6 @@ const VenueProfile = () => {
 
                     <FormField
                       control={form.control}
-                      name="spotify"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Spotify</FormLabel>
-                          <FormControl>
-                            <Input placeholder="https://open.spotify.com/..." {...field} />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-
-                    <FormField
-                      control={form.control}
                       name="youtube"
                       render={({ field }) => (
                         <FormItem>
@@ -729,34 +703,6 @@ const VenueProfile = () => {
                           <FormLabel>TikTok</FormLabel>
                           <FormControl>
                             <Input placeholder="https://tiktok.com/@..." {...field} />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-
-                    <FormField
-                      control={form.control}
-                      name="bandcamp"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Bandcamp</FormLabel>
-                          <FormControl>
-                            <Input placeholder="https://bandcamp.com/..." {...field} />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-
-                    <FormField
-                      control={form.control}
-                      name="soundcloud"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>SoundCloud</FormLabel>
-                          <FormControl>
-                            <Input placeholder="https://soundcloud.com/..." {...field} />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
