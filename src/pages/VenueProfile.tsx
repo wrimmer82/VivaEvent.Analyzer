@@ -10,7 +10,7 @@ import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage, FormDescription } from "@/components/ui/form";
 import { useToast } from "@/hooks/use-toast";
-import { ArrowLeft, Building2, Users, Music, Euro, Calendar, MapPin, ExternalLink, LogOut, Loader2 } from "lucide-react";
+import { ArrowLeft, Building2, Users, Music, Euro, Calendar, MapPin, ExternalLink, LogOut, Loader2, Share2 } from "lucide-react";
 import { Checkbox } from "@/components/ui/checkbox";
 import { supabase } from "@/integrations/supabase/client";
 import Navbar from "@/components/Navbar";
@@ -44,6 +44,13 @@ const formSchema = z.object({
   email: z.string().email("Email non valida"),
   phone: z.string(),
   website: z.string().optional(),
+  instagram: z.string().optional(),
+  facebook: z.string().optional(),
+  spotify: z.string().optional(),
+  youtube: z.string().optional(),
+  tiktok: z.string().optional(),
+  bandcamp: z.string().optional(),
+  soundcloud: z.string().optional(),
 });
 
 const VenueProfile = () => {
@@ -69,6 +76,13 @@ const VenueProfile = () => {
       email: "",
       phone: "",
       website: "",
+      instagram: "",
+      facebook: "",
+      spotify: "",
+      youtube: "",
+      tiktok: "",
+      bandcamp: "",
+      soundcloud: "",
     },
   });
 
@@ -101,6 +115,7 @@ const VenueProfile = () => {
 
       if (venueData) {
         setVenueId(venueData.id);
+        const links = venueData.links as any || {};
         form.reset({
           venueName: venueData.nome_locale || "",
           description: "",
@@ -114,6 +129,13 @@ const VenueProfile = () => {
           email: venueData.email || "",
           phone: "",
           website: "",
+          instagram: links.instagram || "",
+          facebook: links.facebook || "",
+          spotify: links.spotify || "",
+          youtube: links.youtube || "",
+          tiktok: links.tiktok || "",
+          bandcamp: links.bandcamp || "",
+          soundcloud: links.soundcloud || "",
         });
       }
     } catch (error) {
@@ -156,6 +178,16 @@ const VenueProfile = () => {
         return;
       }
 
+      const links = {
+        instagram: values.instagram || undefined,
+        facebook: values.facebook || undefined,
+        spotify: values.spotify || undefined,
+        youtube: values.youtube || undefined,
+        tiktok: values.tiktok || undefined,
+        bandcamp: values.bandcamp || undefined,
+        soundcloud: values.soundcloud || undefined,
+      };
+
       const venueData = {
         user_id: userId,
         nome_locale: values.venueName,
@@ -165,6 +197,7 @@ const VenueProfile = () => {
         capacita: parseInt(values.capacity),
         budget_medio: parseInt(values.budgetMax),
         generi_preferiti: values.genres,
+        links: links,
       };
 
       if (venueId) {
@@ -618,6 +651,118 @@ const VenueProfile = () => {
                       </FormItem>
                     )}
                   />
+                </CardContent>
+              </Card>
+
+              {/* Social Links */}
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <Share2 className="w-5 h-5 text-accent" />
+                    Social Media
+                  </CardTitle>
+                  <CardDescription>Collega i tuoi profili social</CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div className="grid md:grid-cols-2 gap-4">
+                    <FormField
+                      control={form.control}
+                      name="instagram"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Instagram</FormLabel>
+                          <FormControl>
+                            <Input placeholder="https://instagram.com/..." {...field} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+
+                    <FormField
+                      control={form.control}
+                      name="facebook"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Facebook</FormLabel>
+                          <FormControl>
+                            <Input placeholder="https://facebook.com/..." {...field} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+
+                    <FormField
+                      control={form.control}
+                      name="spotify"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Spotify</FormLabel>
+                          <FormControl>
+                            <Input placeholder="https://open.spotify.com/..." {...field} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+
+                    <FormField
+                      control={form.control}
+                      name="youtube"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>YouTube</FormLabel>
+                          <FormControl>
+                            <Input placeholder="https://youtube.com/..." {...field} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+
+                    <FormField
+                      control={form.control}
+                      name="tiktok"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>TikTok</FormLabel>
+                          <FormControl>
+                            <Input placeholder="https://tiktok.com/@..." {...field} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+
+                    <FormField
+                      control={form.control}
+                      name="bandcamp"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Bandcamp</FormLabel>
+                          <FormControl>
+                            <Input placeholder="https://bandcamp.com/..." {...field} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+
+                    <FormField
+                      control={form.control}
+                      name="soundcloud"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>SoundCloud</FormLabel>
+                          <FormControl>
+                            <Input placeholder="https://soundcloud.com/..." {...field} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  </div>
                 </CardContent>
               </Card>
 

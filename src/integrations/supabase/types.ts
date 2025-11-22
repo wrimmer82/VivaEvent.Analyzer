@@ -260,6 +260,7 @@ export type Database = {
           generi_preferiti: string[]
           id: string
           indirizzo: string
+          links: Json | null
           nome_locale: string
           user_id: string
         }
@@ -273,6 +274,7 @@ export type Database = {
           generi_preferiti: string[]
           id?: string
           indirizzo: string
+          links?: Json | null
           nome_locale: string
           user_id: string
         }
@@ -286,6 +288,7 @@ export type Database = {
           generi_preferiti?: string[]
           id?: string
           indirizzo?: string
+          links?: Json | null
           nome_locale?: string
           user_id?: string
         }
