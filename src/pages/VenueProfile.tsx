@@ -40,7 +40,6 @@ const formSchema = z.object({
   budgetMin: z.string().min(1, "Budget minimo richiesto"),
   budgetMax: z.string().min(1, "Budget massimo richiesto"),
   genres: z.array(z.string()).min(1, "Seleziona almeno un genere").max(3, "Seleziona massimo 3 generi"),
-  availableDates: z.string().optional(),
   email: z.string().email("Email non valida"),
   phone: z.string(),
   website: z.string().optional(),
@@ -69,7 +68,6 @@ const VenueProfile = () => {
       budgetMin: "",
       budgetMax: "",
       genres: [],
-      availableDates: "",
       email: "",
       phone: "",
       website: "",
@@ -112,17 +110,16 @@ const VenueProfile = () => {
         const links = venueData.links as any || {};
         form.reset({
           venueName: venueData.nome_locale || "",
-          description: "",
+          description: venueData.biografia || "",
           capacity: venueData.capacita?.toString() || "",
           address: venueData.indirizzo || "",
           city: venueData.citta || "",
           budgetMin: "",
           budgetMax: venueData.budget_medio?.toString() || "",
           genres: venueData.generi_preferiti || [],
-          availableDates: "",
           email: venueData.email || "",
-          phone: "",
-          website: "",
+          phone: venueData.telefono || "",
+          website: venueData.sito_web || "",
           instagram: links.instagram || "",
           facebook: links.facebook || "",
           youtube: links.youtube || "",
@@ -179,7 +176,10 @@ const VenueProfile = () => {
       const venueData = {
         user_id: userId,
         nome_locale: values.venueName,
+        biografia: values.description,
         email: values.email,
+        telefono: values.phone,
+        sito_web: values.website || null,
         indirizzo: values.address,
         citta: values.city,
         capacita: parseInt(values.capacity),
@@ -606,39 +606,6 @@ const VenueProfile = () => {
                       </Button>
                     </div>
                   )}
-                </CardContent>
-              </Card>
-
-              {/* Calendario Eventi */}
-              <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <Calendar className="w-5 h-5 text-accent" />
-                    Disponibilità Eventi
-                  </CardTitle>
-                  <CardDescription>Indica le date in cui sei disponibile per ospitare eventi</CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <FormField
-                    control={form.control}
-                    name="availableDates"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Date Disponibili</FormLabel>
-                        <FormControl>
-                          <Textarea 
-                            placeholder="Es. Venerdì e Sabato sera, Tutti i giorni dal 15/01 al 31/01..."
-                            className="min-h-[100px]"
-                            {...field}
-                          />
-                        </FormControl>
-                        <FormDescription>
-                          Descrivi quando il tuo venue è disponibile per ospitare concerti
-                        </FormDescription>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
                 </CardContent>
               </Card>
 
