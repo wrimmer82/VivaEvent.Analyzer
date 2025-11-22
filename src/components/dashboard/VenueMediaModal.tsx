@@ -192,7 +192,14 @@ const VenueMediaModal = ({
                   {/* Indirizzo */}
                   <div className="flex items-center gap-2">
                     <MapPin className="h-4 w-4 text-cyan-500" />
-                    <span className="text-sm text-gray-300">{venueData.indirizzo}</span>
+                    <a 
+                      href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(`${venueData.indirizzo}, ${venueData.citta}`)}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-sm text-cyan-400 hover:underline transition-colors"
+                    >
+                      {venueData.indirizzo}
+                    </a>
                   </div>
 
                   {/* Sito Web */}
