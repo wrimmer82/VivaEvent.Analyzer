@@ -14,7 +14,17 @@ import { supabase } from "@/integrations/supabase/client";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
-import { Check, X } from "lucide-react";
+import { Check, X, Edit } from "lucide-react";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+} from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 
 interface BookingRequest {
   id: string;
@@ -25,6 +35,7 @@ interface BookingRequest {
   sender_name: string;
   receiver_name: string;
   type: 'received' | 'sent';
+  personal_message?: string;
 }
 
 const BookingsTable = () => {
@@ -32,6 +43,14 @@ const BookingsTable = () => {
   const [receivedBookings, setReceivedBookings] = useState<BookingRequest[]>([]);
   const [sentBookings, setSentBookings] = useState<BookingRequest[]>([]);
   const [updatingId, setUpdatingId] = useState<string | null>(null);
+  const [counterOfferOpen, setCounterOfferOpen] = useState(false);
+  const [selectedBooking, setSelectedBooking] = useState<BookingRequest | null>(null);
+  const [counterOfferData, setCounterOfferData] = useState({
+    event_date: '',
+    event_time: '',
+    proposed_compensation: 0,
+    personal_message: ''
+  });
   const { toast } = useToast();
 
   useEffect(() => {
@@ -53,7 +72,8 @@ const BookingsTable = () => {
           event_time,
           status,
           proposed_compensation,
-          sender_id
+          sender_id,
+          personal_message
         `)
         .eq("receiver_id", session.user.id)
         .order("created_at", { ascending: false });
@@ -202,6 +222,56 @@ const BookingsTable = () => {
     }
   };
 
+  const handleCounterOffer = (booking: BookingRequest) => {
+    setSelectedBooking(booking);
+    setCounterOfferData({
+      event_date: booking.event_date,
+      event_time: booking.event_time,
+      proposed_compensation: booking.proposed_compensation,
+      personal_message: booking.personal_message || ''
+    });
+    setCounterOfferOpen(true);
+  };
+
+  const handleSubmitCounterOffer = async () => {
+    if (!selectedBooking) return;
+
+    try {
+      setUpdatingId(selectedBooking.id);
+
+      const { error } = await supabase
+        .from("booking_requests")
+        .update({
+          event_date: counterOfferData.event_date,
+          event_time: counterOfferData.event_time,
+          proposed_compensation: counterOfferData.proposed_compensation,
+          personal_message: counterOfferData.personal_message,
+          status: 'pending'
+        })
+        .eq("id", selectedBooking.id);
+
+      if (error) throw error;
+
+      toast({
+        title: "Controproposta inviata",
+        description: "La tua controproposta è stata inviata con successo.",
+      });
+
+      setCounterOfferOpen(false);
+      setSelectedBooking(null);
+      await loadBookings();
+    } catch (error) {
+      console.error("Error submitting counter offer:", error);
+      toast({
+        title: "Errore",
+        description: "Si è verificato un errore nell'invio della controproposta.",
+        variant: "destructive",
+      });
+    } finally {
+      setUpdatingId(null);
+    }
+  };
+
   if (loading) {
     return (
       <Card className="bg-[#1a1f2e] border-cyan-500/30">
@@ -280,6 +350,15 @@ const BookingsTable = () => {
                               </Button>
                               <Button
                                 size="sm"
+                                variant="outline"
+                                className="border-cyan-500/30 hover:bg-cyan-500/20"
+                                onClick={() => handleCounterOffer(booking)}
+                                disabled={updatingId === booking.id}
+                              >
+                                <Edit className="h-4 w-4" />
+                              </Button>
+                              <Button
+                                size="sm"
                                 variant="destructive"
                                 onClick={() => handleUpdateStatus(booking.id, 'rejected')}
                                 disabled={updatingId === booking.id}
@@ -339,6 +418,82 @@ const BookingsTable = () => {
           </TabsContent>
         </Tabs>
       </CardContent>
+
+      {/* Counter Offer Dialog */}
+      <Dialog open={counterOfferOpen} onOpenChange={setCounterOfferOpen}>
+        <DialogContent className="bg-[#1a1f2e] border-cyan-500/30 text-white">
+          <DialogHeader>
+            <DialogTitle className="text-cyan-400">Invia Controproposta</DialogTitle>
+            <DialogDescription className="text-gray-400">
+              Modifica i dettagli della richiesta di booking e invia una controproposta
+            </DialogDescription>
+          </DialogHeader>
+          
+          <div className="space-y-4 py-4">
+            <div className="space-y-2">
+              <Label htmlFor="event_date" className="text-gray-300">Data Evento</Label>
+              <Input
+                id="event_date"
+                type="date"
+                value={counterOfferData.event_date}
+                onChange={(e) => setCounterOfferData({ ...counterOfferData, event_date: e.target.value })}
+                className="bg-[#0f1419] border-cyan-500/30 text-white"
+              />
+            </div>
+            
+            <div className="space-y-2">
+              <Label htmlFor="event_time" className="text-gray-300">Orario</Label>
+              <Input
+                id="event_time"
+                type="time"
+                value={counterOfferData.event_time}
+                onChange={(e) => setCounterOfferData({ ...counterOfferData, event_time: e.target.value })}
+                className="bg-[#0f1419] border-cyan-500/30 text-white"
+              />
+            </div>
+            
+            <div className="space-y-2">
+              <Label htmlFor="compensation" className="text-gray-300">Compenso Proposto (€)</Label>
+              <Input
+                id="compensation"
+                type="number"
+                value={counterOfferData.proposed_compensation}
+                onChange={(e) => setCounterOfferData({ ...counterOfferData, proposed_compensation: parseInt(e.target.value) || 0 })}
+                className="bg-[#0f1419] border-cyan-500/30 text-white"
+              />
+            </div>
+            
+            <div className="space-y-2">
+              <Label htmlFor="message" className="text-gray-300">Messaggio (opzionale)</Label>
+              <Input
+                id="message"
+                type="text"
+                placeholder="Aggiungi un messaggio alla tua controproposta..."
+                value={counterOfferData.personal_message}
+                onChange={(e) => setCounterOfferData({ ...counterOfferData, personal_message: e.target.value })}
+                className="bg-[#0f1419] border-cyan-500/30 text-white"
+              />
+            </div>
+          </div>
+          
+          <DialogFooter>
+            <Button
+              variant="outline"
+              onClick={() => setCounterOfferOpen(false)}
+              className="border-cyan-500/30 hover:bg-cyan-500/10"
+            >
+              Annulla
+            </Button>
+            <Button
+              onClick={handleSubmitCounterOffer}
+              disabled={updatingId === selectedBooking?.id}
+              className="bg-gradient-to-r from-cyan-500 to-blue-500 hover:from-cyan-600 hover:to-blue-600"
+            >
+              Invia Controproposta
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </Card>
   );
 };
