@@ -1,13 +1,13 @@
 import { useState, useEffect } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
-import { Music2 } from "lucide-react";
 import LoginForm from "@/components/auth/LoginForm";
 import SignupStepOne from "@/components/auth/SignupStepOne";
 import SignupFormArtista from "@/components/auth/SignupFormArtista";
 import SignupFormVenue from "@/components/auth/SignupFormVenue";
 import SignupFormProfessionista from "@/components/auth/SignupFormProfessionista";
 import MatrixRain from "@/components/MatrixRain";
+import notaMusicale from "@/assets/nota-musicale.png";
 
 type UserType = "artista" | "venue" | "professionista" | null;
 
@@ -129,7 +129,11 @@ const Auth = () => {
         <div className="flex justify-center mb-8">
           <div className="flex items-center gap-2">
             <div className="flex items-center justify-center w-12 h-12 rounded-lg bg-gradient-to-br from-primary to-accent">
-              <Music2 className="w-7 h-7 text-white" />
+              <img 
+                src={notaMusicale} 
+                alt="VivaEvent Logo" 
+                className="w-8 h-8 object-contain"
+              />
             </div>
             <span className="text-2xl font-bold text-foreground">VivaEvent</span>
           </div>
