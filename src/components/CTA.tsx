@@ -1,8 +1,9 @@
 import { useState, useEffect, useRef } from "react";
 import { Button } from "@/components/ui/button";
-import { ArrowRight, Music2 } from "lucide-react";
+import { ArrowRight } from "lucide-react";
 import { Link } from "react-router-dom";
 import MatrixRain from "@/components/MatrixRain";
+import notaMusicale from "@/assets/nota-musicale.png";
 const CTA = () => {
   const [isVisible, setIsVisible] = useState(false);
   const sectionRef = useRef<HTMLDivElement>(null);
@@ -31,9 +32,11 @@ const CTA = () => {
           <div className="inline-flex items-center justify-center w-20 h-20 backdrop-blur-sm rounded-2xl mb-4" style={{
           background: 'hsl(180, 100%, 30%, 0.2)'
         }}>
-            <Music2 className="w-10 h-10" style={{
-            color: 'hsl(180, 100%, 50%)'
-          }} />
+            <img 
+              src={notaMusicale} 
+              alt="Nota musicale" 
+              className="w-12 h-12 object-contain"
+            />
           </div>
           
           <h2 className={`text-4xl md:text-6xl font-bold transition-all duration-700 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`} style={{
