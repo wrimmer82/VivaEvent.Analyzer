@@ -159,131 +159,133 @@ const VenueMediaModal = ({
               </Button>
             </div>
 
-            {/* Sezione Descrizione */}
-            <div className="space-y-6">
-              <div>
-                <h3 className="text-xl font-semibold text-cyan-400 mb-4">Descrizione</h3>
-                
-                {/* Biografia */}
-                {venueData.biografia && (
-                  <div className="mb-4">
-                    <p className="text-gray-300 leading-relaxed whitespace-pre-wrap">
-                      {venueData.biografia}
-                    </p>
+            {/* Sezione Biografia/Descrizione */}
+            {venueData.biografia && (
+              <div className="bg-gradient-to-br from-cyan-500/10 to-blue-500/10 p-6 rounded-xl border border-cyan-500/30">
+                <h3 className="text-xl font-semibold text-cyan-400 mb-4 flex items-center gap-2">
+                  <Music className="h-5 w-5" />
+                  Descrizione del Locale
+                </h3>
+                <p className="text-gray-200 leading-relaxed whitespace-pre-wrap text-base">
+                  {venueData.biografia}
+                </p>
+              </div>
+            )}
+
+            {/* Sezione Contatti */}
+            <div>
+              <h3 className="text-xl font-semibold text-cyan-400 mb-4">Contatti e Informazioni</h3>
+              
+              {/* Informazioni di contatto */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3 bg-[#0f1419]/50 p-4 rounded-lg border border-cyan-500/20">
+                {/* Email */}
+                <div className="flex items-center gap-2">
+                  <Mail className="h-4 w-4 text-cyan-500" />
+                  <span className="text-sm text-gray-300">{venueData.email}</span>
+                </div>
+
+                {/* Telefono */}
+                {venueData.telefono && (
+                  <div className="flex items-center gap-2">
+                    <Phone className="h-4 w-4 text-cyan-500" />
+                    <span className="text-sm text-gray-300">{venueData.telefono}</span>
                   </div>
                 )}
 
-                {/* Informazioni di contatto */}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-3 bg-[#0f1419]/50 p-4 rounded-lg border border-cyan-500/20">
-                  {/* Email */}
-                  <div className="flex items-center gap-2">
-                    <Mail className="h-4 w-4 text-cyan-500" />
-                    <span className="text-sm text-gray-300">{venueData.email}</span>
-                  </div>
-
-                  {/* Telefono */}
-                  {venueData.telefono && (
-                    <div className="flex items-center gap-2">
-                      <Phone className="h-4 w-4 text-cyan-500" />
-                      <span className="text-sm text-gray-300">{venueData.telefono}</span>
-                    </div>
-                  )}
-
-                  {/* Indirizzo */}
-                  <div className="flex items-center gap-2">
-                    <MapPin className="h-4 w-4 text-cyan-500" />
-                    <a 
-                      href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(`${venueData.indirizzo}, ${venueData.citta}`)}`}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-sm text-cyan-400 hover:underline transition-colors"
-                    >
-                      {venueData.indirizzo}
-                    </a>
-                  </div>
-
-                  {/* Sito Web */}
-                  {venueData.sito_web && (
-                    <div className="flex items-center gap-2">
-                      <Globe className="h-4 w-4 text-cyan-500" />
-                      <button
-                        onClick={() => openLink(venueData.sito_web)}
-                        className="text-sm text-cyan-400 hover:underline"
-                      >
-                        {venueData.sito_web}
-                      </button>
-                    </div>
-                  )}
+                {/* Indirizzo */}
+                <div className="flex items-center gap-2">
+                  <MapPin className="h-4 w-4 text-cyan-500" />
+                  <a 
+                    href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(`${venueData.indirizzo}, ${venueData.citta}`)}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-sm text-cyan-400 hover:underline transition-colors"
+                  >
+                    {venueData.indirizzo}
+                  </a>
                 </div>
 
-                {/* Social Links */}
-                {venueData.links && Object.keys(venueData.links).length > 0 && (
-                  <div className="mt-4">
-                    <h4 className="text-lg font-semibold text-cyan-400 mb-3">Social Media</h4>
-                    <div className="flex flex-wrap gap-2">
-                      {venueData.links.instagram && (
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() => openLink(venueData.links?.instagram)}
-                          className="border-cyan-500/50 text-cyan-400 hover:bg-cyan-500/10"
-                        >
-                          <Instagram className="h-4 w-4 mr-2" />
-                          Instagram
-                        </Button>
-                      )}
-                      {venueData.links.facebook && (
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() => openLink(venueData.links?.facebook)}
-                          className="border-cyan-500/50 text-cyan-400 hover:bg-cyan-500/10"
-                        >
-                          <Facebook className="h-4 w-4 mr-2" />
-                          Facebook
-                        </Button>
-                      )}
-                      {venueData.links.youtube && (
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() => openLink(venueData.links?.youtube)}
-                          className="border-cyan-500/50 text-cyan-400 hover:bg-cyan-500/10"
-                        >
-                          <Youtube className="h-4 w-4 mr-2" />
-                          YouTube
-                        </Button>
-                      )}
-                      {venueData.links.tiktok && (
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() => openLink(venueData.links?.tiktok)}
-                          className="border-cyan-500/50 text-cyan-400 hover:bg-cyan-500/10"
-                        >
-                          <Music className="h-4 w-4 mr-2" />
-                          TikTok
-                        </Button>
-                      )}
-                    </div>
+                {/* Sito Web */}
+                {venueData.sito_web && (
+                  <div className="flex items-center gap-2">
+                    <Globe className="h-4 w-4 text-cyan-500" />
+                    <button
+                      onClick={() => openLink(venueData.sito_web)}
+                      className="text-sm text-cyan-400 hover:underline"
+                    >
+                      {venueData.sito_web}
+                    </button>
                   </div>
                 )}
               </div>
 
-              {/* Statistiche */}
-              <div>
-                <h3 className="text-xl font-semibold text-cyan-400 mb-4">Informazioni Venue</h3>
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="bg-[#0f1419]/50 p-4 rounded-lg border border-cyan-500/20">
-                    <div className="text-sm text-gray-400 mb-1">Capacità</div>
-                    <div className="text-2xl font-bold text-cyan-400">{venueData.capacita}</div>
-                    <div className="text-xs text-gray-500">persone</div>
+              {/* Social Links */}
+              {venueData.links && Object.keys(venueData.links).length > 0 && (
+                <div className="mt-4">
+                  <h4 className="text-lg font-semibold text-cyan-400 mb-3">Social Media</h4>
+                  <div className="flex flex-wrap gap-2">
+                    {venueData.links.instagram && (
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => openLink(venueData.links?.instagram)}
+                        className="border-cyan-500/50 text-cyan-400 hover:bg-cyan-500/10"
+                      >
+                        <Instagram className="h-4 w-4 mr-2" />
+                        Instagram
+                      </Button>
+                    )}
+                    {venueData.links.facebook && (
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => openLink(venueData.links?.facebook)}
+                        className="border-cyan-500/50 text-cyan-400 hover:bg-cyan-500/10"
+                      >
+                        <Facebook className="h-4 w-4 mr-2" />
+                        Facebook
+                      </Button>
+                    )}
+                    {venueData.links.youtube && (
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => openLink(venueData.links?.youtube)}
+                        className="border-cyan-500/50 text-cyan-400 hover:bg-cyan-500/10"
+                      >
+                        <Youtube className="h-4 w-4 mr-2" />
+                        YouTube
+                      </Button>
+                    )}
+                    {venueData.links.tiktok && (
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => openLink(venueData.links?.tiktok)}
+                        className="border-cyan-500/50 text-cyan-400 hover:bg-cyan-500/10"
+                      >
+                        <Music className="h-4 w-4 mr-2" />
+                        TikTok
+                      </Button>
+                    )}
                   </div>
-                  <div className="bg-[#0f1419]/50 p-4 rounded-lg border border-cyan-500/20">
-                    <div className="text-sm text-gray-400 mb-1">Budget Medio</div>
-                    <div className="text-2xl font-bold text-cyan-400">€{venueData.budget_medio}</div>
-                    <div className="text-xs text-gray-500">per evento</div>
-                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* Statistiche */}
+            <div>
+              <h3 className="text-xl font-semibold text-cyan-400 mb-4">Informazioni Venue</h3>
+              <div className="grid grid-cols-2 gap-4">
+                <div className="bg-[#0f1419]/50 p-4 rounded-lg border border-cyan-500/20">
+                  <div className="text-sm text-gray-400 mb-1">Capacità</div>
+                  <div className="text-2xl font-bold text-cyan-400">{venueData.capacita}</div>
+                  <div className="text-xs text-gray-500">persone</div>
+                </div>
+                <div className="bg-[#0f1419]/50 p-4 rounded-lg border border-cyan-500/20">
+                  <div className="text-sm text-gray-400 mb-1">Budget Medio</div>
+                  <div className="text-2xl font-bold text-cyan-400">€{venueData.budget_medio}</div>
+                  <div className="text-xs text-gray-500">per evento</div>
                 </div>
               </div>
             </div>
