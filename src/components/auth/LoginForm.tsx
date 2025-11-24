@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { Eye, EyeOff } from "lucide-react";
@@ -26,6 +27,9 @@ const LoginForm = ({ onSwitchToSignup, onBackToHome }: LoginFormProps) => {
   const [loading, setLoading] = useState(false);
   const [emailError, setEmailError] = useState("");
   const [loginError, setLoginError] = useState("");
+  const [resetPasswordOpen, setResetPasswordOpen] = useState(false);
+  const [resetEmail, setResetEmail] = useState("");
+  const [resetLoading, setResetLoading] = useState(false);
   const { toast } = useToast();
 
   const validateEmail = (value: string) => {
@@ -78,6 +82,52 @@ const LoginForm = ({ onSwitchToSignup, onBackToHome }: LoginFormProps) => {
       setLoginError("Si è verificato un errore. Riprova.");
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handlePasswordReset = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setResetLoading(true);
+
+    try {
+      const emailValidation = z.string().email().safeParse(resetEmail);
+      if (!emailValidation.success) {
+        toast({
+          title: "Email non valida",
+          description: "Inserisci un indirizzo email valido",
+          variant: "destructive",
+        });
+        setResetLoading(false);
+        return;
+      }
+
+      const { error } = await supabase.auth.resetPasswordForEmail(resetEmail.trim(), {
+        redirectTo: `${window.location.origin}/accedi`,
+      });
+
+      if (error) {
+        toast({
+          title: "Errore",
+          description: error.message || "Si è verificato un errore",
+          variant: "destructive",
+        });
+      } else {
+        toast({
+          title: "Email inviata!",
+          description: "Controlla la tua casella di posta per il link di reset password",
+          className: "bg-green-500 text-white",
+        });
+        setResetPasswordOpen(false);
+        setResetEmail("");
+      }
+    } catch (error) {
+      toast({
+        title: "Errore",
+        description: "Si è verificato un errore. Riprova.",
+        variant: "destructive",
+      });
+    } finally {
+      setResetLoading(false);
     }
   };
 
@@ -162,12 +212,7 @@ const LoginForm = ({ onSwitchToSignup, onBackToHome }: LoginFormProps) => {
           <button
             type="button"
             className="text-sm text-muted-foreground hover:text-foreground hover:underline"
-            onClick={() => {
-              toast({
-                title: "Password dimenticata",
-                description: "Funzionalità disponibile a breve",
-              });
-            }}
+            onClick={() => setResetPasswordOpen(true)}
           >
             Password dimenticata?
           </button>
@@ -202,6 +247,53 @@ const LoginForm = ({ onSwitchToSignup, onBackToHome }: LoginFormProps) => {
           Torna alla home
         </Button>
       </div>
+
+      {/* Password Reset Dialog */}
+      <Dialog open={resetPasswordOpen} onOpenChange={setResetPasswordOpen}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>Recupera Password</DialogTitle>
+            <DialogDescription>
+              Inserisci la tua email per ricevere un link di reset password
+            </DialogDescription>
+          </DialogHeader>
+          <form onSubmit={handlePasswordReset} className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="reset-email">Email</Label>
+              <Input
+                id="reset-email"
+                type="email"
+                placeholder="tue-email@example.com"
+                value={resetEmail}
+                onChange={(e) => setResetEmail(e.target.value)}
+                disabled={resetLoading}
+                required
+              />
+            </div>
+            <div className="flex gap-3">
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => {
+                  setResetPasswordOpen(false);
+                  setResetEmail("");
+                }}
+                disabled={resetLoading}
+                className="flex-1"
+              >
+                Annulla
+              </Button>
+              <Button
+                type="submit"
+                disabled={resetLoading}
+                className="flex-1"
+              >
+                {resetLoading ? "Invio in corso..." : "Invia Link"}
+              </Button>
+            </div>
+          </form>
+        </DialogContent>
+      </Dialog>
     </>
   );
 };
