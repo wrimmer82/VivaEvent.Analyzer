@@ -192,12 +192,99 @@ const ProfessionalPublicProfile = () => {
               <Briefcase className="h-5 w-5 text-primary" />
               Informazioni Professionali
             </h2>
-            <p className="text-muted-foreground leading-relaxed mb-4">
-              Professionista specializzato in <strong>{professional.ruolo}</strong> nel settore musicale.
-            </p>
-            <p className="text-muted-foreground leading-relaxed">
-              Per maggiori informazioni e per richieste di collaborazione, contattare via email.
-            </p>
+            
+            {professional.biografia ? (
+              <div className="mb-6">
+                <h3 className="text-sm font-semibold text-foreground mb-2">Bio Professionale</h3>
+                <p className="text-muted-foreground leading-relaxed">{professional.biografia}</p>
+              </div>
+            ) : (
+              <p className="text-muted-foreground leading-relaxed mb-4">
+                Professionista specializzato in <strong>{professional.ruolo}</strong> nel settore musicale.
+              </p>
+            )}
+
+            {professional.competenze && (
+              <div className="mb-6">
+                <h3 className="text-sm font-semibold text-foreground mb-2">Competenze</h3>
+                <p className="text-muted-foreground leading-relaxed">{professional.competenze}</p>
+              </div>
+            )}
+
+            {professional.disponibilita && (
+              <div className="mb-6">
+                <h3 className="text-sm font-semibold text-foreground mb-2">Disponibilità</h3>
+                <p className="text-muted-foreground">{professional.disponibilita}</p>
+              </div>
+            )}
+
+            {professional.links && Object.keys(professional.links).length > 0 && (
+              <div className="mt-6">
+                <h3 className="text-sm font-semibold text-foreground mb-3">Link e Social</h3>
+                <div className="flex flex-wrap gap-2">
+                  {professional.links.facebook && (
+                    <a
+                      href={professional.links.facebook.startsWith('http') ? professional.links.facebook : `https://facebook.com/${professional.links.facebook}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-xs px-3 py-1 rounded-full bg-primary/10 text-primary hover:bg-primary/20 transition-colors"
+                    >
+                      Facebook
+                    </a>
+                  )}
+                  {professional.links.instagram && (
+                    <a
+                      href={professional.links.instagram.startsWith('http') ? professional.links.instagram : `https://instagram.com/${professional.links.instagram}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-xs px-3 py-1 rounded-full bg-primary/10 text-primary hover:bg-primary/20 transition-colors"
+                    >
+                      Instagram
+                    </a>
+                  )}
+                  {professional.links.x && (
+                    <a
+                      href={professional.links.x.startsWith('http') ? professional.links.x : `https://x.com/${professional.links.x}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-xs px-3 py-1 rounded-full bg-primary/10 text-primary hover:bg-primary/20 transition-colors"
+                    >
+                      X (Twitter)
+                    </a>
+                  )}
+                  {professional.links.linkedin && (
+                    <a
+                      href={professional.links.linkedin.startsWith('http') ? professional.links.linkedin : `https://linkedin.com/in/${professional.links.linkedin}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-xs px-3 py-1 rounded-full bg-primary/10 text-primary hover:bg-primary/20 transition-colors"
+                    >
+                      LinkedIn
+                    </a>
+                  )}
+                  {professional.links.website && (
+                    <a
+                      href={professional.links.website}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-xs px-3 py-1 rounded-full bg-primary/10 text-primary hover:bg-primary/20 transition-colors"
+                    >
+                      Sito Web
+                    </a>
+                  )}
+                  {professional.links.altro && (
+                    <a
+                      href={professional.links.altro}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-xs px-3 py-1 rounded-full bg-primary/10 text-primary hover:bg-primary/20 transition-colors"
+                    >
+                      Altro
+                    </a>
+                  )}
+                </div>
+              </div>
+            )}
           </Card>
 
           {/* Contact Info */}
@@ -211,6 +298,28 @@ const ProfessionalPublicProfile = () => {
                 <span className="text-muted-foreground text-sm">Ruolo</span>
                 <span className="font-bold text-foreground">{professional.ruolo}</span>
               </div>
+              
+              {professional.esperienza && (
+                <div className="flex justify-between items-center">
+                  <span className="text-muted-foreground text-sm">Esperienza</span>
+                  <span className="font-bold text-foreground">{professional.esperienza} anni</span>
+                </div>
+              )}
+              
+              {professional.tariffa_oraria && (
+                <div className="flex justify-between items-center">
+                  <span className="text-muted-foreground text-sm">Tariffa Oraria</span>
+                  <span className="font-bold text-foreground">€{professional.tariffa_oraria}</span>
+                </div>
+              )}
+              
+              {professional.localita && (
+                <div className="flex justify-between items-center">
+                  <span className="text-muted-foreground text-sm">Località</span>
+                  <span className="font-bold text-foreground">{professional.localita}</span>
+                </div>
+              )}
+              
               {professional.email && (
                 <div className="flex flex-col gap-1">
                   <span className="text-muted-foreground text-sm">Email</span>
