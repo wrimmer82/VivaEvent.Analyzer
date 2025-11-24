@@ -49,17 +49,20 @@ const Auth = () => {
     checkSession();
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      async (event, session) => {
+      (event, session) => {
         if (session && event === "SIGNED_IN") {
-          const { data: userData } = await supabase
-            .from("users")
-            .select("user_type, profile_completed")
-            .eq("id", session.user.id)
-            .maybeSingle();
+          // Defer Supabase calls with setTimeout to prevent deadlock
+          setTimeout(async () => {
+            const { data: userData } = await supabase
+              .from("users")
+              .select("user_type, profile_completed")
+              .eq("id", session.user.id)
+              .maybeSingle();
 
-          if (userData) {
-            redirectBasedOnProfile(userData.user_type, userData.profile_completed);
-          }
+            if (userData) {
+              redirectBasedOnProfile(userData.user_type, userData.profile_completed);
+            }
+          }, 0);
         }
       }
     );
