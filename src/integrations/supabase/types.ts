@@ -160,29 +160,50 @@ export type Database = {
       professionisti: {
         Row: {
           avatar_url: string | null
+          biografia: string | null
+          competenze: string | null
           created_at: string
+          disponibilita: string | null
           email: string
+          esperienza: number | null
           id: string
+          links: Json | null
+          localita: string | null
           nome_completo: string
           ruolo: string
+          tariffa_oraria: number | null
           user_id: string
         }
         Insert: {
           avatar_url?: string | null
+          biografia?: string | null
+          competenze?: string | null
           created_at?: string
+          disponibilita?: string | null
           email: string
+          esperienza?: number | null
           id?: string
+          links?: Json | null
+          localita?: string | null
           nome_completo: string
           ruolo: string
+          tariffa_oraria?: number | null
           user_id: string
         }
         Update: {
           avatar_url?: string | null
+          biografia?: string | null
+          competenze?: string | null
           created_at?: string
+          disponibilita?: string | null
           email?: string
+          esperienza?: number | null
           id?: string
+          links?: Json | null
+          localita?: string | null
           nome_completo?: string
           ruolo?: string
+          tariffa_oraria?: number | null
           user_id?: string
         }
         Relationships: [

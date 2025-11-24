@@ -87,21 +87,22 @@ const ProfessionalProfile = () => {
 
       if (professionalData) {
         setProfessionalId(professionalData.id);
+        const links = (professionalData.links as Record<string, string>) || {};
         form.reset({
           fullName: professionalData.nome_completo || "",
           profession: professionalData.ruolo || "",
-          bio: "",
-          experience: "",
-          hourlyRate: "",
-          facebook: "",
-          instagram: "",
-          x: "",
-          linkedin: "",
-          website: "",
-          altro: "",
-          skills: "",
-          availability: "",
-          location: "",
+          bio: professionalData.biografia || "",
+          experience: professionalData.esperienza?.toString() || "",
+          hourlyRate: professionalData.tariffa_oraria?.toString() || "",
+          facebook: links.facebook || "",
+          instagram: links.instagram || "",
+          x: links.x || "",
+          linkedin: links.linkedin || "",
+          website: links.website || "",
+          altro: links.altro || "",
+          skills: professionalData.competenze || "",
+          availability: professionalData.disponibilita || "",
+          location: professionalData.localita || "",
         });
       }
     } catch (error) {
@@ -133,12 +134,82 @@ const ProfessionalProfile = () => {
     }
   };
 
-  const onSubmit = (values: z.infer<typeof formSchema>) => {
-    console.log(values);
-    toast({
-      title: "Profilo Salvato!",
-      description: "Il tuo profilo professionale è stato creato con successo.",
-    });
+  const onSubmit = async (values: z.infer<typeof formSchema>) => {
+    try {
+      if (!userId) {
+        toast({
+          title: "Errore",
+          description: "Devi essere autenticato per salvare il profilo",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      const { data: { session } } = await supabase.auth.getSession();
+      const email = session?.user?.email || "";
+
+      const links = {
+        facebook: values.facebook || "",
+        instagram: values.instagram || "",
+        x: values.x || "",
+        linkedin: values.linkedin || "",
+        website: values.website || "",
+        altro: values.altro || "",
+      };
+
+      const professionalData = {
+        user_id: userId,
+        nome_completo: values.fullName,
+        ruolo: values.profession,
+        email: email,
+        biografia: values.bio,
+        esperienza: parseInt(values.experience),
+        tariffa_oraria: parseInt(values.hourlyRate),
+        competenze: values.skills,
+        disponibilita: values.availability,
+        localita: values.location,
+        links: links,
+      };
+
+      if (professionalId) {
+        // Update existing profile
+        const { error } = await supabase
+          .from("professionisti")
+          .update(professionalData)
+          .eq("id", professionalId);
+
+        if (error) throw error;
+      } else {
+        // Insert new profile
+        const { data, error } = await supabase
+          .from("professionisti")
+          .insert([professionalData])
+          .select()
+          .single();
+
+        if (error) throw error;
+        if (data) setProfessionalId(data.id);
+      }
+
+      toast({
+        title: "Profilo Salvato!",
+        description: "Il tuo profilo professionale è stato salvato con successo.",
+      });
+
+      // Update user profile_completed status
+      await supabase
+        .from("users")
+        .update({ profile_completed: true })
+        .eq("id", userId);
+
+    } catch (error) {
+      console.error("Error saving professional profile:", error);
+      toast({
+        title: "Errore",
+        description: "Si è verificato un errore durante il salvataggio del profilo",
+        variant: "destructive",
+      });
+    }
   };
 
   if (loading) {
