@@ -21,6 +21,7 @@ const formSchema = z.object({
   experience: z.string().min(1, "Inserisci gli anni di esperienza"),
   hourlyRate: z.string().min(1, "Inserisci la tariffa oraria"),
   facebook: z.string().optional(),
+  instagram: z.string().optional(),
   x: z.string().optional(),
   linkedin: z.string().optional(),
   website: z.string().url("Inserisci un URL valido").optional().or(z.literal("")),
@@ -46,6 +47,7 @@ const ProfessionalProfile = () => {
       experience: "",
       hourlyRate: "",
       facebook: "",
+      instagram: "",
       x: "",
       linkedin: "",
       website: "",
@@ -92,6 +94,7 @@ const ProfessionalProfile = () => {
           experience: "",
           hourlyRate: "",
           facebook: "",
+          instagram: "",
           x: "",
           linkedin: "",
           website: "",
@@ -355,6 +358,20 @@ const ProfessionalProfile = () => {
                       render={({ field }) => (
                         <FormItem>
                           <FormLabel>Facebook</FormLabel>
+                          <FormControl>
+                            <Input placeholder="@nomeutente" {...field} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+
+                    <FormField
+                      control={form.control}
+                      name="instagram"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Instagram</FormLabel>
                           <FormControl>
                             <Input placeholder="@nomeutente" {...field} />
                           </FormControl>
