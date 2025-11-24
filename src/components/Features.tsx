@@ -62,7 +62,14 @@ const Features = () => {
             borderColor: 'hsl(210, 20%, 30%)'
           }}>
                 <div className={`inline-flex w-14 h-14 rounded-xl bg-gradient-to-br ${feature.color} items-center justify-center mb-4 group-hover:scale-110 transition-transform`}>
-                  <Icon className="w-7 h-7 text-white" />
+                  <Icon 
+                    className="w-7 h-7 text-white animate-pulse" 
+                    style={{
+                      filter: index % 2 === 0 
+                        ? 'drop-shadow(0 0 15px hsl(180, 100%, 50%))' 
+                        : 'drop-shadow(0 0 15px hsl(25, 100%, 50%))'
+                    }}
+                  />
                 </div>
                 <h3 className="text-xl font-semibold text-foreground mb-3">
                   {feature.title}
