@@ -20,10 +20,11 @@ const formSchema = z.object({
   bio: z.string().min(50, "La bio deve contenere almeno 50 caratteri"),
   experience: z.string().min(1, "Inserisci gli anni di esperienza"),
   hourlyRate: z.string().min(1, "Inserisci la tariffa oraria"),
-  portfolio: z.string().url("Inserisci un URL valido").optional().or(z.literal("")),
-  instagram: z.string().optional(),
+  facebook: z.string().optional(),
+  x: z.string().optional(),
   linkedin: z.string().optional(),
   website: z.string().url("Inserisci un URL valido").optional().or(z.literal("")),
+  altro: z.string().optional(),
   skills: z.string().min(10, "Descrivi le tue competenze principali"),
   availability: z.string().min(1, "Indica la tua disponibilità"),
   location: z.string().min(2, "Inserisci la tua località"),
@@ -44,10 +45,11 @@ const ProfessionalProfile = () => {
       bio: "",
       experience: "",
       hourlyRate: "",
-      portfolio: "",
-      instagram: "",
+      facebook: "",
+      x: "",
       linkedin: "",
       website: "",
+      altro: "",
       skills: "",
       availability: "",
       location: "",
@@ -89,10 +91,11 @@ const ProfessionalProfile = () => {
           bio: "",
           experience: "",
           hourlyRate: "",
-          portfolio: "",
-          instagram: "",
+          facebook: "",
+          x: "",
           linkedin: "",
           website: "",
+          altro: "",
           skills: "",
           availability: "",
           location: "",
@@ -327,24 +330,10 @@ const ProfessionalProfile = () => {
               {/* Links & Portfolio */}
               <Card>
                 <CardHeader>
-                  <CardTitle>Portfolio e Social</CardTitle>
-                  <CardDescription>Condividi i tuoi lavori e profili professionali</CardDescription>
+                  <CardTitle>Link e Social</CardTitle>
+                  <CardDescription>Condividi i tuoi profili professionali</CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-6">
-                  <FormField
-                    control={form.control}
-                    name="portfolio"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Link Portfolio</FormLabel>
-                        <FormControl>
-                          <Input placeholder="https://tuoportfolio.com" {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-
                   <FormField
                     control={form.control}
                     name="website"
@@ -362,6 +351,34 @@ const ProfessionalProfile = () => {
                   <div className="grid md:grid-cols-2 gap-6">
                     <FormField
                       control={form.control}
+                      name="facebook"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Facebook</FormLabel>
+                          <FormControl>
+                            <Input placeholder="@nomeutente" {...field} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+
+                    <FormField
+                      control={form.control}
+                      name="x"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>X (Twitter)</FormLabel>
+                          <FormControl>
+                            <Input placeholder="@nomeutente" {...field} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+
+                    <FormField
+                      control={form.control}
                       name="linkedin"
                       render={({ field }) => (
                         <FormItem>
@@ -376,12 +393,12 @@ const ProfessionalProfile = () => {
 
                     <FormField
                       control={form.control}
-                      name="instagram"
+                      name="altro"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel>Instagram</FormLabel>
+                          <FormLabel>Altro</FormLabel>
                           <FormControl>
-                            <Input placeholder="@nomeutente" {...field} />
+                            <Input placeholder="Altri link professionali" {...field} />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
