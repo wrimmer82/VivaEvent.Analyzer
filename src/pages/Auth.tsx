@@ -53,14 +53,27 @@ const Auth = () => {
         if (session && event === "SIGNED_IN") {
           // Defer Supabase calls with setTimeout to prevent deadlock
           setTimeout(async () => {
-            const { data: userData } = await supabase
-              .from("users")
-              .select("user_type, profile_completed")
-              .eq("id", session.user.id)
-              .maybeSingle();
+            try {
+              const { data: userData, error } = await supabase
+                .from("users")
+                .select("user_type, profile_completed")
+                .eq("id", session.user.id)
+                .maybeSingle();
 
-            if (userData) {
-              redirectBasedOnProfile(userData.user_type, userData.profile_completed);
+              if (error) {
+                console.error("Error fetching user data:", error);
+                return;
+              }
+
+              if (userData) {
+                redirectBasedOnProfile(userData.user_type, userData.profile_completed);
+              } else {
+                // If no userData found, redirect to home
+                navigate("/");
+              }
+            } catch (error) {
+              console.error("Error in auth state change:", error);
+              navigate("/");
             }
           }, 0);
         }
