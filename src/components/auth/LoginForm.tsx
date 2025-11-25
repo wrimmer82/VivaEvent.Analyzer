@@ -71,16 +71,17 @@ const LoginForm = ({ onSwitchToSignup, onBackToHome }: LoginFormProps) => {
         } else {
           setLoginError(error.message || "Si è verificato un errore durante l'accesso");
         }
+        setLoading(false);
       } else {
         toast({
           title: "Accesso riuscito!",
           description: "Benvenuto su VivaEvent",
           className: "bg-green-500 text-white",
         });
+        // Keep loading true - redirect will happen via Auth.tsx onAuthStateChange
       }
     } catch (error) {
       setLoginError("Si è verificato un errore. Riprova.");
-    } finally {
       setLoading(false);
     }
   };
