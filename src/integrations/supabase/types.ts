@@ -133,6 +133,42 @@ export type Database = {
         }
         Relationships: []
       }
+      collaboration_requests: {
+        Row: {
+          created_at: string
+          id: string
+          personal_message: string | null
+          receiver_id: string
+          receiver_type: string
+          sender_id: string
+          service_description: string
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          personal_message?: string | null
+          receiver_id: string
+          receiver_type: string
+          sender_id: string
+          service_description: string
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          personal_message?: string | null
+          receiver_id?: string
+          receiver_type?: string
+          sender_id?: string
+          service_description?: string
+          status?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       landing_logs: {
         Row: {
           content: string

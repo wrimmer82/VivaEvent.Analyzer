@@ -10,6 +10,7 @@ import { Star, MapPin, Euro, Users, X, LogOut, Mail, Phone, ArrowRight } from "l
 import StatsSidebar from "@/components/dashboard/StatsSidebar";
 import { BookingModal } from "@/components/dashboard/BookingModal";
 import { ArtistMediaModal } from "@/components/dashboard/ArtistMediaModal";
+import CollaborationRequestModal from "@/components/dashboard/CollaborationRequestModal";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
 import MatrixRain from "@/components/MatrixRain";
@@ -64,6 +65,18 @@ const ProfessionalMatchingDashboard = () => {
     open: false,
     artistId: "",
     artistName: "",
+  });
+
+  const [collaborationModal, setCollaborationModal] = useState<{
+    open: boolean;
+    receiverId: string;
+    receiverName: string;
+    receiverType: "artista" | "venue";
+  }>({
+    open: false,
+    receiverId: "",
+    receiverName: "",
+    receiverType: "artista",
   });
 
   useEffect(() => {
@@ -504,10 +517,17 @@ const ProfessionalMatchingDashboard = () => {
                               </Button>
                               <Button 
                                 variant="outline"
-                                onClick={() => handleOpenBookingModal(match)}
+                                onClick={() => {
+                                  setCollaborationModal({
+                                    open: true,
+                                    receiverId: match.id,
+                                    receiverName: match.nome,
+                                    receiverType: match.tipo,
+                                  });
+                                }}
                                 className="w-full border-cyan-500/50 text-cyan-400 hover:bg-cyan-500/10"
                               >
-                                Contatta
+                                Richiedi Collaborazione
                               </Button>
                             </div>
                           </div>
@@ -552,10 +572,23 @@ const ProfessionalMatchingDashboard = () => {
           const match = sortedMatches.find(m => m.id === artistMediaModal.artistId);
           if (match) {
             setArtistMediaModal({ ...artistMediaModal, open: false });
-            setSelectedMatch(match);
-            setBookingModalOpen(true);
+            setCollaborationModal({
+              open: true,
+              receiverId: match.id,
+              receiverName: match.nome,
+              receiverType: "artista",
+            });
           }
         }}
+      />
+
+      {/* Collaboration Request Modal */}
+      <CollaborationRequestModal
+        open={collaborationModal.open}
+        onOpenChange={(open) => setCollaborationModal({ ...collaborationModal, open })}
+        receiverId={collaborationModal.receiverId}
+        receiverName={collaborationModal.receiverName}
+        receiverType={collaborationModal.receiverType}
       />
     </div>
   );

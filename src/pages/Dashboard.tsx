@@ -10,13 +10,14 @@ import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { User, X, LogOut, Calendar, Clock, Euro } from "lucide-react";
+import { User, X, LogOut, Calendar, Clock, Euro, Users } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
 import { format } from "date-fns";
 import { it } from "date-fns/locale";
 import MatrixRain from "@/components/MatrixRain";
 import VenueMediaModal from "@/components/dashboard/VenueMediaModal";
+import CollaborationRequestsTable from "@/components/dashboard/CollaborationRequestsTable";
 
 const Dashboard = () => {
   const navigate = useNavigate();
@@ -536,6 +537,21 @@ const Dashboard = () => {
           <aside className="hidden xl:block lg:col-span-3">
             <StatsSidebar />
           </aside>
+        </div>
+
+        {/* Collaboration Requests Section */}
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+          <Card className="bg-[#1a1f2e] border-cyan-500/30">
+            <CardHeader>
+              <CardTitle className="text-white flex items-center gap-2">
+                <Users className="h-5 w-5 text-cyan-400" />
+                Richieste di Collaborazione Ricevute
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <CollaborationRequestsTable />
+            </CardContent>
+          </Card>
         </div>
       </div>
 
