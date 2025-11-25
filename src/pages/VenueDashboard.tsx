@@ -20,9 +20,11 @@ import {
   ArrowRight,
   Calendar,
   TrendingUp,
-  CheckCircle
+  CheckCircle,
+  Users
 } from "lucide-react";
 import MatrixRain from "@/components/MatrixRain";
+import CollaborationRequestsTable from "@/components/dashboard/CollaborationRequestsTable";
 
 interface Venue {
   id: string;
@@ -434,6 +436,19 @@ const VenueDashboard = () => {
 
         {/* Bookings Table */}
         <BookingsTable />
+
+        {/* Collaboration Requests Section */}
+        <Card className="bg-[#1a1f2e] border-cyan-500/30 mt-8">
+          <CardHeader>
+            <CardTitle className="text-white flex items-center gap-2">
+              <Users className="h-5 w-5 text-cyan-400" />
+              Richieste di Collaborazione Ricevute
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <CollaborationRequestsTable />
+          </CardContent>
+        </Card>
 
         {/* Recent Activity */}
         <Card className="bg-[#1a1f2e] border-cyan-500/30 mt-8">
