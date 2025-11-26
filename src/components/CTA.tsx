@@ -90,14 +90,6 @@ const CTA = () => {
             </Button>
           </div>
 
-          <p className="text-sm pt-4 animate-fade-in" style={{
-          color: 'hsl(180, 100%, 60%, 0.8)',
-          animationDelay: '0.8s',
-          opacity: 0,
-          animationFillMode: 'forwards'
-        }}>
-            Nessuna carta di credito richiesta • Inizia in 2 minuti • Cancella quando vuoi
-          </p>
         </div>
       </div>
     </section>;
