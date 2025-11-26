@@ -63,7 +63,7 @@ const Pricing = () => {
       />
       <div className="container mx-auto px-4 relative z-10">
         <div className="max-w-3xl mx-auto text-center mb-16">
-          <h2 className="text-4xl md:text-5xl font-bold text-foreground mb-4">
+          <h2 className="text-4xl md:text-5xl font-bold mb-4 bg-gradient-to-r from-neon-orange via-neon-orange-glow to-primary bg-clip-text text-transparent animate-pulse" style={{ textShadow: '0 0 30px hsl(25 100% 50% / 0.6)' }}>
             Prezzi Trasparenti
           </h2>
           <p className="text-xl text-muted-foreground">
