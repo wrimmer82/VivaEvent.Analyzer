@@ -29,14 +29,15 @@ interface SignupFormProfessionistaProps {
 }
 
 const ruoli = [
+  "Recording Engineer",
+  "Mixing Engineer",
+  "Mastering Engineer",
+  "Sound Engineer",
   "Booking Agent",
   "Music Manager",
-  "Promoter",
-  "Event Organizer",
-  "Sound Engineer",
-  "Photographer",
   "Tour Manager",
-  "Altro",
+  "Photographer",
+  "Event Organizer",
 ];
 
 const SignupFormProfessionista = ({ onBack, onSwitchToLogin }: SignupFormProfessionistaProps) => {
