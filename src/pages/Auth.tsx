@@ -31,6 +31,12 @@ const Auth = () => {
 
   useEffect(() => {
     const checkSession = async () => {
+      // Only check session if user is in login mode
+      // Don't redirect if user is actively trying to sign up
+      if (!isLogin) {
+        return;
+      }
+
       const { data: { session } } = await supabase.auth.getSession();
       if (session) {
         // Check profile completion status
@@ -81,7 +87,7 @@ const Auth = () => {
     );
 
     return () => subscription.unsubscribe();
-  }, [navigate]);
+  }, [navigate, isLogin]);
 
   const redirectBasedOnProfile = (userType: string, profileCompleted: boolean) => {
     // Professionisti vanno sempre alla loro dashboard
