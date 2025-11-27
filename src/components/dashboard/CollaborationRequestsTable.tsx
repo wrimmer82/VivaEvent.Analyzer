@@ -121,7 +121,7 @@ const CollaborationRequestsTable = () => {
 
   if (loading) {
     return (
-      <div className="flex justify-center items-center py-8">
+      <div className="flex justify-center items-center py-4">
         <Loader2 className="h-6 w-6 animate-spin text-primary" />
       </div>
     );
@@ -129,7 +129,7 @@ const CollaborationRequestsTable = () => {
 
   if (requests.length === 0) {
     return (
-      <div className="text-center py-8 text-muted-foreground">
+      <div className="text-center py-4 text-muted-foreground">
         Nessuna richiesta di collaborazione ricevuta
       </div>
     );
@@ -140,40 +140,40 @@ const CollaborationRequestsTable = () => {
       <Table>
         <TableHeader>
           <TableRow>
-            <TableHead className="text-foreground">Professionista</TableHead>
-            <TableHead className="text-foreground">Servizi</TableHead>
-            <TableHead className="text-foreground">Messaggio</TableHead>
-            <TableHead className="text-foreground">Stato</TableHead>
-            <TableHead className="text-foreground">Data</TableHead>
-            <TableHead className="text-foreground">Azioni</TableHead>
+            <TableHead className="text-foreground py-2">Professionista</TableHead>
+            <TableHead className="text-foreground py-2">Servizi</TableHead>
+            <TableHead className="text-foreground py-2">Messaggio</TableHead>
+            <TableHead className="text-foreground py-2">Stato</TableHead>
+            <TableHead className="text-foreground py-2">Data</TableHead>
+            <TableHead className="text-foreground py-2">Azioni</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
           {requests.map((request) => (
             <TableRow key={request.id}>
-              <TableCell className="text-foreground">
+              <TableCell className="text-foreground py-2">
                 <div>
-                  <div className="font-semibold">{request.sender_name}</div>
-                  <div className="text-sm text-muted-foreground">
+                  <div className="font-semibold text-sm">{request.sender_name}</div>
+                  <div className="text-xs text-muted-foreground">
                     {request.sender_email}
                   </div>
                 </div>
               </TableCell>
-              <TableCell className="text-foreground max-w-xs">
-                <div className="line-clamp-2">{request.service_description}</div>
+              <TableCell className="text-foreground max-w-xs py-2">
+                <div className="line-clamp-2 text-sm">{request.service_description}</div>
               </TableCell>
-              <TableCell className="text-foreground max-w-xs">
+              <TableCell className="text-foreground max-w-xs py-2">
                 {request.personal_message ? (
-                  <div className="line-clamp-2">{request.personal_message}</div>
+                  <div className="line-clamp-2 text-sm">{request.personal_message}</div>
                 ) : (
-                  <span className="text-muted-foreground italic">Nessun messaggio</span>
+                  <span className="text-muted-foreground italic text-xs">Nessun messaggio</span>
                 )}
               </TableCell>
-              <TableCell>{getStatusBadge(request.status)}</TableCell>
-              <TableCell className="text-foreground">
+              <TableCell className="py-2">{getStatusBadge(request.status)}</TableCell>
+              <TableCell className="text-foreground py-2 text-sm">
                 {new Date(request.created_at).toLocaleDateString("it-IT")}
               </TableCell>
-              <TableCell>
+              <TableCell className="py-2">
                 {request.status === "pending" && (
                   <div className="flex gap-2">
                     <Button
