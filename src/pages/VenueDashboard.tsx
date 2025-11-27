@@ -9,6 +9,8 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { toast } from "@/hooks/use-toast";
 import BookingsTable from "@/components/dashboard/BookingsTable";
 import { Calendar as CalendarComponent } from "@/components/ui/calendar";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { CalendarView } from "@/components/dashboard/CalendarView";
 import {
   Building2,
   Music,
@@ -434,21 +436,36 @@ const VenueDashboard = () => {
           </CardContent>
         </Card>
 
-        {/* Bookings Table */}
-        <BookingsTable />
-
-        {/* Collaboration Requests Section */}
-        <Card className="bg-[#1a1f2e] border-cyan-500/30 mt-4">
-          <CardHeader className="pb-3">
-            <CardTitle className="text-white flex items-center gap-2 text-lg">
-              <Users className="h-4 w-4 text-cyan-400" />
-              Richieste di Collaborazione Ricevute
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="pt-0 pb-4">
-            <CollaborationRequestsTable />
-          </CardContent>
-        </Card>
+        {/* Tabs Section */}
+        <Tabs defaultValue="proposte" className="w-full">
+          <TabsList className="grid w-full grid-cols-3 bg-[#1a1f2e] border-cyan-500/30">
+            <TabsTrigger value="proposte">Proposte</TabsTrigger>
+            <TabsTrigger value="richieste">Richieste Ricevute</TabsTrigger>
+            <TabsTrigger value="calendario">Calendario Eventi</TabsTrigger>
+          </TabsList>
+          
+          <TabsContent value="proposte" className="mt-4">
+            <BookingsTable />
+          </TabsContent>
+          
+          <TabsContent value="richieste" className="mt-4">
+            <Card className="bg-[#1a1f2e] border-cyan-500/30">
+              <CardHeader className="pb-3">
+                <CardTitle className="text-white flex items-center gap-2 text-lg">
+                  <Users className="h-4 w-4 text-cyan-400" />
+                  Richieste di Collaborazione Ricevute
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="pt-0 pb-4">
+                <CollaborationRequestsTable />
+              </CardContent>
+            </Card>
+          </TabsContent>
+          
+          <TabsContent value="calendario" className="mt-4">
+            <CalendarView />
+          </TabsContent>
+        </Tabs>
 
         {/* Recent Activity */}
         <Card className="bg-[#1a1f2e] border-cyan-500/30 mt-8">
