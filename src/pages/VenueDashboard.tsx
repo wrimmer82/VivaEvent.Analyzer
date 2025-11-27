@@ -407,14 +407,14 @@ const VenueDashboard = () => {
         </div>
 
         {/* Calendario Eventi Confermati */}
-        <Card className="bg-[#1a1f2e] border-cyan-500/30 mb-8">
-          <CardHeader>
-            <CardTitle className="text-white flex items-center gap-2">
-              <Calendar className="h-5 w-5 text-cyan-400" />
+        <Card className="bg-[#1a1f2e] border-cyan-500/30 mb-4">
+          <CardHeader className="pb-3">
+            <CardTitle className="text-white flex items-center gap-2 text-lg">
+              <Calendar className="h-4 w-4 text-cyan-400" />
               Calendario Eventi Confermati
             </CardTitle>
           </CardHeader>
-          <CardContent className="flex justify-center">
+          <CardContent className="flex justify-center pt-0 pb-4">
             <CalendarComponent
               mode="multiple"
               selected={confirmedEvents}
@@ -438,14 +438,14 @@ const VenueDashboard = () => {
         <BookingsTable />
 
         {/* Collaboration Requests Section */}
-        <Card className="bg-[#1a1f2e] border-cyan-500/30 mt-8">
-          <CardHeader>
-            <CardTitle className="text-white flex items-center gap-2">
-              <Users className="h-5 w-5 text-cyan-400" />
+        <Card className="bg-[#1a1f2e] border-cyan-500/30 mt-4">
+          <CardHeader className="pb-3">
+            <CardTitle className="text-white flex items-center gap-2 text-lg">
+              <Users className="h-4 w-4 text-cyan-400" />
               Richieste di Collaborazione Ricevute
             </CardTitle>
           </CardHeader>
-          <CardContent>
+          <CardContent className="pt-0 pb-4">
             <CollaborationRequestsTable />
           </CardContent>
         </Card>

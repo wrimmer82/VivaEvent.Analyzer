@@ -287,11 +287,11 @@ const BookingsTable = () => {
 
   return (
     <Card className="bg-[#1a1f2e] border-cyan-500/30">
-      <CardHeader>
-        <CardTitle className="text-white">Proposte di Collaborazione</CardTitle>
+      <CardHeader className="pb-3">
+        <CardTitle className="text-white text-lg">Proposte di Collaborazione</CardTitle>
         <p className="text-sm text-gray-400">Gestisci le tue richieste ricevute e inviate</p>
       </CardHeader>
-      <CardContent>
+      <CardContent className="pt-0 pb-4">
         <Tabs defaultValue="received" className="w-full">
           <TabsList className="bg-[#0f1419] border border-cyan-500/20">
             <TabsTrigger value="received" className="data-[state=active]:bg-cyan-500/20 data-[state=active]:text-cyan-400">
@@ -302,9 +302,9 @@ const BookingsTable = () => {
             </TabsTrigger>
           </TabsList>
 
-          <TabsContent value="received" className="mt-4">
+          <TabsContent value="received" className="mt-2">
             {receivedBookings.length === 0 ? (
-              <div className="text-center py-8 text-gray-400">
+              <div className="text-center py-4 text-gray-400">
                 Nessuna proposta ricevuta
               </div>
             ) : (
@@ -312,31 +312,31 @@ const BookingsTable = () => {
                 <Table>
                   <TableHeader>
                     <TableRow className="border-cyan-500/20 hover:bg-transparent">
-                      <TableHead className="text-cyan-400">Da</TableHead>
-                      <TableHead className="text-cyan-400">Data Evento</TableHead>
-                      <TableHead className="text-cyan-400">Compenso</TableHead>
-                      <TableHead className="text-cyan-400">Stato</TableHead>
-                      <TableHead className="text-cyan-400 text-right">Azioni</TableHead>
+                      <TableHead className="text-cyan-400 py-2">Da</TableHead>
+                      <TableHead className="text-cyan-400 py-2">Data Evento</TableHead>
+                      <TableHead className="text-cyan-400 py-2">Compenso</TableHead>
+                      <TableHead className="text-cyan-400 py-2">Stato</TableHead>
+                      <TableHead className="text-cyan-400 text-right py-2">Azioni</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
                     {receivedBookings.map((booking) => (
                       <TableRow key={booking.id} className="border-cyan-500/10 hover:bg-cyan-500/5">
-                        <TableCell className="font-medium text-white">
+                        <TableCell className="font-medium text-white py-2">
                           {booking.sender_name}
                         </TableCell>
-                        <TableCell className="text-gray-400">
+                        <TableCell className="text-gray-400 py-2">
                           {formatDate(booking.event_date, booking.event_time)}
                         </TableCell>
-                        <TableCell className="text-gray-400">
+                        <TableCell className="text-gray-400 py-2">
                           €{booking.proposed_compensation}
                         </TableCell>
-                        <TableCell>
+                        <TableCell className="py-2">
                           <Badge className={getStatusColor(booking.status)}>
                             {getStatusLabel(booking.status)}
                           </Badge>
                         </TableCell>
-                        <TableCell className="text-right">
+                        <TableCell className="text-right py-2">
                           {booking.status === 'pending' && (
                             <div className="flex gap-2 justify-end">
                               <Button
@@ -376,9 +376,9 @@ const BookingsTable = () => {
             )}
           </TabsContent>
 
-          <TabsContent value="sent" className="mt-4">
+          <TabsContent value="sent" className="mt-2">
             {sentBookings.length === 0 ? (
-              <div className="text-center py-8 text-gray-400">
+              <div className="text-center py-4 text-gray-400">
                 Nessuna proposta inviata
               </div>
             ) : (
@@ -386,25 +386,25 @@ const BookingsTable = () => {
                 <Table>
                   <TableHeader>
                     <TableRow className="border-cyan-500/20 hover:bg-transparent">
-                      <TableHead className="text-cyan-400">A</TableHead>
-                      <TableHead className="text-cyan-400">Data Evento</TableHead>
-                      <TableHead className="text-cyan-400">Compenso</TableHead>
-                      <TableHead className="text-cyan-400">Stato</TableHead>
+                      <TableHead className="text-cyan-400 py-2">A</TableHead>
+                      <TableHead className="text-cyan-400 py-2">Data Evento</TableHead>
+                      <TableHead className="text-cyan-400 py-2">Compenso</TableHead>
+                      <TableHead className="text-cyan-400 py-2">Stato</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
                     {sentBookings.map((booking) => (
                       <TableRow key={booking.id} className="border-cyan-500/10 hover:bg-cyan-500/5">
-                        <TableCell className="font-medium text-white">
+                        <TableCell className="font-medium text-white py-2">
                           {booking.receiver_name}
                         </TableCell>
-                        <TableCell className="text-gray-400">
+                        <TableCell className="text-gray-400 py-2">
                           {formatDate(booking.event_date, booking.event_time)}
                         </TableCell>
-                        <TableCell className="text-gray-400">
+                        <TableCell className="text-gray-400 py-2">
                           €{booking.proposed_compensation}
                         </TableCell>
-                        <TableCell>
+                        <TableCell className="py-2">
                           <Badge className={getStatusColor(booking.status)}>
                             {getStatusLabel(booking.status)}
                           </Badge>
