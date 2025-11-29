@@ -309,6 +309,33 @@ export type Database = {
         }
         Relationships: []
       }
+      venue_calendar_notes: {
+        Row: {
+          created_at: string
+          id: string
+          note_date: string
+          note_text: string
+          updated_at: string
+          venue_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          note_date: string
+          note_text: string
+          updated_at?: string
+          venue_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          note_date?: string
+          note_text?: string
+          updated_at?: string
+          venue_id?: string
+        }
+        Relationships: []
+      }
       venues: {
         Row: {
           avatar_url: string | null

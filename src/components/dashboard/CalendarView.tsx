@@ -28,7 +28,7 @@ export const CalendarView = () => {
   const [isNoteDialogOpen, setIsNoteDialogOpen] = useState(false);
   const [noteText, setNoteText] = useState('');
 
-  const { data: bookings, isLoading } = useQuery({
+  const { data: bookings, isLoading: bookingsLoading } = useQuery({
     queryKey: ['venue-bookings-calendar'],
     queryFn: async () => {
       const { data: { user } } = await supabase.auth.getUser();
@@ -50,7 +50,25 @@ export const CalendarView = () => {
     },
   });
 
-  const updateNoteMutation = useMutation({
+  const { data: calendarNotes, isLoading: notesLoading } = useQuery({
+    queryKey: ['venue-calendar-notes'],
+    queryFn: async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) throw new Error('Not authenticated');
+
+      const { data, error } = await supabase
+        .from('venue_calendar_notes')
+        .select('*')
+        .eq('venue_id', user.id);
+
+      if (error) throw error;
+      return data;
+    },
+  });
+
+  const isLoading = bookingsLoading || notesLoading;
+
+  const updateBookingNoteMutation = useMutation({
     mutationFn: async ({ id, note }: { id: string; note: string }) => {
       const { error } = await supabase
         .from('booking_requests')
@@ -61,13 +79,56 @@ export const CalendarView = () => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['venue-bookings-calendar'] });
-      toast.success('Nota salvata con successo');
+      toast.success('Nota evento salvata con successo');
       setIsNoteDialogOpen(false);
       setSelectedEvent(null);
       setNoteText('');
     },
     onError: (error) => {
-      console.error('Error saving note:', error);
+      console.error('Error saving booking note:', error);
+      toast.error('Errore nel salvataggio della nota evento');
+    },
+  });
+
+  const saveCalendarNoteMutation = useMutation({
+    mutationFn: async ({ date, note }: { date: string; note: string }) => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) throw new Error('Not authenticated');
+
+      // Check if note already exists for this date
+      const { data: existing } = await supabase
+        .from('venue_calendar_notes')
+        .select('id')
+        .eq('venue_id', user.id)
+        .eq('note_date', date)
+        .maybeSingle();
+
+      if (existing) {
+        // Update existing note
+        const { error } = await supabase
+          .from('venue_calendar_notes')
+          .update({ note_text: note })
+          .eq('id', existing.id);
+
+        if (error) throw error;
+      } else {
+        // Insert new note
+        const { error } = await supabase
+          .from('venue_calendar_notes')
+          .insert({ venue_id: user.id, note_date: date, note_text: note });
+
+        if (error) throw error;
+      }
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['venue-calendar-notes'] });
+      toast.success('Nota giornaliera salvata con successo');
+      setIsNoteDialogOpen(false);
+      setSelectedEvent(null);
+      setNoteText('');
+    },
+    onError: (error) => {
+      console.error('Error saving calendar note:', error);
       toast.error('Errore nel salvataggio della nota');
     },
   });
@@ -113,9 +174,45 @@ export const CalendarView = () => {
     setIsNoteDialogOpen(true);
   };
 
+  const handleDayClick = (date: Date) => {
+    // Check if this day has a booking
+    const bookingOnDay = events.find(event => {
+      const eventDate = event.start ? moment(event.start).format('YYYY-MM-DD') : '';
+      const clickedDate = moment(date).format('YYYY-MM-DD');
+      return eventDate === clickedDate;
+    });
+
+    if (bookingOnDay) {
+      handleEventClick(bookingOnDay);
+    } else {
+      // Check if this day has a calendar note
+      const noteForDay = calendarNotes?.find(note => 
+        moment(note.note_date).format('YYYY-MM-DD') === moment(date).format('YYYY-MM-DD')
+      );
+      
+      setSelectedEvent({
+        id: '',
+        title: moment(date).format('DD/MM/YYYY'),
+        start: date,
+        end: date,
+        status: 'note',
+        venue_notes: noteForDay?.note_text || '',
+      });
+      setNoteText(noteForDay?.note_text || '');
+      setIsNoteDialogOpen(true);
+    }
+  };
+
   const handleSaveNote = () => {
-    if (selectedEvent) {
-      updateNoteMutation.mutate({ id: selectedEvent.id, note: noteText });
+    if (!selectedEvent) return;
+
+    if (selectedEvent.status === 'note') {
+      // Save as calendar note
+      const dateStr = selectedEvent.start ? moment(selectedEvent.start).format('YYYY-MM-DD') : '';
+      saveCalendarNoteMutation.mutate({ date: dateStr, note: noteText });
+    } else {
+      // Save as booking note
+      updateBookingNoteMutation.mutate({ id: selectedEvent.id, note: noteText });
     }
   };
 
@@ -125,16 +222,34 @@ export const CalendarView = () => {
 
   const eventStyleGetter = (event: BookingEvent) => {
     const style = {
-      backgroundColor: 'hsl(var(--primary))',
+      backgroundColor: event.status === 'accepted' ? 'hsl(189, 80%, 50%)' : 'hsl(var(--primary))',
       borderRadius: '4px',
       opacity: 0.9,
-      color: 'hsl(var(--primary-foreground))',
+      color: 'white',
       border: 'none',
       display: 'block',
       fontSize: '0.875rem',
       padding: '2px 4px',
+      fontWeight: 'bold',
     };
     return { style };
+  };
+
+  const dayStyleGetter = (date: Date) => {
+    const dateStr = moment(date).format('YYYY-MM-DD');
+    const hasNote = calendarNotes?.some(note => 
+      moment(note.note_date).format('YYYY-MM-DD') === dateStr
+    );
+
+    if (hasNote) {
+      return {
+        style: {
+          backgroundColor: 'rgba(139, 92, 246, 0.1)',
+          border: '1px solid rgba(139, 92, 246, 0.3)',
+        }
+      };
+    }
+    return {};
   };
 
   if (isLoading) {
@@ -159,8 +274,11 @@ export const CalendarView = () => {
               endAccessor="end"
               onEventDrop={handleEventDrop}
               onSelectEvent={handleEventClick}
+              onSelectSlot={(slotInfo) => handleDayClick(slotInfo.start)}
+              selectable
               draggableAccessor={() => true}
               eventPropGetter={eventStyleGetter}
+              dayPropGetter={dayStyleGetter}
               views={['month']}
               defaultView="month"
               messages={{
@@ -179,16 +297,33 @@ export const CalendarView = () => {
       <Dialog open={isNoteDialogOpen} onOpenChange={setIsNoteDialogOpen}>
         <DialogContent className="bg-[#1a1f2e] border-cyan-500/30 text-white">
           <DialogHeader>
-            <DialogTitle>Note per {selectedEvent?.title}</DialogTitle>
+            <DialogTitle>
+              {selectedEvent?.status === 'accepted' ? (
+                <>Note per evento: {selectedEvent?.title}</>
+              ) : (
+                <>Note per {selectedEvent?.title}</>
+              )}
+            </DialogTitle>
           </DialogHeader>
           <div className="space-y-4">
             <div>
               <p className="text-sm text-gray-400 mb-2">
-                Data: {selectedEvent?.start && moment(selectedEvent.start).format('DD/MM/YYYY HH:mm')}
+                {selectedEvent?.status === 'accepted' ? (
+                  <>Data evento: {selectedEvent?.start && moment(selectedEvent.start).format('DD/MM/YYYY HH:mm')}</>
+                ) : (
+                  <>Data: {selectedEvent?.start && moment(selectedEvent.start).format('DD/MM/YYYY')}</>
+                )}
               </p>
+              {selectedEvent?.status === 'accepted' && (
+                <p className="text-xs text-cyan-400 mb-2">
+                  💡 Questa è una nota per un evento confermato
+                </p>
+              )}
             </div>
             <Textarea
-              placeholder="Aggiungi note per questo evento..."
+              placeholder={selectedEvent?.status === 'accepted' 
+                ? "Aggiungi note per questo evento (es. rider tecnico, note logistiche)..." 
+                : "Aggiungi note per questa data (es. promemoria, appunti)..."}
               value={noteText}
               onChange={(e) => setNoteText(e.target.value)}
               className="min-h-[120px] bg-[#0f1419] border-cyan-500/30 text-white"
@@ -204,10 +339,10 @@ export const CalendarView = () => {
             </Button>
             <Button 
               onClick={handleSaveNote}
-              disabled={updateNoteMutation.isPending}
+              disabled={updateBookingNoteMutation.isPending || saveCalendarNoteMutation.isPending}
               className="bg-gradient-to-r from-cyan-500 to-blue-500"
             >
-              {updateNoteMutation.isPending ? 'Salvataggio...' : 'Salva Nota'}
+              {(updateBookingNoteMutation.isPending || saveCalendarNoteMutation.isPending) ? 'Salvataggio...' : 'Salva Nota'}
             </Button>
           </DialogFooter>
         </DialogContent>
