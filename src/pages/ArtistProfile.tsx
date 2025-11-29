@@ -21,6 +21,7 @@ const formSchema = z.object({
   genre: z.string().min(2, "Genere musicale richiesto"),
   bio: z.string().max(500, "Massimo 500 caratteri"),
   localFanbase: z.string().min(2, "Località richiesta"),
+  website: z.string().optional(),
   instagram: z.string().optional(),
   facebook: z.string().optional(),
   spotify: z.string().optional(),
@@ -45,6 +46,7 @@ const ArtistProfile = () => {
       genre: "",
       bio: "",
       localFanbase: "",
+      website: "",
       instagram: "",
       facebook: "",
       spotify: "",
@@ -91,6 +93,7 @@ const ArtistProfile = () => {
           genre: artistData.genere_musicale || "",
           bio: artistData.biografia || "",
           localFanbase: artistData.citta || "",
+          website: existingLinks.website || "",
           instagram: existingLinks.instagram || "",
           facebook: existingLinks.facebook || "",
           spotify: existingLinks.spotify || "",
@@ -151,6 +154,7 @@ const ArtistProfile = () => {
 
       // Prepare links object with social media
       const links = {
+        website: values.website || "",
         instagram: values.instagram || "",
         facebook: values.facebook || "",
         spotify: values.spotify || "",
@@ -363,6 +367,20 @@ const ArtistProfile = () => {
                   <CardDescription>Link ai tuoi profili social e piattaforme streaming</CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-4">
+                  <FormField
+                    control={form.control}
+                    name="website"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Sito Web</FormLabel>
+                        <FormControl>
+                          <Input placeholder="https://tuosito.com" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
                   <FormField
                     control={form.control}
                     name="instagram"
