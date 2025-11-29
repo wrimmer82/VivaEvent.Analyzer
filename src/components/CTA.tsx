@@ -36,7 +36,8 @@ const CTA = () => {
               className="w-40 h-40 md:w-48 md:h-48 object-contain mx-auto"
               style={{
                 filter: 'drop-shadow(0 0 30px hsl(180, 100%, 50%)) drop-shadow(0 0 50px hsl(180, 100%, 50%))',
-                animation: 'pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite, gentle-rotate 4s ease-in-out infinite'
+                animation: 'pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite, gentle-rotate 4s ease-in-out infinite',
+                mixBlendMode: 'screen'
               }}
             />
           </div>
