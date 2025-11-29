@@ -149,18 +149,17 @@ const Auth = () => {
       <div className="relative z-10 w-full max-w-2xl">
         {/* Logo */}
         <div className="flex justify-center mb-8">
-          <div className="flex items-center gap-2">
-            <div className="flex items-center justify-center w-14 h-14 rounded-lg bg-gradient-to-br from-primary to-accent">
-              <img 
-                src={notaMusicale} 
-                alt="VivaEvent Logo" 
-                className="w-10 h-10 object-contain animate-pulse"
-                style={{
-                  filter: 'drop-shadow(0 0 15px hsl(180, 100%, 50%))',
-                  animation: 'pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite, gentle-rotate 4s ease-in-out infinite'
-                }}
-              />
-            </div>
+          <div className="flex flex-col items-center gap-4">
+            <img 
+              src={notaMusicale} 
+              alt="VivaEvent Logo" 
+              className="w-32 h-32 md:w-40 md:h-40 object-contain"
+              style={{
+                filter: 'drop-shadow(0 0 30px hsl(180, 100%, 50%)) drop-shadow(0 0 50px hsl(180, 100%, 50%))',
+                animation: 'pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite, gentle-rotate 4s ease-in-out infinite',
+                mixBlendMode: 'screen'
+              }}
+            />
             <span className="text-2xl font-bold text-foreground">VivaEvent</span>
           </div>
         </div>
