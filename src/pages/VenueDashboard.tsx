@@ -408,33 +408,6 @@ const VenueDashboard = () => {
           </Card>
         </div>
 
-        {/* Calendario Eventi Confermati */}
-        <Card className="bg-[#1a1f2e] border-cyan-500/30 mb-4">
-          <CardHeader className="pb-3">
-            <CardTitle className="text-white flex items-center gap-2 text-lg">
-              <Calendar className="h-4 w-4 text-cyan-400" />
-              Calendario Eventi Confermati
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="flex justify-center pt-0 pb-4">
-            <CalendarComponent
-              mode="multiple"
-              selected={confirmedEvents}
-              className="rounded-md border border-cyan-500/30 bg-[#0f1419]"
-              modifiers={{
-                confirmed: confirmedEvents
-              }}
-              modifiersStyles={{
-                confirmed: {
-                  backgroundColor: 'hsl(189, 80%, 50%, 0.3)',
-                  color: 'hsl(189, 80%, 70%)',
-                  fontWeight: 'bold',
-                  border: '2px solid hsl(189, 80%, 50%)'
-                }
-              }}
-            />
-          </CardContent>
-        </Card>
 
         {/* Tabs Section */}
         <Tabs defaultValue="proposte" className="w-full">

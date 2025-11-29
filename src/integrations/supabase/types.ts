@@ -106,6 +106,7 @@ export type Database = {
           sender_id: string
           status: Database["public"]["Enums"]["booking_status"]
           updated_at: string
+          venue_notes: string | null
         }
         Insert: {
           created_at?: string
@@ -118,6 +119,7 @@ export type Database = {
           sender_id: string
           status?: Database["public"]["Enums"]["booking_status"]
           updated_at?: string
+          venue_notes?: string | null
         }
         Update: {
           created_at?: string
@@ -130,6 +132,7 @@ export type Database = {
           sender_id?: string
           status?: Database["public"]["Enums"]["booking_status"]
           updated_at?: string
+          venue_notes?: string | null
         }
         Relationships: []
       }
