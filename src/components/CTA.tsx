@@ -29,15 +29,13 @@ const CTA = () => {
       
       <div className="container mx-auto px-4 relative z-10">
         <div className="max-w-4xl mx-auto text-center space-y-8">
-          <div className="inline-flex items-center justify-center w-24 h-24 backdrop-blur-sm rounded-2xl mb-4" style={{
-          background: 'hsl(180, 100%, 30%, 0.2)'
-        }}>
+          <div className="mb-8">
             <img 
               src={notaMusicale} 
               alt="Nota musicale" 
-              className="w-16 h-16 object-contain animate-pulse"
+              className="w-40 h-40 md:w-48 md:h-48 object-contain mx-auto"
               style={{
-                filter: 'drop-shadow(0 0 20px hsl(180, 100%, 50%)) drop-shadow(0 0 40px hsl(180, 100%, 50%))',
+                filter: 'drop-shadow(0 0 30px hsl(180, 100%, 50%)) drop-shadow(0 0 50px hsl(180, 100%, 50%))',
                 animation: 'pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite, gentle-rotate 4s ease-in-out infinite'
               }}
             />
