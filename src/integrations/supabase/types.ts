@@ -223,6 +223,33 @@ export type Database = {
         }
         Relationships: []
       }
+      professional_calendar_notes: {
+        Row: {
+          created_at: string
+          id: string
+          note_date: string
+          note_text: string
+          professional_id: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          note_date: string
+          note_text: string
+          professional_id: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          note_date?: string
+          note_text?: string
+          professional_id?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       professionisti: {
         Row: {
           avatar_url: string | null

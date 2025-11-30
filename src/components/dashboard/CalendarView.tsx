@@ -23,7 +23,7 @@ interface BookingEvent extends Event {
 }
 
 interface CalendarViewProps {
-  userType: 'venue' | 'artista';
+  userType: 'venue' | 'artista' | 'professionista';
 }
 
 export const CalendarView = ({ userType }: CalendarViewProps) => {
@@ -47,7 +47,7 @@ export const CalendarView = ({ userType }: CalendarViewProps) => {
 
         if (error) throw error;
         return data;
-      } else {
+      } else if (userType === 'artista') {
         // For artists, load bookings they sent that were accepted
         const { data, error } = await supabase
           .from('booking_requests')
@@ -57,6 +57,24 @@ export const CalendarView = ({ userType }: CalendarViewProps) => {
 
         if (error) throw error;
         return data;
+      } else {
+        // For professionals, load both sent and received accepted bookings
+        const { data: sentData, error: sentError } = await supabase
+          .from('booking_requests')
+          .select('*')
+          .eq('sender_id', user.id)
+          .eq('status', 'accepted');
+
+        const { data: receivedData, error: receivedError } = await supabase
+          .from('booking_requests')
+          .select('*')
+          .eq('receiver_id', user.id)
+          .eq('status', 'accepted');
+
+        if (sentError) throw sentError;
+        if (receivedError) throw receivedError;
+
+        return [...(sentData || []), ...(receivedData || [])];
       }
     },
   });
@@ -75,11 +93,19 @@ export const CalendarView = ({ userType }: CalendarViewProps) => {
 
         if (error) throw error;
         return data || [];
-      } else {
+      } else if (userType === 'artista') {
         const { data, error } = await supabase
           .from('artist_calendar_notes')
           .select('*')
           .eq('artist_id', user.id);
+
+        if (error) throw error;
+        return data || [];
+      } else {
+        const { data, error } = await supabase
+          .from('professional_calendar_notes')
+          .select('*')
+          .eq('professional_id', user.id);
 
         if (error) throw error;
         return data || [];
@@ -141,7 +167,7 @@ export const CalendarView = ({ userType }: CalendarViewProps) => {
 
           if (error) throw error;
         }
-      } else {
+      } else if (userType === 'artista') {
         // For artists
         const { data: existing } = await supabase
           .from('artist_calendar_notes')
@@ -163,6 +189,31 @@ export const CalendarView = ({ userType }: CalendarViewProps) => {
           const { error } = await supabase
             .from('artist_calendar_notes')
             .insert({ artist_id: user.id, note_date: date, note_text: note });
+
+          if (error) throw error;
+        }
+      } else {
+        // For professionals
+        const { data: existing } = await supabase
+          .from('professional_calendar_notes')
+          .select('id')
+          .eq('professional_id', user.id)
+          .eq('note_date', date)
+          .maybeSingle();
+
+        if (existing) {
+          // Update existing note
+          const { error } = await supabase
+            .from('professional_calendar_notes')
+            .update({ note_text: note })
+            .eq('id', existing.id);
+
+          if (error) throw error;
+        } else {
+          // Insert new note
+          const { error } = await supabase
+            .from('professional_calendar_notes')
+            .insert({ professional_id: user.id, note_date: date, note_text: note });
 
           if (error) throw error;
         }
@@ -206,11 +257,13 @@ export const CalendarView = ({ userType }: CalendarViewProps) => {
     const [hours, minutes] = booking.event_time.split(':');
     eventDate.setHours(parseInt(hours), parseInt(minutes));
 
-    let displayName = 'Sconosciuto';
+    let displayName = 'Evento';
     if (userType === 'venue' && booking.artisti) {
       displayName = booking.artisti.nome_completo || 'Artista';
     } else if (userType === 'artista' && booking.venues) {
       displayName = booking.venues.nome_locale || 'Venue';
+    } else if (userType === 'professionista') {
+      displayName = 'Collaborazione';
     }
 
     return {
