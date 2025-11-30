@@ -22,47 +22,68 @@ interface BookingEvent extends Event {
   venue_notes?: string;
 }
 
-export const CalendarView = () => {
+interface CalendarViewProps {
+  userType: 'venue' | 'artista';
+}
+
+export const CalendarView = ({ userType }: CalendarViewProps) => {
   const queryClient = useQueryClient();
   const [selectedEvent, setSelectedEvent] = useState<BookingEvent | null>(null);
   const [isNoteDialogOpen, setIsNoteDialogOpen] = useState(false);
   const [noteText, setNoteText] = useState('');
 
   const { data: bookings, isLoading: bookingsLoading } = useQuery({
-    queryKey: ['venue-bookings-calendar'],
+    queryKey: [`${userType}-bookings-calendar`],
     queryFn: async () => {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error('Not authenticated');
 
-      const { data, error } = await supabase
-        .from('booking_requests')
-        .select(`
-          *,
-          artisti:sender_id (
-            nome_completo
-          )
-        `)
-        .eq('receiver_id', user.id)
-        .eq('status', 'accepted');
+      if (userType === 'venue') {
+        const { data, error } = await supabase
+          .from('booking_requests')
+          .select('*, artisti!booking_requests_sender_id_fkey(nome_completo)')
+          .eq('receiver_id', user.id)
+          .eq('status', 'accepted');
 
-      if (error) throw error;
-      return data;
+        if (error) throw error;
+        return data;
+      } else {
+        // For artists, load bookings they sent that were accepted
+        const { data, error } = await supabase
+          .from('booking_requests')
+          .select('*, venues!booking_requests_receiver_id_fkey(nome_locale)')
+          .eq('sender_id', user.id)
+          .eq('status', 'accepted');
+
+        if (error) throw error;
+        return data;
+      }
     },
   });
 
   const { data: calendarNotes, isLoading: notesLoading } = useQuery({
-    queryKey: ['venue-calendar-notes'],
+    queryKey: [`${userType}-calendar-notes`],
     queryFn: async () => {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error('Not authenticated');
 
-      const { data, error } = await supabase
-        .from('venue_calendar_notes')
-        .select('*')
-        .eq('venue_id', user.id);
+      if (userType === 'venue') {
+        const { data, error } = await supabase
+          .from('venue_calendar_notes')
+          .select('*')
+          .eq('venue_id', user.id);
 
-      if (error) throw error;
-      return data;
+        if (error) throw error;
+        return data || [];
+      } else {
+        const { data, error } = await supabase
+          .from('artist_calendar_notes')
+          .select('*')
+          .eq('artist_id', user.id);
+
+        if (error) throw error;
+        return data || [];
+      }
     },
   });
 
@@ -78,7 +99,7 @@ export const CalendarView = () => {
       if (error) throw error;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['venue-bookings-calendar'] });
+      queryClient.invalidateQueries({ queryKey: [`${userType}-bookings-calendar`] });
       toast.success('Nota evento salvata con successo');
       setIsNoteDialogOpen(false);
       setSelectedEvent(null);
@@ -95,33 +116,60 @@ export const CalendarView = () => {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error('Not authenticated');
 
-      // Check if note already exists for this date
-      const { data: existing } = await supabase
-        .from('venue_calendar_notes')
-        .select('id')
-        .eq('venue_id', user.id)
-        .eq('note_date', date)
-        .maybeSingle();
-
-      if (existing) {
-        // Update existing note
-        const { error } = await supabase
+      if (userType === 'venue') {
+        // Check if note already exists for this date
+        const { data: existing } = await supabase
           .from('venue_calendar_notes')
-          .update({ note_text: note })
-          .eq('id', existing.id);
+          .select('id')
+          .eq('venue_id', user.id)
+          .eq('note_date', date)
+          .maybeSingle();
 
-        if (error) throw error;
+        if (existing) {
+          // Update existing note
+          const { error } = await supabase
+            .from('venue_calendar_notes')
+            .update({ note_text: note })
+            .eq('id', existing.id);
+
+          if (error) throw error;
+        } else {
+          // Insert new note
+          const { error } = await supabase
+            .from('venue_calendar_notes')
+            .insert({ venue_id: user.id, note_date: date, note_text: note });
+
+          if (error) throw error;
+        }
       } else {
-        // Insert new note
-        const { error } = await supabase
-          .from('venue_calendar_notes')
-          .insert({ venue_id: user.id, note_date: date, note_text: note });
+        // For artists
+        const { data: existing } = await supabase
+          .from('artist_calendar_notes')
+          .select('id')
+          .eq('artist_id', user.id)
+          .eq('note_date', date)
+          .maybeSingle();
 
-        if (error) throw error;
+        if (existing) {
+          // Update existing note
+          const { error } = await supabase
+            .from('artist_calendar_notes')
+            .update({ note_text: note })
+            .eq('id', existing.id);
+
+          if (error) throw error;
+        } else {
+          // Insert new note
+          const { error } = await supabase
+            .from('artist_calendar_notes')
+            .insert({ artist_id: user.id, note_date: date, note_text: note });
+
+          if (error) throw error;
+        }
       }
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['venue-calendar-notes'] });
+      queryClient.invalidateQueries({ queryKey: [`${userType}-calendar-notes`] });
       toast.success('Nota giornaliera salvata con successo');
       setIsNoteDialogOpen(false);
       setSelectedEvent(null);
@@ -143,8 +191,8 @@ export const CalendarView = () => {
       if (error) throw error;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['venue-bookings-calendar'] });
-      queryClient.invalidateQueries({ queryKey: ['venue-bookings'] });
+      queryClient.invalidateQueries({ queryKey: [`${userType}-bookings-calendar`] });
+      queryClient.invalidateQueries({ queryKey: [`${userType}-bookings`] });
       toast.success('Data evento aggiornata');
     },
     onError: (error) => {
@@ -158,9 +206,16 @@ export const CalendarView = () => {
     const [hours, minutes] = booking.event_time.split(':');
     eventDate.setHours(parseInt(hours), parseInt(minutes));
 
+    let displayName = 'Sconosciuto';
+    if (userType === 'venue' && booking.artisti) {
+      displayName = booking.artisti.nome_completo || 'Artista';
+    } else if (userType === 'artista' && booking.venues) {
+      displayName = booking.venues.nome_locale || 'Venue';
+    }
+
     return {
       id: booking.id,
-      title: booking.artisti?.nome_completo || 'Artista',
+      title: displayName,
       start: eventDate,
       end: new Date(eventDate.getTime() + 2 * 60 * 60 * 1000), // 2 ore di durata di default
       status: booking.status,
