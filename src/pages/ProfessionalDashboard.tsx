@@ -21,6 +21,7 @@ import {
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
 import MatrixRain from "@/components/MatrixRain";
+import { CalendarView } from "@/components/dashboard/CalendarView";
 
 interface Professional {
   id: string;
@@ -377,6 +378,11 @@ const ProfessionalDashboard = () => {
 
         {/* Bookings Table */}
         <BookingsTable />
+
+        {/* Calendario Eventi */}
+        <div className="mt-8">
+          <CalendarView userType="professionista" />
+        </div>
       </div>
     </div>
   );
