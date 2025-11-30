@@ -335,7 +335,6 @@ const Dashboard = () => {
               <TabsList className="w-full mb-6">
                 <TabsTrigger value="matches" className="flex-1">Match Suggeriti</TabsTrigger>
                 <TabsTrigger value="bookings" className="flex-1">Proposte Inviate</TabsTrigger>
-                <TabsTrigger value="calendario" className="flex-1">Calendario Eventi</TabsTrigger>
               </TabsList>
 
               <TabsContent value="matches">
@@ -531,10 +530,6 @@ const Dashboard = () => {
                     )}
                   </CardContent>
                 </Card>
-              </TabsContent>
-
-              <TabsContent value="calendario">
-                <CalendarView userType="artista" />
               </TabsContent>
             </Tabs>
           </main>
