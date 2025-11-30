@@ -14,6 +14,33 @@ export type Database = {
   }
   public: {
     Tables: {
+      artist_calendar_notes: {
+        Row: {
+          artist_id: string
+          created_at: string
+          id: string
+          note_date: string
+          note_text: string
+          updated_at: string
+        }
+        Insert: {
+          artist_id: string
+          created_at?: string
+          id?: string
+          note_date: string
+          note_text: string
+          updated_at?: string
+        }
+        Update: {
+          artist_id?: string
+          created_at?: string
+          id?: string
+          note_date?: string
+          note_text?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       artisti: {
         Row: {
           accenni_brani: string[] | null

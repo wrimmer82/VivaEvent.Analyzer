@@ -436,7 +436,7 @@ const VenueDashboard = () => {
           </TabsContent>
           
           <TabsContent value="calendario" className="mt-4">
-            <CalendarView />
+            <CalendarView userType="venue" />
           </TabsContent>
         </Tabs>
 
