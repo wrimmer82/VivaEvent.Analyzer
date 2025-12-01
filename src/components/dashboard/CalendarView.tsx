@@ -39,24 +39,41 @@ export const CalendarView = ({ userType }: CalendarViewProps) => {
       if (!user) throw new Error('Not authenticated');
 
       if (userType === 'venue') {
-        const { data, error } = await supabase
+        // For venues, load both sent and received accepted bookings
+        const { data: sentData, error: sentError } = await supabase
+          .from('booking_requests')
+          .select('*')
+          .eq('sender_id', user.id)
+          .eq('status', 'accepted');
+
+        const { data: receivedData, error: receivedError } = await supabase
           .from('booking_requests')
           .select('*, artisti!booking_requests_sender_id_fkey(nome_completo)')
           .eq('receiver_id', user.id)
           .eq('status', 'accepted');
 
-        if (error) throw error;
-        return data;
+        if (sentError) throw sentError;
+        if (receivedError) throw receivedError;
+
+        return [...(sentData || []), ...(receivedData || [])];
       } else if (userType === 'artista') {
-        // For artists, load bookings they sent that were accepted
-        const { data, error } = await supabase
+        // For artists, load both sent and received accepted bookings
+        const { data: sentData, error: sentError } = await supabase
           .from('booking_requests')
           .select('*, venues!booking_requests_receiver_id_fkey(nome_locale)')
           .eq('sender_id', user.id)
           .eq('status', 'accepted');
 
-        if (error) throw error;
-        return data;
+        const { data: receivedData, error: receivedError } = await supabase
+          .from('booking_requests')
+          .select('*')
+          .eq('receiver_id', user.id)
+          .eq('status', 'accepted');
+
+        if (sentError) throw sentError;
+        if (receivedError) throw receivedError;
+
+        return [...(sentData || []), ...(receivedData || [])];
       } else {
         // For professionals, load both sent and received accepted bookings
         const { data: sentData, error: sentError } = await supabase
@@ -258,10 +275,18 @@ export const CalendarView = ({ userType }: CalendarViewProps) => {
     eventDate.setHours(parseInt(hours), parseInt(minutes));
 
     let displayName = 'Evento';
-    if (userType === 'venue' && booking.artisti) {
-      displayName = booking.artisti.nome_completo || 'Artista';
-    } else if (userType === 'artista' && booking.venues) {
-      displayName = booking.venues.nome_locale || 'Venue';
+    if (userType === 'venue') {
+      if (booking.artisti) {
+        displayName = booking.artisti.nome_completo || 'Artista';
+      } else {
+        displayName = 'Artista';
+      }
+    } else if (userType === 'artista') {
+      if (booking.venues) {
+        displayName = booking.venues.nome_locale || 'Venue';
+      } else {
+        displayName = 'Venue';
+      }
     } else if (userType === 'professionista') {
       displayName = 'Collaborazione';
     }
