@@ -42,13 +42,13 @@ export const CalendarView = ({ userType }: CalendarViewProps) => {
         // For venues, load both sent and received accepted bookings
         const { data: sentData, error: sentError } = await supabase
           .from('booking_requests')
-          .select('*')
+          .select('*, artisti!booking_requests_receiver_id_fkey(nome_completo), professionisti!booking_requests_receiver_id_fkey(nome_completo)')
           .eq('sender_id', user.id)
           .eq('status', 'accepted');
 
         const { data: receivedData, error: receivedError } = await supabase
           .from('booking_requests')
-          .select('*, artisti!booking_requests_sender_id_fkey(nome_completo)')
+          .select('*, artisti!booking_requests_sender_id_fkey(nome_completo), professionisti!booking_requests_sender_id_fkey(nome_completo)')
           .eq('receiver_id', user.id)
           .eq('status', 'accepted');
 
@@ -60,13 +60,13 @@ export const CalendarView = ({ userType }: CalendarViewProps) => {
         // For artists, load both sent and received accepted bookings
         const { data: sentData, error: sentError } = await supabase
           .from('booking_requests')
-          .select('*, venues!booking_requests_receiver_id_fkey(nome_locale)')
+          .select('*, venues!booking_requests_receiver_id_fkey(nome_locale), professionisti!booking_requests_receiver_id_fkey(nome_completo)')
           .eq('sender_id', user.id)
           .eq('status', 'accepted');
 
         const { data: receivedData, error: receivedError } = await supabase
           .from('booking_requests')
-          .select('*')
+          .select('*, venues!booking_requests_sender_id_fkey(nome_locale), professionisti!booking_requests_sender_id_fkey(nome_completo)')
           .eq('receiver_id', user.id)
           .eq('status', 'accepted');
 
@@ -278,14 +278,18 @@ export const CalendarView = ({ userType }: CalendarViewProps) => {
     if (userType === 'venue') {
       if (booking.artisti) {
         displayName = booking.artisti.nome_completo || 'Artista';
+      } else if (booking.professionisti) {
+        displayName = booking.professionisti.nome_completo || 'Professionista';
       } else {
-        displayName = 'Artista';
+        displayName = 'Collaboratore';
       }
     } else if (userType === 'artista') {
       if (booking.venues) {
         displayName = booking.venues.nome_locale || 'Venue';
+      } else if (booking.professionisti) {
+        displayName = booking.professionisti.nome_completo || 'Professionista';
       } else {
-        displayName = 'Venue';
+        displayName = 'Collaboratore';
       }
     } else if (userType === 'professionista') {
       displayName = 'Collaborazione';
