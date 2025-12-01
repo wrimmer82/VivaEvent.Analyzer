@@ -196,12 +196,26 @@ const BookingsTable = () => {
     try {
       setUpdatingId(bookingId);
       
+      // Get the booking details first
+      const { data: bookingData } = await supabase
+        .from("booking_requests")
+        .select("*")
+        .eq("id", bookingId)
+        .single();
+
+      if (!bookingData) throw new Error("Booking not found");
+
       const { error } = await supabase
         .from("booking_requests")
         .update({ status: newStatus })
         .eq("id", bookingId);
 
       if (error) throw error;
+
+      // If accepted, create calendar notes for both users
+      if (newStatus === 'accepted') {
+        await createCalendarNotes(bookingData);
+      }
 
       toast({
         title: newStatus === 'accepted' ? "Proposta accettata" : "Proposta rifiutata",
@@ -219,6 +233,114 @@ const BookingsTable = () => {
       });
     } finally {
       setUpdatingId(null);
+    }
+  };
+
+  const createCalendarNotes = async (booking: any) => {
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) return;
+
+      // Get user types
+      const { data: senderUser } = await supabase
+        .from("users")
+        .select("user_type")
+        .eq("id", booking.sender_id)
+        .single();
+
+      const { data: receiverUser } = await supabase
+        .from("users")
+        .select("user_type")
+        .eq("id", booking.receiver_id)
+        .single();
+
+      if (!senderUser || !receiverUser) return;
+
+      // Get names for the note
+      const senderName = await getUserName(booking.sender_id);
+      const receiverName = await getUserName(booking.receiver_id);
+
+      const eventDate = new Date(booking.event_date);
+      const formattedDate = eventDate.toLocaleDateString('it-IT');
+      
+      // Create note text
+      const senderNoteText = `Evento confermato con ${receiverName}\n${formattedDate} alle ${booking.event_time}\nCompenso: €${booking.proposed_compensation}${booking.personal_message ? '\n' + booking.personal_message : ''}`;
+      const receiverNoteText = `Evento confermato con ${senderName}\n${formattedDate} alle ${booking.event_time}\nCompenso: €${booking.proposed_compensation}${booking.personal_message ? '\n' + booking.personal_message : ''}`;
+
+      // Create calendar note for sender
+      if (senderUser.user_type === 'venue') {
+        await supabase
+          .from("venue_calendar_notes")
+          .upsert({
+            venue_id: booking.sender_id,
+            note_date: booking.event_date,
+            note_text: senderNoteText
+          }, {
+            onConflict: 'venue_id,note_date',
+            ignoreDuplicates: false
+          });
+      } else if (senderUser.user_type === 'artista') {
+        await supabase
+          .from("artist_calendar_notes")
+          .upsert({
+            artist_id: booking.sender_id,
+            note_date: booking.event_date,
+            note_text: senderNoteText
+          }, {
+            onConflict: 'artist_id,note_date',
+            ignoreDuplicates: false
+          });
+      } else if (senderUser.user_type === 'professionista') {
+        await supabase
+          .from("professional_calendar_notes")
+          .upsert({
+            professional_id: booking.sender_id,
+            note_date: booking.event_date,
+            note_text: senderNoteText
+          }, {
+            onConflict: 'professional_id,note_date',
+            ignoreDuplicates: false
+          });
+      }
+
+      // Create calendar note for receiver
+      if (receiverUser.user_type === 'venue') {
+        await supabase
+          .from("venue_calendar_notes")
+          .upsert({
+            venue_id: booking.receiver_id,
+            note_date: booking.event_date,
+            note_text: receiverNoteText
+          }, {
+            onConflict: 'venue_id,note_date',
+            ignoreDuplicates: false
+          });
+      } else if (receiverUser.user_type === 'artista') {
+        await supabase
+          .from("artist_calendar_notes")
+          .upsert({
+            artist_id: booking.receiver_id,
+            note_date: booking.event_date,
+            note_text: receiverNoteText
+          }, {
+            onConflict: 'artist_id,note_date',
+            ignoreDuplicates: false
+          });
+      } else if (receiverUser.user_type === 'professionista') {
+        await supabase
+          .from("professional_calendar_notes")
+          .upsert({
+            professional_id: booking.receiver_id,
+            note_date: booking.event_date,
+            note_text: receiverNoteText
+          }, {
+            onConflict: 'professional_id,note_date',
+            ignoreDuplicates: false
+          });
+      }
+    } catch (error) {
+      console.error("Error creating calendar notes:", error);
+      // Don't throw error, just log it - calendar note creation is not critical
     }
   };
 
