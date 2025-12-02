@@ -192,10 +192,64 @@ const BookingsTable = () => {
     return `${eventDate.toLocaleDateString('it-IT')} - ${time.slice(0, 5)}`;
   };
 
+  const createCalendarNoteForUser = async (userId: string, noteDate: string, noteText: string) => {
+    // Determine user type
+    const { data: artistData } = await supabase
+      .from("artisti")
+      .select("id")
+      .eq("user_id", userId)
+      .maybeSingle();
+    
+    if (artistData) {
+      await supabase.from("artist_calendar_notes").upsert({
+        artist_id: userId,
+        note_date: noteDate,
+        note_text: noteText
+      }, { onConflict: 'artist_id,note_date' });
+      return;
+    }
+
+    const { data: venueData } = await supabase
+      .from("venues")
+      .select("id")
+      .eq("user_id", userId)
+      .maybeSingle();
+    
+    if (venueData) {
+      await supabase.from("venue_calendar_notes").upsert({
+        venue_id: userId,
+        note_date: noteDate,
+        note_text: noteText
+      }, { onConflict: 'venue_id,note_date' });
+      return;
+    }
+
+    const { data: professionalData } = await supabase
+      .from("professionisti")
+      .select("id")
+      .eq("user_id", userId)
+      .maybeSingle();
+    
+    if (professionalData) {
+      await supabase.from("professional_calendar_notes").upsert({
+        professional_id: userId,
+        note_date: noteDate,
+        note_text: noteText
+      }, { onConflict: 'professional_id,note_date' });
+    }
+  };
+
   const handleUpdateStatus = async (bookingId: string, newStatus: 'accepted' | 'rejected') => {
     try {
       setUpdatingId(bookingId);
       
+      // Get the booking details first
+      const { data: bookingData } = await supabase
+        .from("booking_requests")
+        .select("*")
+        .eq("id", bookingId)
+        .single();
+
       const { error } = await supabase
         .from("booking_requests")
         .update({ status: newStatus })
@@ -203,9 +257,26 @@ const BookingsTable = () => {
 
       if (error) throw error;
 
+      // If accepted, create calendar notes for both sender and receiver
+      if (newStatus === 'accepted' && bookingData) {
+        const senderName = await getUserName(bookingData.sender_id);
+        const receiverName = await getUserName(bookingData.receiver_id);
+        
+        const noteForReceiver = `✅ Evento confermato con ${senderName}\n📅 ${new Date(bookingData.event_date).toLocaleDateString('it-IT')} - ${bookingData.event_time.slice(0, 5)}\n💰 €${bookingData.proposed_compensation}${bookingData.personal_message ? `\n📝 ${bookingData.personal_message}` : ''}`;
+        const noteForSender = `✅ Evento confermato con ${receiverName}\n📅 ${new Date(bookingData.event_date).toLocaleDateString('it-IT')} - ${bookingData.event_time.slice(0, 5)}\n💰 €${bookingData.proposed_compensation}${bookingData.personal_message ? `\n📝 ${bookingData.personal_message}` : ''}`;
+
+        // Create calendar notes for both parties
+        await Promise.all([
+          createCalendarNoteForUser(bookingData.receiver_id, bookingData.event_date, noteForReceiver),
+          createCalendarNoteForUser(bookingData.sender_id, bookingData.event_date, noteForSender)
+        ]);
+      }
+
       toast({
         title: newStatus === 'accepted' ? "Proposta accettata" : "Proposta rifiutata",
-        description: `La proposta è stata ${newStatus === 'accepted' ? 'accettata' : 'rifiutata'} con successo.`,
+        description: newStatus === 'accepted' 
+          ? "La proposta è stata accettata e aggiunta al calendario."
+          : "La proposta è stata rifiutata.",
       });
 
       // Reload bookings to reflect the change
