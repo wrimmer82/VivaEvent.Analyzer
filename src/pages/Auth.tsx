@@ -56,7 +56,8 @@ const Auth = () => {
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       (event, session) => {
-        if (session && event === "SIGNED_IN") {
+        // Only handle SIGNED_IN event - don't redirect on other events like TOKEN_REFRESHED
+        if (event === "SIGNED_IN" && session) {
           // Defer Supabase calls with setTimeout to prevent deadlock
           setTimeout(async () => {
             try {
@@ -73,13 +74,11 @@ const Auth = () => {
 
               if (userData) {
                 redirectBasedOnProfile(userData.user_type, userData.profile_completed);
-              } else {
-                // If no userData found, redirect to home
-                navigate("/");
               }
+              // Don't redirect if no userData - stay on current page
             } catch (error) {
               console.error("Error in auth state change:", error);
-              navigate("/");
+              // Don't redirect on error - stay on current page
             }
           }, 0);
         }
