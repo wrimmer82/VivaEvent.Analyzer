@@ -39,61 +39,23 @@ export const CalendarView = ({ userType }: CalendarViewProps) => {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error('Not authenticated');
 
-      if (userType === 'venue') {
-        // For venues, load both sent and received accepted bookings
-        const { data: sentData, error: sentError } = await supabase
-          .from('booking_requests')
-          .select('*, artisti!booking_requests_receiver_id_fkey(nome_completo), professionisti!booking_requests_receiver_id_fkey(nome_completo)')
-          .eq('sender_id', user.id)
-          .eq('status', 'accepted');
+      // For all user types, load both sent and received accepted bookings
+      const { data: sentData, error: sentError } = await supabase
+        .from('booking_requests')
+        .select('*')
+        .eq('sender_id', user.id)
+        .eq('status', 'accepted');
 
-        const { data: receivedData, error: receivedError } = await supabase
-          .from('booking_requests')
-          .select('*, artisti!booking_requests_sender_id_fkey(nome_completo), professionisti!booking_requests_sender_id_fkey(nome_completo)')
-          .eq('receiver_id', user.id)
-          .eq('status', 'accepted');
+      const { data: receivedData, error: receivedError } = await supabase
+        .from('booking_requests')
+        .select('*')
+        .eq('receiver_id', user.id)
+        .eq('status', 'accepted');
 
-        if (sentError) throw sentError;
-        if (receivedError) throw receivedError;
+      if (sentError) throw sentError;
+      if (receivedError) throw receivedError;
 
-        return [...(sentData || []), ...(receivedData || [])];
-      } else if (userType === 'artista') {
-        // For artists, load both sent and received accepted bookings
-        const { data: sentData, error: sentError } = await supabase
-          .from('booking_requests')
-          .select('*, venues!booking_requests_receiver_id_fkey(nome_locale), professionisti!booking_requests_receiver_id_fkey(nome_completo)')
-          .eq('sender_id', user.id)
-          .eq('status', 'accepted');
-
-        const { data: receivedData, error: receivedError } = await supabase
-          .from('booking_requests')
-          .select('*, venues!booking_requests_sender_id_fkey(nome_locale), professionisti!booking_requests_sender_id_fkey(nome_completo)')
-          .eq('receiver_id', user.id)
-          .eq('status', 'accepted');
-
-        if (sentError) throw sentError;
-        if (receivedError) throw receivedError;
-
-        return [...(sentData || []), ...(receivedData || [])];
-      } else {
-        // For professionals, load both sent and received accepted bookings
-        const { data: sentData, error: sentError } = await supabase
-          .from('booking_requests')
-          .select('*')
-          .eq('sender_id', user.id)
-          .eq('status', 'accepted');
-
-        const { data: receivedData, error: receivedError } = await supabase
-          .from('booking_requests')
-          .select('*')
-          .eq('receiver_id', user.id)
-          .eq('status', 'accepted');
-
-        if (sentError) throw sentError;
-        if (receivedError) throw receivedError;
-
-        return [...(sentData || []), ...(receivedData || [])];
-      }
+      return [...(sentData || []), ...(receivedData || [])];
     },
   });
 
