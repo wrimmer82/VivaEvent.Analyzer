@@ -1,4 +1,4 @@
-import { Calendar, momentLocalizer, Event } from 'react-big-calendar';
+import { Calendar, momentLocalizer, Event, DateCellWrapperProps } from 'react-big-calendar';
 import moment from 'moment';
 import 'react-big-calendar/lib/css/react-big-calendar.css';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
@@ -9,7 +9,8 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
 import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
+import { StickyNote, CheckCircle2 } from 'lucide-react';
 
 const localizer = momentLocalizer(moment);
 
@@ -372,21 +373,77 @@ export const CalendarView = ({ userType }: CalendarViewProps) => {
     return { style };
   };
 
+  // Create sets for quick lookup of dates with notes and events
+  const datesWithNotes = useMemo(() => {
+    const noteSet = new Set<string>();
+    calendarNotes?.forEach(note => {
+      noteSet.add(moment(note.note_date).format('YYYY-MM-DD'));
+    });
+    return noteSet;
+  }, [calendarNotes]);
+
+  const datesWithEvents = useMemo(() => {
+    const eventSet = new Set<string>();
+    events.forEach(event => {
+      if (event.start) {
+        eventSet.add(moment(event.start).format('YYYY-MM-DD'));
+      }
+    });
+    return eventSet;
+  }, [events]);
+
   const dayStyleGetter = (date: Date) => {
     const dateStr = moment(date).format('YYYY-MM-DD');
-    const hasNote = calendarNotes?.some(note => 
-      moment(note.note_date).format('YYYY-MM-DD') === dateStr
-    );
+    const hasNote = datesWithNotes.has(dateStr);
+    const hasEvent = datesWithEvents.has(dateStr);
 
-    if (hasNote) {
+    if (hasEvent && hasNote) {
       return {
         style: {
-          backgroundColor: 'rgba(139, 92, 246, 0.1)',
-          border: '1px solid rgba(139, 92, 246, 0.3)',
+          background: 'linear-gradient(135deg, rgba(6, 182, 212, 0.25) 0%, rgba(139, 92, 246, 0.25) 100%)',
+          border: '2px solid rgba(6, 182, 212, 0.6)',
+          boxShadow: '0 0 12px rgba(6, 182, 212, 0.4), inset 0 0 8px rgba(139, 92, 246, 0.3)',
+        }
+      };
+    } else if (hasEvent) {
+      return {
+        style: {
+          backgroundColor: 'rgba(6, 182, 212, 0.2)',
+          border: '2px solid rgba(6, 182, 212, 0.5)',
+          boxShadow: '0 0 10px rgba(6, 182, 212, 0.3)',
+        }
+      };
+    } else if (hasNote) {
+      return {
+        style: {
+          backgroundColor: 'rgba(251, 146, 60, 0.2)',
+          border: '2px solid rgba(251, 146, 60, 0.5)',
+          boxShadow: '0 0 10px rgba(251, 146, 60, 0.3)',
         }
       };
     }
     return {};
+  };
+
+  // Custom date cell wrapper to show icons
+  const CustomDateCellWrapper = ({ children, value }: DateCellWrapperProps) => {
+    const dateStr = moment(value).format('YYYY-MM-DD');
+    const hasNote = datesWithNotes.has(dateStr);
+    const hasEvent = datesWithEvents.has(dateStr);
+
+    return (
+      <div className="rbc-day-bg relative">
+        {children}
+        <div className="absolute bottom-1 right-1 flex gap-0.5">
+          {hasEvent && (
+            <CheckCircle2 className="h-4 w-4 text-cyan-400 drop-shadow-[0_0_4px_rgba(6,182,212,0.8)]" />
+          )}
+          {hasNote && !hasEvent && (
+            <StickyNote className="h-4 w-4 text-orange-400 drop-shadow-[0_0_4px_rgba(251,146,60,0.8)]" />
+          )}
+        </div>
+      </div>
+    );
   };
 
   if (isLoading) {
@@ -416,6 +473,9 @@ export const CalendarView = ({ userType }: CalendarViewProps) => {
               draggableAccessor={() => true}
               eventPropGetter={eventStyleGetter}
               dayPropGetter={dayStyleGetter}
+              components={{
+                dateCellWrapper: CustomDateCellWrapper,
+              }}
               views={['month']}
               defaultView="month"
               messages={{
