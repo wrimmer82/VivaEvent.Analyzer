@@ -112,23 +112,30 @@ const VenueDashboard = () => {
         .select("*", { count: "exact", head: true })
         .eq("sender_id", session.user.id);
 
-      // Fetch confirmed bookings
-      const { count: eventiConfermati } = await supabase
+      // Fetch confirmed bookings (both sent and received)
+      const { count: eventiConfermatiRicevuti } = await supabase
         .from("booking_requests")
         .select("*", { count: "exact", head: true })
         .eq("receiver_id", session.user.id)
         .eq("status", "accepted");
 
+      const { count: eventiConfermatiInviati } = await supabase
+        .from("booking_requests")
+        .select("*", { count: "exact", head: true })
+        .eq("sender_id", session.user.id)
+        .eq("status", "accepted");
+
+      const eventiConfermati = (eventiConfermatiRicevuti || 0) + (eventiConfermatiInviati || 0);
+
       // Calculate success rate
       const totale = (proposteInviate || 0) + (proposteRicevute || 0);
-      const successo = eventiConfermati || 0;
-      const tassoSuccesso = totale > 0 ? Math.round((successo / totale) * 100) : 0;
+      const tassoSuccesso = totale > 0 ? Math.round((eventiConfermati / totale) * 100) : 0;
 
       setStatsData({
         proposteRicevute: proposteRicevute || 0,
         proposteInviate: proposteInviate || 0,
         tassoSuccesso: `${tassoSuccesso}%`,
-        eventiConfermati: eventiConfermati || 0
+        eventiConfermati: eventiConfermati
       });
 
       // Load confirmed events for calendar
