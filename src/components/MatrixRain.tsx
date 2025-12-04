@@ -54,27 +54,31 @@ const MatrixRain = () => {
         vec2 uv = gl_FragCoord.xy / u_resolution.xy;
         vec2 p = gl_FragCoord.xy;
         
+        // Invert Y to make rain fall from top to bottom
+        float invertedY = u_resolution.y - p.y;
+        
         // More columns for denser effect
         float columns = 120.0;
         float columnWidth = u_resolution.x / columns;
         
-        vec2 grid = vec2(floor(p.x / columnWidth), floor(p.y / 18.0));
+        vec2 grid = vec2(floor(p.x / columnWidth), floor(invertedY / 18.0));
         vec2 gridUV = mod(p, vec2(columnWidth, 18.0)) / vec2(columnWidth, 18.0);
         
         float columnRandom = random(vec2(grid.x, 0.0));
         float speed = 1.5 + columnRandom * 3.0;
         float offset = columnRandom * 100.0;
         
-        float row = mod(grid.y + u_time * speed * 4.0 + offset, u_resolution.y / 18.0);
+        float maxRows = u_resolution.y / 18.0;
+        float row = mod(grid.y + u_time * speed * 4.0 + offset, maxRows);
         
         float charRandom = random(vec2(grid.x, floor(row)));
         float charCode = floor(charRandom * 15.0);
         
         float brightness = 0.0;
         
-        // Leading bright character - longer trail
-        float headRow = mod(u_time * speed * 4.0 + offset, u_resolution.y / 18.0);
-        float distFromHead = mod(headRow - grid.y + u_resolution.y / 18.0, u_resolution.y / 18.0);
+        // Leading bright character falling down - longer trail
+        float headRow = mod(u_time * speed * 4.0 + offset, maxRows);
+        float distFromHead = mod(headRow - grid.y + maxRows, maxRows);
         
         // Brighter head and longer trail
         if (distFromHead < 2.0) {
