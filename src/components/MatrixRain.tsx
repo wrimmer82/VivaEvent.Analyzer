@@ -54,58 +54,67 @@ const MatrixRain = () => {
         vec2 uv = gl_FragCoord.xy / u_resolution.xy;
         vec2 p = gl_FragCoord.xy;
         
-        float columns = 80.0;
+        // More columns for denser effect
+        float columns = 120.0;
         float columnWidth = u_resolution.x / columns;
         
-        vec2 grid = vec2(floor(p.x / columnWidth), floor(p.y / 20.0));
-        vec2 gridUV = mod(p, vec2(columnWidth, 20.0)) / vec2(columnWidth, 20.0);
+        vec2 grid = vec2(floor(p.x / columnWidth), floor(p.y / 18.0));
+        vec2 gridUV = mod(p, vec2(columnWidth, 18.0)) / vec2(columnWidth, 18.0);
         
         float columnRandom = random(vec2(grid.x, 0.0));
-        float speed = 1.0 + columnRandom * 2.0;
+        float speed = 1.5 + columnRandom * 3.0;
         float offset = columnRandom * 100.0;
         
-        float row = mod(grid.y + u_time * speed * 3.0 + offset, u_resolution.y / 20.0);
+        float row = mod(grid.y + u_time * speed * 4.0 + offset, u_resolution.y / 18.0);
         
         float charRandom = random(vec2(grid.x, floor(row)));
         float charCode = floor(charRandom * 15.0);
         
         float brightness = 0.0;
         
-        // Leading bright character
-        float headRow = mod(u_time * speed * 3.0 + offset, u_resolution.y / 20.0);
-        float distFromHead = mod(headRow - grid.y + u_resolution.y / 20.0, u_resolution.y / 20.0);
+        // Leading bright character - longer trail
+        float headRow = mod(u_time * speed * 4.0 + offset, u_resolution.y / 18.0);
+        float distFromHead = mod(headRow - grid.y + u_resolution.y / 18.0, u_resolution.y / 18.0);
         
-        if (distFromHead < 1.0) {
-          brightness = 1.0;
-        } else if (distFromHead < 25.0) {
-          brightness = (25.0 - distFromHead) / 25.0;
-          brightness = brightness * brightness;
+        // Brighter head and longer trail
+        if (distFromHead < 2.0) {
+          brightness = 1.5;
+        } else if (distFromHead < 40.0) {
+          brightness = (40.0 - distFromHead) / 40.0;
+          brightness = brightness * brightness * 1.2;
         }
         
-        // Flicker effect
-        float flicker = random(vec2(grid.x, grid.y + floor(u_time * 10.0)));
-        brightness *= 0.8 + flicker * 0.2;
+        // More intense flicker effect
+        float flicker = random(vec2(grid.x, grid.y + floor(u_time * 15.0)));
+        brightness *= 0.7 + flicker * 0.5;
         
         // Character rendering
         float char = character(charCode * 1000.0, gridUV * 2.0 - 0.5);
         
-        // Matrix cyan/green color
-        vec3 color = vec3(0.0, 0.85, 1.0); // Cyan color matching the theme
+        // Matrix cyan color with green tint
+        vec3 color = vec3(0.0, 0.95, 0.9);
         
-        // Head glow is white-cyan
-        if (distFromHead < 1.0) {
-          color = vec3(0.7, 1.0, 1.0);
+        // Head glow is bright white-cyan
+        if (distFromHead < 2.0) {
+          color = vec3(0.9, 1.0, 1.0);
         }
         
         float alpha = char * brightness;
         
-        // Add glow effect
-        float glow = brightness * 0.3 * (1.0 - length(gridUV - 0.5) * 1.5);
+        // Enhanced glow effect for immersion
+        float glow = brightness * 0.6 * (1.0 - length(gridUV - 0.5) * 1.2);
         glow = max(glow, 0.0);
         
-        vec3 finalColor = color * alpha + vec3(0.0, 0.85, 1.0) * glow;
+        // Add depth fog effect - characters in "background" slightly dimmer
+        float depth = random(vec2(grid.x * 0.1, 0.0));
+        float depthFactor = 0.6 + depth * 0.4;
         
-        gl_FragColor = vec4(finalColor, alpha + glow * 0.5);
+        // Add ambient glow
+        float ambientGlow = 0.02 * brightness;
+        
+        vec3 finalColor = color * alpha * depthFactor + vec3(0.0, 0.9, 0.85) * glow * 1.5 + vec3(0.0, 0.3, 0.3) * ambientGlow;
+        
+        gl_FragColor = vec4(finalColor, (alpha + glow * 0.8 + ambientGlow) * 1.2);
       }
     `;
 
@@ -257,7 +266,7 @@ const MatrixRain = () => {
   return (
     <canvas
       ref={canvasRef}
-      className="absolute inset-0 opacity-30"
+      className="absolute inset-0 opacity-60"
       style={{ pointerEvents: 'none' }}
     />
   );
