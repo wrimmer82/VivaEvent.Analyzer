@@ -42,7 +42,16 @@ const CTA = () => {
           </div>
           
           <h2 className={`text-4xl md:text-6xl font-bold transition-all duration-700 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`} style={{
-          color: 'hsl(180, 100%, 50%)'
+          color: 'hsl(180, 100%, 50%)',
+          textShadow: `
+            1px 1px 0 hsl(180, 100%, 40%),
+            2px 2px 0 hsl(180, 100%, 35%),
+            3px 3px 0 hsl(180, 100%, 30%),
+            4px 4px 0 hsl(180, 100%, 25%),
+            5px 5px 10px rgba(0, 0, 0, 0.5),
+            0 0 20px hsl(180, 100%, 50%),
+            0 0 40px hsl(180, 100%, 40%)
+          `
         }}>
             Pronto a Rivoluzionare il Tuo Booking?
           </h2>
