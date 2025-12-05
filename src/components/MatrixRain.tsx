@@ -57,71 +57,68 @@ const MatrixRain = () => {
         // Invert Y to make rain fall from top to bottom
         float invertedY = u_resolution.y - p.y;
         
-        // Maximum density columns
-        float columns = 180.0;
+        // More columns for denser effect
+        float columns = 120.0;
         float columnWidth = u_resolution.x / columns;
         
-        vec2 grid = vec2(floor(p.x / columnWidth), floor(invertedY / 14.0));
-        vec2 gridUV = mod(p, vec2(columnWidth, 14.0)) / vec2(columnWidth, 14.0);
+        vec2 grid = vec2(floor(p.x / columnWidth), floor(invertedY / 18.0));
+        vec2 gridUV = mod(p, vec2(columnWidth, 18.0)) / vec2(columnWidth, 18.0);
         
         float columnRandom = random(vec2(grid.x, 0.0));
-        float speed = 2.0 + columnRandom * 4.0;
+        float speed = 1.5 + columnRandom * 3.0;
         float offset = columnRandom * 100.0;
         
-        float maxRows = u_resolution.y / 14.0;
-        float row = mod(grid.y + u_time * speed * 5.0 + offset, maxRows);
+        float maxRows = u_resolution.y / 18.0;
+        float row = mod(grid.y + u_time * speed * 4.0 + offset, maxRows);
         
         float charRandom = random(vec2(grid.x, floor(row)));
         float charCode = floor(charRandom * 15.0);
         
         float brightness = 0.0;
         
-        // Leading bright character with very long trail
-        float headRow = mod(u_time * speed * 5.0 + offset, maxRows);
+        // Leading bright character falling down - longer trail
+        float headRow = mod(u_time * speed * 4.0 + offset, maxRows);
         float distFromHead = mod(headRow - grid.y + maxRows, maxRows);
         
-        // Ultra bright head and extended trail
-        if (distFromHead < 3.0) {
-          brightness = 2.0;
-        } else if (distFromHead < 60.0) {
-          brightness = (60.0 - distFromHead) / 60.0;
-          brightness = brightness * brightness * 1.5;
+        // Brighter head and longer trail
+        if (distFromHead < 2.0) {
+          brightness = 1.5;
+        } else if (distFromHead < 40.0) {
+          brightness = (40.0 - distFromHead) / 40.0;
+          brightness = brightness * brightness * 1.2;
         }
         
-        // Intense flicker effect
-        float flicker = random(vec2(grid.x, grid.y + floor(u_time * 20.0)));
-        brightness *= 0.6 + flicker * 0.6;
+        // More intense flicker effect
+        float flicker = random(vec2(grid.x, grid.y + floor(u_time * 15.0)));
+        brightness *= 0.7 + flicker * 0.5;
         
         // Character rendering
         float char = character(charCode * 1000.0, gridUV * 2.0 - 0.5);
         
-        // Matrix cyan color
-        vec3 color = vec3(0.0, 1.0, 0.95);
+        // Matrix cyan color with green tint
+        vec3 color = vec3(0.0, 0.95, 0.9);
         
-        // Head glow is bright white
-        if (distFromHead < 3.0) {
-          color = vec3(1.0, 1.0, 1.0);
+        // Head glow is bright white-cyan
+        if (distFromHead < 2.0) {
+          color = vec3(0.9, 1.0, 1.0);
         }
         
         float alpha = char * brightness;
         
-        // Maximum glow effect for full immersion
-        float glow = brightness * 0.8 * (1.0 - length(gridUV - 0.5) * 1.0);
+        // Enhanced glow effect for immersion
+        float glow = brightness * 0.6 * (1.0 - length(gridUV - 0.5) * 1.2);
         glow = max(glow, 0.0);
         
-        // Depth layers for 3D feel
+        // Add depth fog effect - characters in "background" slightly dimmer
         float depth = random(vec2(grid.x * 0.1, 0.0));
-        float depthFactor = 0.5 + depth * 0.5;
+        float depthFactor = 0.6 + depth * 0.4;
         
-        // Strong ambient glow
-        float ambientGlow = 0.05 * brightness;
+        // Add ambient glow
+        float ambientGlow = 0.02 * brightness;
         
-        // Background scanlines
-        float scanline = sin(p.y * 0.5) * 0.02 + 0.02;
+        vec3 finalColor = color * alpha * depthFactor + vec3(0.0, 0.9, 0.85) * glow * 1.5 + vec3(0.0, 0.3, 0.3) * ambientGlow;
         
-        vec3 finalColor = color * alpha * depthFactor + vec3(0.0, 1.0, 0.9) * glow * 2.0 + vec3(0.0, 0.4, 0.4) * ambientGlow + vec3(0.0, 0.1, 0.1) * scanline;
-        
-        gl_FragColor = vec4(finalColor, (alpha + glow * 1.0 + ambientGlow + scanline) * 1.5);
+        gl_FragColor = vec4(finalColor, (alpha + glow * 0.8 + ambientGlow) * 1.2);
       }
     `;
 
@@ -273,7 +270,7 @@ const MatrixRain = () => {
   return (
     <canvas
       ref={canvasRef}
-      className="absolute inset-0 opacity-90"
+      className="absolute inset-0 opacity-60"
       style={{ pointerEvents: 'none' }}
     />
   );
