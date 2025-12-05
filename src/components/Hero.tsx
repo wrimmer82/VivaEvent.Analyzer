@@ -20,7 +20,21 @@ const Hero = () => {
         <div className="max-w-4xl mx-auto text-center space-y-8">
           {/* Main heading */}
           <h1 className="text-5xl md:text-7xl font-bold tracking-tight animate-fade-in" style={{ animationDelay: '0.1s' }}>
-            <span className="text-primary drop-shadow-[0_0_30px_rgba(0,217,255,0.5)]">
+            <span 
+              className="text-primary"
+              style={{
+                textShadow: `
+                  0 0 10px rgba(0, 217, 255, 0.8),
+                  0 0 20px rgba(0, 217, 255, 0.6),
+                  0 0 40px rgba(0, 217, 255, 0.4),
+                  2px 2px 0px rgba(0, 180, 220, 1),
+                  4px 4px 0px rgba(0, 150, 190, 0.9),
+                  6px 6px 0px rgba(0, 120, 160, 0.8),
+                  8px 8px 0px rgba(0, 90, 130, 0.7),
+                  10px 10px 15px rgba(0, 0, 0, 0.5)
+                `
+              }}
+            >
               VivaEvent
             </span>
             <br />
