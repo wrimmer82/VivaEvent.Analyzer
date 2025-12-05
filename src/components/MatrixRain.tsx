@@ -30,7 +30,7 @@ const MatrixRain = () => {
       }
     `;
 
-    // Fragment shader for Matrix rain effect
+    // Fragment shader for Matrix rain effect with 3D depth
     const fragmentShaderSource = `
       precision mediump float;
       uniform float u_time;
@@ -51,74 +51,94 @@ const MatrixRain = () => {
       }
       
       void main() {
-        vec2 uv = gl_FragCoord.xy / u_resolution.xy;
         vec2 p = gl_FragCoord.xy;
-        
-        // Invert Y to make rain fall from top to bottom
         float invertedY = u_resolution.y - p.y;
         
-        // More columns for denser effect
-        float columns = 120.0;
-        float columnWidth = u_resolution.x / columns;
+        vec3 finalColor = vec3(0.0);
+        float finalAlpha = 0.0;
         
-        vec2 grid = vec2(floor(p.x / columnWidth), floor(invertedY / 18.0));
-        vec2 gridUV = mod(p, vec2(columnWidth, 18.0)) / vec2(columnWidth, 18.0);
-        
-        float columnRandom = random(vec2(grid.x, 0.0));
-        float speed = 1.5 + columnRandom * 3.0;
-        float offset = columnRandom * 100.0;
-        
-        float maxRows = u_resolution.y / 18.0;
-        float row = mod(grid.y + u_time * speed * 4.0 + offset, maxRows);
-        
-        float charRandom = random(vec2(grid.x, floor(row)));
-        float charCode = floor(charRandom * 15.0);
-        
-        float brightness = 0.0;
-        
-        // Leading bright character falling down - longer trail
-        float headRow = mod(u_time * speed * 4.0 + offset, maxRows);
-        float distFromHead = mod(headRow - grid.y + maxRows, maxRows);
-        
-        // Brighter head and longer trail
-        if (distFromHead < 2.0) {
-          brightness = 1.5;
-        } else if (distFromHead < 40.0) {
-          brightness = (40.0 - distFromHead) / 40.0;
-          brightness = brightness * brightness * 1.2;
+        // Render 3 depth layers for 3D effect
+        for (int layer = 0; layer < 3; layer++) {
+          float layerDepth = float(layer);
+          
+          // Depth affects: column count, character size, speed, brightness
+          float depthScale = 1.0 + layerDepth * 0.6; // 1.0, 1.6, 2.2
+          float columns = 60.0 + layerDepth * 30.0; // 60, 90, 120 columns
+          float charSize = 24.0 - layerDepth * 4.0; // 24, 20, 16 pixel height
+          
+          // Slower, more cinematic speed - back layers even slower
+          float baseSpeed = 0.4 - layerDepth * 0.1; // 0.4, 0.3, 0.2
+          
+          float columnWidth = u_resolution.x / columns;
+          
+          vec2 grid = vec2(floor(p.x / columnWidth), floor(invertedY / charSize));
+          vec2 gridUV = mod(p, vec2(columnWidth, charSize)) / vec2(columnWidth, charSize);
+          
+          float columnRandom = random(vec2(grid.x + layerDepth * 100.0, layerDepth));
+          float speed = baseSpeed + columnRandom * 0.3;
+          float offset = columnRandom * 80.0 + layerDepth * 25.0;
+          
+          float maxRows = u_resolution.y / charSize;
+          float row = mod(grid.y + u_time * speed * 3.0 + offset, maxRows);
+          
+          float charRandom = random(vec2(grid.x, floor(row) + layerDepth * 50.0));
+          float charCode = floor(charRandom * 15.0);
+          
+          float brightness = 0.0;
+          
+          // Leading character with long cinematic trail
+          float headRow = mod(u_time * speed * 3.0 + offset, maxRows);
+          float distFromHead = mod(headRow - grid.y + maxRows, maxRows);
+          
+          // Foreground (layer 0) is brightest, background dimmer
+          float layerBrightness = 1.3 - layerDepth * 0.35; // 1.3, 0.95, 0.6
+          
+          if (distFromHead < 2.5) {
+            brightness = 1.6 * layerBrightness;
+          } else if (distFromHead < 50.0) {
+            brightness = (50.0 - distFromHead) / 50.0;
+            brightness = brightness * brightness * layerBrightness;
+          }
+          
+          // Subtle flicker
+          float flicker = random(vec2(grid.x, grid.y + floor(u_time * 8.0) + layerDepth));
+          brightness *= 0.75 + flicker * 0.35;
+          
+          // Character rendering - foreground chars slightly larger in UV
+          float charScale = 2.0 - layerDepth * 0.15;
+          float char = character(charCode * 1000.0, gridUV * charScale - (charScale - 2.0) * 0.25);
+          
+          // Depth-based color: foreground cyan-white, background deeper cyan-green
+          vec3 color = vec3(0.0, 0.95 - layerDepth * 0.1, 0.9 - layerDepth * 0.15);
+          
+          // Bright head glow
+          if (distFromHead < 2.5) {
+            color = mix(vec3(0.95, 1.0, 1.0), vec3(0.5, 1.0, 0.95), layerDepth * 0.3);
+          }
+          
+          float alpha = char * brightness;
+          
+          // Glow effect - stronger for foreground
+          float glowIntensity = 0.7 - layerDepth * 0.15;
+          float glow = brightness * glowIntensity * (1.0 - length(gridUV - 0.5) * 1.1);
+          glow = max(glow, 0.0);
+          
+          // Depth fog - back layers more faded
+          float depthFog = 1.0 - layerDepth * 0.25;
+          
+          // Ambient glow per layer
+          float ambientGlow = 0.015 * brightness * (1.0 - layerDepth * 0.3);
+          
+          // Accumulate layers with depth blending
+          vec3 layerColor = color * alpha * depthFog + vec3(0.0, 0.9, 0.85) * glow * 1.2 + vec3(0.0, 0.25, 0.25) * ambientGlow;
+          float layerAlpha = (alpha + glow * 0.7 + ambientGlow) * depthFog;
+          
+          // Back layers render first (behind), foreground on top
+          finalColor = finalColor * (1.0 - layerAlpha * 0.5) + layerColor;
+          finalAlpha = max(finalAlpha, layerAlpha);
         }
         
-        // More intense flicker effect
-        float flicker = random(vec2(grid.x, grid.y + floor(u_time * 15.0)));
-        brightness *= 0.7 + flicker * 0.5;
-        
-        // Character rendering
-        float char = character(charCode * 1000.0, gridUV * 2.0 - 0.5);
-        
-        // Matrix cyan color with green tint
-        vec3 color = vec3(0.0, 0.95, 0.9);
-        
-        // Head glow is bright white-cyan
-        if (distFromHead < 2.0) {
-          color = vec3(0.9, 1.0, 1.0);
-        }
-        
-        float alpha = char * brightness;
-        
-        // Enhanced glow effect for immersion
-        float glow = brightness * 0.6 * (1.0 - length(gridUV - 0.5) * 1.2);
-        glow = max(glow, 0.0);
-        
-        // Add depth fog effect - characters in "background" slightly dimmer
-        float depth = random(vec2(grid.x * 0.1, 0.0));
-        float depthFactor = 0.6 + depth * 0.4;
-        
-        // Add ambient glow
-        float ambientGlow = 0.02 * brightness;
-        
-        vec3 finalColor = color * alpha * depthFactor + vec3(0.0, 0.9, 0.85) * glow * 1.5 + vec3(0.0, 0.3, 0.3) * ambientGlow;
-        
-        gl_FragColor = vec4(finalColor, (alpha + glow * 0.8 + ambientGlow) * 1.2);
+        gl_FragColor = vec4(finalColor, finalAlpha * 1.1);
       }
     `;
 
