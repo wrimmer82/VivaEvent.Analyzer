@@ -19,7 +19,7 @@ const plans = [
   },
   {
     name: "Pro",
-    price: "6,99",
+    price: "5",
     description: "Per artisti professionisti",
     features: [
       "Proposte illimitate",
