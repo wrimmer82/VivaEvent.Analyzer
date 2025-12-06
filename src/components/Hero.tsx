@@ -52,7 +52,7 @@ const Hero = () => {
               </Link>
             </Button>
             <Button size="lg" variant="outline" className="text-lg px-8 py-6 border-primary/50 text-foreground hover:bg-primary/10 hover:border-primary transition-all" asChild>
-              <Link to="/#how-it-works">
+              <Link to="/inizia-ora">
                 Scopri Come Funziona
               </Link>
             </Button>
