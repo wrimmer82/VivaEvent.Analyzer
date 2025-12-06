@@ -26,8 +26,7 @@ const plans = [
       "Analytics avanzati",
       "Supporto prioritario",
       "Profilo verificato",
-      "Dashboard personalizzata",
-      "AI chatbot dedicato"
+      "Dashboard personalizzata"
     ],
     cta: "Diventa Pro",
     popular: true
@@ -41,8 +40,7 @@ const plans = [
       "Analytics avanzati",
       "Supporto prioritario",
       "Profilo verificato",
-      "Dashboard personalizzata",
-      "AI chatbot dedicato"
+      "Dashboard personalizzata"
     ],
     cta: "Abbonati Ora",
     popular: false,
