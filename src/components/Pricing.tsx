@@ -33,19 +33,21 @@ const plans = [
     popular: true
   },
   {
-    name: "Commission",
-    price: "4-6%",
-    description: "Sul cachet di ogni booking",
+    name: "Annuale",
+    price: "50",
+    description: "Risparmia il 17% rispetto al mensile",
     features: [
-      "Split equo artista-venue",
-      "Zero costi fissi mensili",
-      "Pagamenti sicuri garantiti",
-      "Dashboard completa",
+      "Proposte illimitate",
+      "Analytics avanzati",
       "Supporto prioritario",
-      "Fatturazione automatica"
+      "Profilo verificato",
+      "Dashboard personalizzata",
+      "AI chatbot dedicato"
     ],
-    cta: "Scopri di Più",
-    popular: false
+    cta: "Abbonati Ora",
+    popular: false,
+    isAnnual: true,
+    savings: "Risparmi €10/anno"
   }
 ];
 
@@ -98,8 +100,13 @@ const Pricing = () => {
                 <CardDescription className="text-base">{plan.description}</CardDescription>
                 <div className="mt-6">
                   <span className="text-5xl font-bold text-foreground">€{plan.price}</span>
-                  {plan.name !== "Commission" && (
-                    <span className="text-muted-foreground ml-2">/mese</span>
+                  <span className="text-muted-foreground ml-2">
+                    {plan.isAnnual ? '/anno' : '/mese'}
+                  </span>
+                  {plan.savings && (
+                    <div className="mt-2">
+                      <span className="text-sm text-primary font-medium">{plan.savings}</span>
+                    </div>
                   )}
                 </div>
               </CardHeader>
