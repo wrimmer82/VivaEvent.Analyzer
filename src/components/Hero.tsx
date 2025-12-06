@@ -24,14 +24,11 @@ const Hero = () => {
               className="text-primary"
               style={{
                 textShadow: `
-                  0 0 10px rgba(0, 217, 255, 0.8),
-                  0 0 20px rgba(0, 217, 255, 0.6),
-                  0 0 40px rgba(0, 217, 255, 0.4),
-                  2px 2px 0px rgba(0, 180, 220, 1),
-                  4px 4px 0px rgba(0, 150, 190, 0.9),
-                  6px 6px 0px rgba(0, 120, 160, 0.8),
-                  8px 8px 0px rgba(0, 90, 130, 0.7),
-                  10px 10px 15px rgba(0, 0, 0, 0.5)
+                  0 0 10px rgba(0, 217, 255, 0.6),
+                  0 0 20px rgba(0, 217, 255, 0.3),
+                  1px 1px 0px rgba(0, 150, 190, 0.8),
+                  2px 2px 0px rgba(0, 120, 160, 0.6),
+                  3px 3px 8px rgba(0, 0, 0, 0.4)
                 `
               }}
             >
