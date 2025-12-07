@@ -8,10 +8,17 @@ import StatsSidebar from "@/components/dashboard/StatsSidebar";
 import { BookingModal } from "@/components/dashboard/BookingModal";
 import { ArtistMediaModal } from "@/components/dashboard/ArtistMediaModal";
 import { Badge } from "@/components/ui/badge";
-import { User, X, LogOut } from "lucide-react";
+import { User, X, LogOut, Filter } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
 import MatrixRain from "@/components/MatrixRain";
+import {
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+} from "@/components/ui/sheet";
 
 const VenueMatchingDashboard = () => {
   const navigate = useNavigate();
@@ -241,10 +248,30 @@ const VenueMatchingDashboard = () => {
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-          {/* Filter Sidebar - Left */}
+          {/* Filter Sidebar - Left (Desktop) */}
           <aside className="hidden lg:block lg:col-span-2">
             <FilterSidebar filters={filters} onFilterChange={setFilters} />
           </aside>
+
+          {/* Mobile Filter Button */}
+          <div className="lg:hidden col-span-1 mb-4">
+            <Sheet>
+              <SheetTrigger asChild>
+                <Button variant="outline" className="w-full gap-2 bg-[#1a1f2e] border-cyan-500/30 text-cyan-400 hover:bg-cyan-500/20">
+                  <Filter className="h-4 w-4" />
+                  Filtri
+                </Button>
+              </SheetTrigger>
+              <SheetContent side="left" className="w-[300px] bg-[#0f1419] border-cyan-500/30 overflow-y-auto">
+                <SheetHeader>
+                  <SheetTitle className="text-cyan-400">Filtri</SheetTitle>
+                </SheetHeader>
+                <div className="mt-4">
+                  <FilterSidebar filters={filters} onFilterChange={setFilters} />
+                </div>
+              </SheetContent>
+            </Sheet>
+          </div>
 
           {/* Main Content - Center */}
           <main className="lg:col-span-7">
