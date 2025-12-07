@@ -10,7 +10,7 @@ import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { User, X, LogOut, Calendar, Clock, Euro, Users } from "lucide-react";
+import { User, X, LogOut, Calendar, Clock, Euro, Users, Filter } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
 import { format } from "date-fns";
@@ -19,6 +19,13 @@ import MatrixRain from "@/components/MatrixRain";
 import VenueMediaModal from "@/components/dashboard/VenueMediaModal";
 import CollaborationRequestsTable from "@/components/dashboard/CollaborationRequestsTable";
 import { CalendarView } from "@/components/dashboard/CalendarView";
+import {
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+} from "@/components/ui/sheet";
 
 const Dashboard = () => {
   const navigate = useNavigate();
@@ -316,7 +323,7 @@ const Dashboard = () => {
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-          {/* Filter Sidebar - Left */}
+          {/* Filter Sidebar - Left (Desktop) */}
           <aside className="hidden lg:block lg:col-span-2">
             <FilterSidebar 
               filters={filters} 
@@ -328,6 +335,34 @@ const Dashboard = () => {
               ]}
             />
           </aside>
+
+          {/* Mobile Filter Button */}
+          <div className="lg:hidden col-span-1 mb-4">
+            <Sheet>
+              <SheetTrigger asChild>
+                <Button variant="outline" className="w-full gap-2 bg-[#1a1f2e] border-cyan-500/30 text-cyan-400 hover:bg-cyan-500/20">
+                  <Filter className="h-4 w-4" />
+                  Filtri
+                </Button>
+              </SheetTrigger>
+              <SheetContent side="left" className="w-[300px] bg-[#0f1419] border-cyan-500/30 overflow-y-auto">
+                <SheetHeader>
+                  <SheetTitle className="text-cyan-400">Filtri</SheetTitle>
+                </SheetHeader>
+                <div className="mt-4">
+                  <FilterSidebar 
+                    filters={filters} 
+                    onFilterChange={setFilters}
+                    entityOptions={[
+                      { value: 'tutti', label: 'Tutti' },
+                      { value: 'venue', label: 'Venue' },
+                      { value: 'professionista', label: 'Professionista' }
+                    ]}
+                  />
+                </div>
+              </SheetContent>
+            </Sheet>
+          </div>
 
           {/* Main Content - Center */}
           <main className="lg:col-span-7">
