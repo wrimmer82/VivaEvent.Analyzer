@@ -6,7 +6,7 @@ import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Star, MapPin, Euro, Users, X, LogOut, Mail, Phone, ArrowRight } from "lucide-react";
+import { Star, MapPin, Euro, Users, X, LogOut, Mail, Phone, ArrowRight, Filter } from "lucide-react";
 import StatsSidebar from "@/components/dashboard/StatsSidebar";
 import { BookingModal } from "@/components/dashboard/BookingModal";
 import { ArtistMediaModal } from "@/components/dashboard/ArtistMediaModal";
@@ -14,6 +14,13 @@ import CollaborationRequestModal from "@/components/dashboard/CollaborationReque
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
 import MatrixRain from "@/components/MatrixRain";
+import {
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+} from "@/components/ui/sheet";
 
 interface ProfessionalMatch {
   id: string;
@@ -234,6 +241,114 @@ const ProfessionalMatchingDashboard = () => {
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+          {/* Mobile Filter Button */}
+          <div className="lg:hidden col-span-1 mb-4">
+            <Sheet>
+              <SheetTrigger asChild>
+                <Button variant="outline" className="w-full gap-2 bg-[#1a1f2e] border-cyan-500/30 text-cyan-400 hover:bg-cyan-500/20">
+                  <Filter className="h-4 w-4" />
+                  Filtri
+                </Button>
+              </SheetTrigger>
+              <SheetContent side="left" className="w-[300px] bg-[#0f1419] border-cyan-500/30 overflow-y-auto">
+                <SheetHeader>
+                  <SheetTitle className="text-cyan-400">Filtri</SheetTitle>
+                </SheetHeader>
+                <div className="mt-4 space-y-6">
+                  <div>
+                    <label className="text-cyan-400 text-sm font-semibold mb-2 block">Tipo</label>
+                    <Select value={filters.tipo} onValueChange={(value) => setFilters({...filters, tipo: value})}>
+                      <SelectTrigger className="bg-[#0f1419] border-cyan-500/50 text-white">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent className="bg-[#1a1f2e] border-cyan-500/50">
+                        <SelectItem value="tutti">Tutti</SelectItem>
+                        <SelectItem value="artista">Artisti</SelectItem>
+                        <SelectItem value="venue">Venues</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+
+                  <div>
+                    <label className="text-cyan-400 text-sm font-semibold mb-2 block">Genere</label>
+                    <div className="space-y-2 max-h-48 overflow-y-auto">
+                      {genres.map(genre => (
+                        <label key={genre} className="flex items-center gap-2 cursor-pointer text-white hover:text-cyan-400">
+                          <input 
+                            type="checkbox" 
+                            checked={filters.genres.includes(genre)}
+                            onChange={(e) => {
+                              if (e.target.checked) {
+                                setFilters({...filters, genres: [...filters.genres, genre]});
+                              } else {
+                                setFilters({...filters, genres: filters.genres.filter(g => g !== genre)});
+                              }
+                            }}
+                            className="accent-cyan-500"
+                          />
+                          <span className="text-sm">{genre}</span>
+                        </label>
+                      ))}
+                    </div>
+                  </div>
+
+                  <div>
+                    <label className="text-cyan-400 text-sm font-semibold mb-2 block">Città</label>
+                    <Select value={filters.city} onValueChange={(value) => setFilters({...filters, city: value})}>
+                      <SelectTrigger className="bg-[#0f1419] border-cyan-500/50 text-white">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent className="bg-[#1a1f2e] border-cyan-500/50">
+                        {cities.map(city => (
+                          <SelectItem key={city} value={city}>{city}</SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+
+                  <div>
+                    <label className="flex items-center gap-2 cursor-pointer text-white hover:text-cyan-400">
+                      <input 
+                        type="checkbox"
+                        checked={filters.newMatch}
+                        onChange={(e) => setFilters({...filters, newMatch: e.target.checked})}
+                        className="accent-cyan-500"
+                      />
+                      <span className="text-sm">Solo nuovi match</span>
+                    </label>
+                  </div>
+
+                  <div>
+                    <label className="text-cyan-400 text-sm font-semibold mb-2 block">Rating minimo</label>
+                    <Select value={filters.minRating.toString()} onValueChange={(value) => setFilters({...filters, minRating: parseFloat(value)})}>
+                      <SelectTrigger className="bg-[#0f1419] border-cyan-500/50 text-white">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent className="bg-[#1a1f2e] border-cyan-500/50">
+                        <SelectItem value="0">Tutti</SelectItem>
+                        <SelectItem value="4.0">4.0+</SelectItem>
+                        <SelectItem value="4.5">4.5+</SelectItem>
+                        <SelectItem value="4.8">4.8+</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+
+                  {(filters.genres.length > 0 || filters.city !== 'Tutte' || filters.tipo !== 'tutti' || filters.newMatch || filters.minRating > 0) && (
+                    <Button 
+                      variant="outline" 
+                      size="sm" 
+                      className="w-full border-cyan-500/50 text-cyan-400 hover:bg-cyan-500/10"
+                      onClick={() => setFilters({genres: [], city: 'Tutte', tipo: 'tutti', newMatch: false, minRating: 0})}
+                    >
+                      Reset Filtri
+                    </Button>
+                  )}
+                </div>
+              </SheetContent>
+            </Sheet>
+          </div>
+
+          {/* Desktop Filter Sidebar */}
           <aside className="hidden lg:block lg:col-span-2">
             <Card className="bg-[#1a1f2e] border-cyan-500/30 sticky top-4 p-6">
               <h3 className="text-white text-xl font-bold mb-6">🔍 Filtra</h3>
