@@ -25,6 +25,7 @@ import {
   SheetHeader,
   SheetTitle,
   SheetTrigger,
+  SheetClose,
 } from "@/components/ui/sheet";
 
 const Dashboard = () => {
@@ -349,16 +350,23 @@ const Dashboard = () => {
                 <SheetHeader>
                   <SheetTitle className="text-cyan-400">Filtri</SheetTitle>
                 </SheetHeader>
-                <div className="mt-4">
-                  <FilterSidebar 
-                    filters={filters} 
-                    onFilterChange={setFilters}
-                    entityOptions={[
-                      { value: 'tutti', label: 'Tutti' },
-                      { value: 'venue', label: 'Venue' },
-                      { value: 'professionista', label: 'Professionista' }
-                    ]}
-                  />
+                <div className="mt-4 flex flex-col h-[calc(100%-4rem)]">
+                  <div className="flex-1 overflow-y-auto">
+                    <FilterSidebar 
+                      filters={filters} 
+                      onFilterChange={setFilters}
+                      entityOptions={[
+                        { value: 'tutti', label: 'Tutti' },
+                        { value: 'venue', label: 'Venue' },
+                        { value: 'professionista', label: 'Professionista' }
+                      ]}
+                    />
+                  </div>
+                  <SheetClose asChild>
+                    <Button className="mt-4 w-full bg-cyan-500 hover:bg-cyan-600 text-white">
+                      Applica Filtri
+                    </Button>
+                  </SheetClose>
                 </div>
               </SheetContent>
             </Sheet>

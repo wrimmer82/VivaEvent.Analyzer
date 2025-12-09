@@ -20,6 +20,7 @@ import {
   SheetHeader,
   SheetTitle,
   SheetTrigger,
+  SheetClose,
 } from "@/components/ui/sheet";
 
 interface ProfessionalMatch {
@@ -343,6 +344,12 @@ const ProfessionalMatchingDashboard = () => {
                       Reset Filtri
                     </Button>
                   )}
+                  
+                  <SheetClose asChild>
+                    <Button className="mt-4 w-full bg-cyan-500 hover:bg-cyan-600 text-white">
+                      Applica Filtri
+                    </Button>
+                  </SheetClose>
                 </div>
               </SheetContent>
             </Sheet>

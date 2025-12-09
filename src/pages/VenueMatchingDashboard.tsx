@@ -18,6 +18,7 @@ import {
   SheetHeader,
   SheetTitle,
   SheetTrigger,
+  SheetClose,
 } from "@/components/ui/sheet";
 
 const VenueMatchingDashboard = () => {
@@ -266,8 +267,15 @@ const VenueMatchingDashboard = () => {
                 <SheetHeader>
                   <SheetTitle className="text-cyan-400">Filtri</SheetTitle>
                 </SheetHeader>
-                <div className="mt-4">
-                  <FilterSidebar filters={filters} onFilterChange={setFilters} />
+                <div className="mt-4 flex flex-col h-[calc(100%-4rem)]">
+                  <div className="flex-1 overflow-y-auto">
+                    <FilterSidebar filters={filters} onFilterChange={setFilters} />
+                  </div>
+                  <SheetClose asChild>
+                    <Button className="mt-4 w-full bg-cyan-500 hover:bg-cyan-600 text-white">
+                      Applica Filtri
+                    </Button>
+                  </SheetClose>
                 </div>
               </SheetContent>
             </Sheet>
