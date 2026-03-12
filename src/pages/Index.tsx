@@ -2,23 +2,20 @@ import Navbar from "@/components/Navbar";
 import Hero from "@/components/Hero";
 import Features from "@/components/Features";
 import Testimonials from "@/components/Testimonials";
-import HowItWorks from "@/components/HowItWorks";
-import Pricing from "@/components/Pricing";
-import CTA from "@/components/CTA";
 import Footer from "@/components/Footer";
+import { I18nProvider } from "@/hooks/useI18n";
 
 const Index = () => {
   return (
-    <div className="min-h-screen">
-      <Navbar />
-      <Hero />
-      <Features />
-      <Testimonials />
-      <HowItWorks />
-      <Pricing />
-      <CTA />
-      <Footer />
-    </div>
+    <I18nProvider>
+      <div className="min-h-screen bg-background">
+        <Navbar />
+        <Hero />
+        <Features />
+        <Testimonials />
+        <Footer />
+      </div>
+    </I18nProvider>
   );
 };
 
