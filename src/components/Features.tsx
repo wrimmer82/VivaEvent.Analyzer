@@ -1,86 +1,49 @@
-import { Bot, Shield, BarChart3, Zap, Globe, Clock } from "lucide-react";
-import concertBackground from "@/assets/concert-background.png";
-const features = [{
-  icon: Bot,
-  title: "AI Matching Intelligente",
-  description: "Algoritmo che abbina automaticamente artisti e venue per genere, budget e disponibilità",
-  color: "from-primary to-accent"
-}, {
-  icon: Shield,
-  title: "Pagamenti Sicuri",
-  description: "Sistema escrow con Stripe per proteggere artisti e venue durante ogni transazione",
-  color: "from-accent to-primary"
-}, {
-  icon: BarChart3,
-  title: "Analytics Avanzati",
-  description: "Dashboard con metriche dettagliate su affluenza, incassi e performance degli eventi",
-  color: "from-primary to-accent"
-}, {
-  icon: Zap,
-  title: "Contratti Automatici",
-  description: "Generazione e firma elettronica di contratti personalizzati in pochi click",
-  color: "from-accent to-primary"
-}, {
-  icon: Globe,
-  title: "Focus Italia",
-  description: "Integrazione SIAE, SCF e dati localizzati per il mercato musicale italiano",
-  color: "from-primary to-accent"
-}, {
-  icon: Clock,
-  title: "24/7 Supporto AI",
-  description: "Chatbot intelligente sempre disponibile per rispondere a domande e guidare gli utenti",
-  color: "from-accent to-primary"
-}];
-const Features = () => {
-  return <section id="features" className="py-24 bg-background relative overflow-hidden">
-      <div className="absolute inset-0 opacity-10" style={{
-      backgroundImage: `url(${concertBackground})`,
-      backgroundSize: 'cover',
-      backgroundPosition: 'center',
-      backgroundRepeat: 'no-repeat'
-    }} />
-      <div className="container mx-auto px-4 relative z-10">
-        <div className="max-w-3xl mx-auto text-center mb-16">
-          <h2 className="text-4xl md:text-5xl font-bold mb-4 bg-gradient-to-r from-neon-orange via-neon-orange-glow to-primary bg-clip-text text-transparent animate-pulse" style={{ textShadow: '0 0 30px hsl(25 100% 50% / 0.6)' }}>
-            Tutto Quello che Ti Serve
-          </h2>
-          <p className="text-xl text-muted-foreground mb-6 font-bold">
-            Una piattaforma completa per gestire ogni aspetto del booking musicale
-          </p>
-          <div className="text-sm text-muted-foreground/80 space-y-3 max-w-2xl mx-auto">
-            <p className="font-semibold text-xl">Oltre la prenotazione</p>
-            <p className="text-xl">VivaEvent non si limita a prenotare.</p>
-            <p className="text-lg font-medium">Forniamo ai principali artisti e agenzie di booking gli strumenti necessari per massimizzare ricavi, tempo ed efficienza. Abbiamo aiutato migliaia di artisti, relatori e agenti di booking a semplificare i loro processi di prenotazione, scoprire nuovi talenti e monitorare le vendite dei biglietti.</p>
-          </div>
-        </div>
+import { TrendingUp, Bot, ShieldCheck } from "lucide-react";
 
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-6xl mx-auto">
+const features = [
+  {
+    icon: TrendingUp,
+    title: "Performance Storica",
+    description: "Visualizza lo storico delle prenotazioni e delle performance nell'ultimo decennio.",
+  },
+  {
+    icon: Bot,
+    title: "Analisi Predittiva",
+    description: "Ottieni previsioni a 3-5 anni sui trend dei ricavi con il nostro AI.",
+  },
+  {
+    icon: ShieldCheck,
+    title: "Valutazione del Rischio",
+    description: "Rileva cali virali o problemi di conformità legale prima che accadano.",
+  },
+];
+
+const Features = () => {
+  return (
+    <section id="features" className="py-20 bg-background">
+      <div className="container mx-auto px-4">
+        <div className="grid md:grid-cols-3 gap-12 max-w-5xl mx-auto">
           {features.map((feature, index) => {
-          const Icon = feature.icon;
-          return <div key={index} className="group relative p-8 rounded-2xl backdrop-blur-sm border transition-all hover:shadow-elegant" style={{
-            background: 'linear-gradient(135deg, hsl(210, 12%, 10%), hsl(210, 20%, 15%), hsl(210, 12%, 12%))',
-            borderColor: 'hsl(210, 20%, 30%)'
-          }}>
-                <div className={`inline-flex w-14 h-14 rounded-xl bg-gradient-to-br ${feature.color} items-center justify-center mb-4 group-hover:scale-110 transition-transform`}>
+            const Icon = feature.icon;
+            return (
+              <div key={index} className="flex flex-col items-center text-center space-y-4 group">
+                <div className="w-16 h-16 rounded-2xl bg-secondary flex items-center justify-center group-hover:scale-110 transition-transform">
                   <Icon 
-                    className="w-7 h-7 text-white animate-pulse" 
+                    className="w-8 h-8 text-primary"
                     style={{
-                      filter: index % 2 === 0 
-                        ? 'drop-shadow(0 0 15px hsl(180, 100%, 50%))' 
-                        : 'drop-shadow(0 0 15px hsl(25, 100%, 50%))'
+                      filter: 'drop-shadow(0 0 8px hsl(195, 100%, 50%))',
                     }}
                   />
                 </div>
-                <h3 className="text-xl font-semibold text-foreground mb-3">
-                  {feature.title}
-                </h3>
-                <p className="text-muted-foreground leading-relaxed">
-                  {feature.description}
-                </p>
-              </div>;
-        })}
+                <h3 className="text-xl font-bold text-foreground">{feature.title}</h3>
+                <p className="text-muted-foreground leading-relaxed">{feature.description}</p>
+              </div>
+            );
+          })}
         </div>
       </div>
-    </section>;
+    </section>
+  );
 };
+
 export default Features;
