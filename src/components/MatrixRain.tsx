@@ -17,47 +17,44 @@ const MatrixRain = () => {
     
     resizeCanvas();
 
-    const chars = '01';
+    // Katakana + Latin + Numbers
+    const katakana = 'アイウエオカキクケコサシスセソタチツテトナニヌネノハヒフヘホマミムメモヤユヨラリルレロワヲン';
+    const latin = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+    const nums = '0123456789';
+    const chars = katakana + latin + nums;
+
     const fontSize = 14;
     const columns = Math.floor(canvas.width / fontSize);
     const drops: number[] = [];
 
-    // Initialize drops at random positions
     for (let i = 0; i < columns; i++) {
       drops[i] = Math.random() * -100;
     }
 
     const draw = () => {
-      // Semi-transparent black to create trail effect
-      ctx.fillStyle = 'rgba(3, 7, 18, 0.05)';
+      // Dark blue-black trail
+      ctx.fillStyle = 'rgba(2, 4, 15, 0.05)';
       ctx.fillRect(0, 0, canvas.width, canvas.height);
 
       ctx.font = `${fontSize}px monospace`;
 
       for (let i = 0; i < drops.length; i++) {
-        // Random binary character
         const text = chars[Math.floor(Math.random() * chars.length)];
         const x = i * fontSize;
         const y = drops[i] * fontSize;
 
-        // Create gradient effect - brighter at the head
-        const headY = drops[i];
         const brightness = Math.random();
         
         if (brightness > 0.98) {
-          // Bright white head occasionally
           ctx.fillStyle = '#ffffff';
         } else if (brightness > 0.9) {
-          // Bright cyan
           ctx.fillStyle = '#00ffff';
         } else {
-          // Standard cyan with varying opacity
-          ctx.fillStyle = `rgba(0, 217, 255, ${0.5 + Math.random() * 0.5})`;
+          ctx.fillStyle = `rgba(0, 180, 255, ${0.3 + Math.random() * 0.5})`;
         }
 
         ctx.fillText(text, x, y);
 
-        // Reset drop when it reaches bottom
         if (y > canvas.height && Math.random() > 0.975) {
           drops[i] = 0;
         }
@@ -68,25 +65,26 @@ const MatrixRain = () => {
 
     const interval = setInterval(draw, 35);
 
-    window.addEventListener('resize', () => {
+    const handleResize = () => {
       resizeCanvas();
-      // Recalculate columns after resize
       const newColumns = Math.floor(canvas.width / fontSize);
       while (drops.length < newColumns) {
         drops.push(Math.random() * -100);
       }
-    });
+    };
+
+    window.addEventListener('resize', handleResize);
 
     return () => {
       clearInterval(interval);
-      window.removeEventListener('resize', resizeCanvas);
+      window.removeEventListener('resize', handleResize);
     };
   }, []);
 
   return (
     <canvas
       ref={canvasRef}
-      className="absolute inset-0 opacity-40"
+      className="absolute inset-0 opacity-30"
       style={{ pointerEvents: 'none' }}
     />
   );

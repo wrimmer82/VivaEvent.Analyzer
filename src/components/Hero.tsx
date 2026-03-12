@@ -1,76 +1,71 @@
 import { Search } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { useI18n } from "@/hooks/useI18n";
 import MatrixRain from "./MatrixRain";
-import dashboardPreview from "@/assets/dashboard-preview.png";
+import DashboardMockup from "./DashboardMockup";
 
 const Hero = () => {
+  const { lang, t } = useI18n();
+
   return (
     <section className="relative min-h-[90vh] flex flex-col items-center justify-center overflow-hidden bg-background pt-12 pb-8">
       <MatrixRain />
 
-      {/* Background blurs */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute -top-40 -right-40 w-80 h-80 bg-primary/10 rounded-full blur-3xl" />
-        <div className="absolute -bottom-40 -left-40 w-96 h-96 bg-accent/10 rounded-full blur-3xl" />
+        <div className="absolute -top-40 -right-40 w-80 h-80 bg-primary/8 rounded-full blur-3xl" />
+        <div className="absolute -bottom-40 -left-40 w-96 h-96 bg-accent/8 rounded-full blur-3xl" />
       </div>
 
       <div className="container relative z-10 px-4 mx-auto text-center space-y-8">
         {/* Main heading */}
-        <h1 className="text-4xl md:text-6xl lg:text-7xl font-black tracking-tight leading-tight animate-fade-in">
-          <span className="text-foreground">SEMPLIFICA IL </span>
-          <span className="text-primary" style={{ textShadow: '0 0 20px hsl(195, 100%, 50%, 0.6)' }}>
-            BOOKING MUSICALE.
+        <h1 className="text-3xl sm:text-4xl md:text-6xl lg:text-7xl font-black tracking-tight leading-tight animate-fade-in">
+          <span className="text-foreground">
+            {lang === "it" ? "INVESTI CON L'" : "INVEST WITH "}
+          </span>
+          <span className="text-primary" style={{ textShadow: '0 0 25px hsl(195, 100%, 50%, 0.5)' }}>
+            {lang === "it" ? "IA" : "AI"}
+          </span>
+          <span className="text-foreground">
+            {lang === "it" ? " NEI DIRITTI MUSICALI." : " IN MUSIC RIGHTS."}
           </span>
           <br />
           <span 
             className="text-primary"
-            style={{ textShadow: '0 0 20px hsl(195, 100%, 50%, 0.6)' }}
+            style={{ textShadow: '0 0 25px hsl(195, 100%, 50%, 0.5)' }}
           >
-            PREDIRE IL FUTURO CON I DATI.
+            {t.hero.title2[lang]}
           </span>
         </h1>
 
         {/* Subtitle */}
-        <p className="text-lg md:text-xl text-muted-foreground max-w-3xl mx-auto leading-relaxed animate-fade-in" style={{ animationDelay: '0.15s' }}>
-          Piattaforma intelligente per connettere artisti e venue, valutare match e prevedere ricavi con i dati, non con l'istinto.
+        <p className="text-base md:text-lg lg:text-xl text-muted-foreground max-w-3xl mx-auto leading-relaxed animate-fade-in" style={{ animationDelay: '0.15s' }}>
+          {t.hero.subtitle[lang]}
         </p>
 
         {/* Search bar */}
         <div className="max-w-2xl mx-auto animate-fade-in" style={{ animationDelay: '0.3s' }}>
-          <div className="flex items-center rounded-full border border-border/60 bg-secondary/50 backdrop-blur-sm overflow-hidden pl-5 pr-1.5 py-1.5 hover:border-primary/50 transition-colors">
+          <div className="flex items-center rounded-full border border-border/50 bg-secondary/40 backdrop-blur-md overflow-hidden pl-5 pr-1.5 py-1.5 hover:border-primary/40 focus-within:border-primary/60 transition-colors group">
             <Search className="w-5 h-5 text-muted-foreground shrink-0 mr-3" />
             <input
               type="text"
-              placeholder="Cerca Artista, Venue o Genere Musicale..."
-              className="flex-1 bg-transparent text-foreground placeholder:text-muted-foreground/60 outline-none text-base py-2"
+              placeholder={t.hero.searchPlaceholder[lang]}
+              className="flex-1 bg-transparent text-foreground placeholder:text-muted-foreground/50 outline-none text-sm md:text-base py-2"
             />
-            <Button 
-              className="rounded-full px-6 md:px-8 font-bold text-sm md:text-base shrink-0"
+            <Button
+              className="rounded-full px-5 md:px-8 font-bold text-xs md:text-sm shrink-0 transition-all hover:shadow-[0_0_20px_hsl(195,100%,50%,0.4)]"
               style={{
                 background: 'hsl(160, 84%, 45%)',
                 color: 'hsl(0, 0%, 100%)',
               }}
             >
-              ANALIZZA ORA
+              {t.hero.analyzeNow[lang]}
             </Button>
           </div>
         </div>
 
-        {/* Dashboard preview */}
-        <div className="max-w-4xl mx-auto pt-4 animate-fade-in" style={{ animationDelay: '0.45s' }}>
-          <div className="relative rounded-xl overflow-hidden shadow-2xl border border-border/30" style={{ boxShadow: '0 20px 60px -15px hsl(195, 100%, 50%, 0.2)' }}>
-            {/* Fake browser bar */}
-            <div className="flex items-center gap-2 px-4 py-2.5 bg-secondary/80 border-b border-border/30">
-              <div className="w-3 h-3 rounded-full" style={{ background: 'hsl(0, 84%, 60%)' }} />
-              <div className="w-3 h-3 rounded-full" style={{ background: 'hsl(45, 93%, 58%)' }} />
-              <div className="w-3 h-3 rounded-full" style={{ background: 'hsl(160, 84%, 45%)' }} />
-            </div>
-            <img 
-              src={dashboardPreview} 
-              alt="VivaEvent Dashboard Preview" 
-              className="w-full h-auto"
-            />
-          </div>
+        {/* Dashboard Mockup */}
+        <div className="max-w-5xl mx-auto pt-4 animate-fade-in" style={{ animationDelay: '0.45s' }}>
+          <DashboardMockup />
         </div>
       </div>
     </section>
