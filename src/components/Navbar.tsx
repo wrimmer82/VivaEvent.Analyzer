@@ -49,6 +49,15 @@ const Navbar = () => {
               >
                 🇺🇸
               </button>
+              <button
+                onClick={() => setLang("es")}
+                className={`text-base px-1.5 py-0.5 rounded-full transition-all ${
+                  lang === "es" ? "bg-primary/20 scale-110" : "opacity-50 hover:opacity-80"
+                }`}
+                title="Español"
+              >
+                🇪🇸
+              </button>
             </div>
 
             <Button 
