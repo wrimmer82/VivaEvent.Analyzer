@@ -18,7 +18,7 @@ const Footer = () => {
                   <circle cx="18" cy="16" r="3" />
                 </svg>
               </div>
-              <span className="text-lg font-bold">Royalty Check <span className="text-primary">AI</span></span>
+              <span className="text-lg font-bold">VivaEvent <span className="text-primary">AI</span></span>
             </div>
             <p className="text-sm" style={{ color: 'hsl(0, 0%, 70%)' }}>
               {t.footer.description[lang]}
@@ -78,7 +78,7 @@ const Footer = () => {
 
         <div className="pt-8" style={{ borderTop: '1px solid hsl(0, 0%, 20%)' }}>
           <div className="flex flex-col md:flex-row justify-between items-center gap-4 text-sm" style={{ color: 'hsl(0, 0%, 60%)' }}>
-            <p>© 2025 Royalty Check AI. {t.footer.rights[lang]}</p>
+            <p>© 2025 VivaEvent AI. {t.footer.rights[lang]}</p>
             <div className="flex gap-6">
               <a href="#" className="transition-colors hover:brightness-125">{t.footer.privacy[lang]}</a>
               <a href="#" className="transition-colors hover:brightness-125">{t.footer.terms[lang]}</a>
