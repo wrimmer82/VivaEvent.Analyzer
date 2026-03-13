@@ -1,5 +1,6 @@
 import { Mail, MapPin, Youtube, Linkedin } from "lucide-react";
 import { useI18n } from "@/hooks/useI18n";
+import logoVe from "@/assets/logo-ve2.png";
 
 const Footer = () => {
   const { lang, t } = useI18n();
@@ -11,13 +12,7 @@ const Footer = () => {
           {/* Brand */}
           <div className="space-y-4">
             <div className="flex items-center gap-2">
-              <div className="w-8 h-8 rounded-lg bg-primary/20 flex items-center justify-center border border-primary/30">
-                <svg viewBox="0 0 24 24" className="w-4 h-4 text-primary" fill="none" stroke="currentColor" strokeWidth="2">
-                  <path d="M9 18V5l12-2v13" />
-                  <circle cx="6" cy="18" r="3" />
-                  <circle cx="18" cy="16" r="3" />
-                </svg>
-              </div>
+              <img src={logoVe} alt="VivaEvent AI" className="w-8 h-8 rounded-lg object-contain" />
               <span className="text-lg font-bold">VivaEvent <span className="text-primary">AI</span></span>
             </div>
             <p className="text-sm" style={{ color: 'hsl(0, 0%, 70%)' }}>
