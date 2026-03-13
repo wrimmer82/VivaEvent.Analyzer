@@ -18,7 +18,7 @@ const Footer = () => {
                   <circle cx="18" cy="16" r="3" />
                 </svg>
               </div>
-              <span className="text-lg font-bold">Royalty Check <span className="text-primary">AI</span></span>
+              <span className="text-lg font-bold">VivaEvent <span className="text-primary">AI</span></span>
             </div>
             <p className="text-sm" style={{ color: 'hsl(0, 0%, 70%)' }}>
               {t.footer.description[lang]}
