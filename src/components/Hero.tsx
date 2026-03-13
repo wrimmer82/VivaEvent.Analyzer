@@ -20,13 +20,13 @@ const Hero = () => {
         {/* Main heading */}
         <h1 className="text-3xl sm:text-4xl md:text-6xl lg:text-7xl font-black tracking-tight leading-tight animate-fade-in">
           <span className="text-foreground">
-            {lang === "it" ? "INVESTI CON L'" : "INVEST WITH "}
+            {lang === "it" ? "INVESTI CON L'" : lang === "es" ? "INVIERTE CON " : "INVEST WITH "}
           </span>
           <span className="text-primary" style={{ textShadow: '0 0 25px hsl(195, 100%, 50%, 0.5)' }}>
-            {lang === "it" ? "IA" : "AI"}
+            {lang === "it" ? "IA" : lang === "es" ? "IA" : "AI"}
           </span>
           <span className="text-foreground">
-            {lang === "it" ? " NEI DIRITTI MUSICALI." : " IN MUSIC RIGHTS."}
+            {lang === "it" ? " NEI DIRITTI MUSICALI." : lang === "es" ? " EN DERECHOS MUSICALES." : " IN MUSIC RIGHTS."}
           </span>
           <br />
           <span 
