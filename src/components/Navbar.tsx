@@ -19,7 +19,7 @@ const Navbar = () => {
               </svg>
             </div>
             <span className="text-lg font-bold text-foreground tracking-tight">
-              Royalty Check <span className="text-primary">AI</span>
+              VivaEvent <span className="text-primary">AI</span>
             </span>
           </a>
 
