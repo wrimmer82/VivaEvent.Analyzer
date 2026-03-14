@@ -1,46 +1,69 @@
 import { useI18n } from "@/hooks/useI18n";
 
 const Waveform = () => {
-  const points = 64;
-  const data = Array.from({ length: points }, () => Math.random());
+  const bars = [
+    12, 25, 18, 35, 28, 45, 55, 40, 65, 75, 60, 85, 95, 80, 70, 90, 100, 85, 75, 95,
+    88, 70, 60, 80, 90, 72, 55, 68, 82, 50, 40, 62, 78, 45, 35, 58, 70, 42, 30, 50,
+    65, 38, 25, 45, 55, 32, 20, 38, 48, 28, 15, 30, 40, 22, 18, 28, 35, 20, 12, 22,
+  ];
 
   return (
-    <div className="w-full h-24 flex items-center justify-center">
-      <svg viewBox={`0 0 ${points} 1`} width="100%" height="100%">
-        <path
-          d={`M0 1 ${data.map((y, x) => `L${x} ${1 - y}`).join(" ")} L${points - 1} 1 Z`}
-          fill="hsl(230, 60%, 65%)"
-          stroke="hsl(230, 60%, 75%)"
-          strokeWidth="0.02"
+    <div className="w-full h-24 flex items-center justify-center gap-[1px] px-2">
+      {bars.map((h, i) => (
+        <div
+          key={i}
+          className="flex-1 rounded-sm"
+          style={{
+            height: `${h}%`,
+            background: `linear-gradient(to top, hsl(195, 100%, 40%), hsl(160, 84%, 50%))`,
+            opacity: 0.7 + (h / 100) * 0.3,
+            boxShadow: h > 70 ? '0 0 4px hsl(195, 100%, 50%, 0.5)' : 'none',
+            animation: `wavePulse ${1.5 + (i % 5) * 0.3}s ease-in-out infinite alternate`,
+            animationDelay: `${i * 0.05}s`,
+          }}
         />
-      </svg>
+      ))}
     </div>
   );
 };
 
 const SpectrumAnalyzer = () => {
-  const bars = 32;
+  const bands = [
+    30, 45, 60, 80, 95, 85, 70, 90, 100, 88, 72, 65, 80, 92, 78, 55, 68, 85, 75, 60,
+    50, 70, 82, 68, 55, 45, 62, 75, 58, 42,
+  ];
 
   return (
-    <div className="w-full h-24 flex items-center justify-center gap-1 px-2">
-      {Array.from({ length: bars }, (_, i) => {
-        const level = Math.random() * 0.8 + 0.2;
-        const color = `hsl(${i * (360 / bars)}, 70%, 50%)`;
-
-        return (
-          <div
-            key={i}
-            className="flex-1 rounded-sm"
-            style={{
-              background: color,
-              height: `${level * 100}%`,
-              opacity: 0.8,
-              boxShadow: `0 0 4px ${color}`,
-              animation: `pulse ${2 + Math.sin(i)}s ease-in-out infinite alternate`,
-            }}
-          />
-        );
-      })}
+    <div className="w-full h-24 flex items-end justify-center gap-[2px] px-2 relative">
+      {[25, 50, 75].map((pos) => (
+        <div
+          key={pos}
+          className="absolute w-full left-0"
+          style={{
+            bottom: `${pos}%`,
+            height: '1px',
+            background: 'hsl(210, 50%, 20%)',
+            opacity: 0.4,
+          }}
+        />
+      ))}
+      {bands.map((h, i) => (
+        <div
+          key={i}
+          className="flex-1 rounded-t-sm relative"
+          style={{
+            height: `${h}%`,
+            background: h > 85
+              ? `linear-gradient(to top, hsl(195, 100%, 45%), hsl(45, 93%, 58%))`
+              : h > 60
+              ? `linear-gradient(to top, hsl(195, 100%, 40%), hsl(160, 84%, 50%))`
+              : `linear-gradient(to top, hsl(210, 80%, 30%), hsl(195, 100%, 45%))`,
+            boxShadow: h > 80 ? '0 -2px 8px hsl(45, 93%, 58%, 0.4)' : h > 60 ? '0 0 4px hsl(195, 100%, 50%, 0.3)' : 'none',
+            animation: `spectrumBounce ${0.8 + (i % 7) * 0.15}s ease-in-out infinite alternate`,
+            animationDelay: `${i * 0.08}s`,
+          }}
+        />
+      ))}
     </div>
   );
 };
@@ -92,36 +115,62 @@ const RiskMeter = () => {
 };
 
 const Features = () => {
-  const { t } = useI18n();
+  const { lang, t } = useI18n();
 
   const features = [
     {
-      title: t("historicalPerformance"),
-      description: t("historicalPerformanceDescription"),
-      icon: SpectrumAnalyzer,
+      title: t.features.title1[lang],
+      description: t.features.desc1[lang],
+      type: 'waveform' as const,
     },
     {
-      title: t("riskAssessment"),
-      description: t("riskAssessmentDescription"),
-      icon: RiskMeter,
+      title: t.features.title2[lang],
+      description: t.features.desc2[lang],
+      type: 'studioImage' as const,
     },
     {
-      title: t("predictiveAnalysis"),
-      description: t("predictiveAnalysisDescription"),
-      icon: Waveform,
+      title: t.features.title3[lang],
+      description: t.features.desc3[lang],
+      type: 'riskMeter' as const,
     },
   ];
 
   return (
-    <div className="flex flex-col gap-8">
-      {features.map((feature, index) => (
-        <div key={index} className="flex flex-col items-center gap-4 px-4 py-8 rounded-xl bg-zinc-900/50 backdrop-blur-sm">
-          <div className="w-full max-w-xs">{<feature.icon />}</div>
-          <h3 className="text-xl font-semibold text-center">{feature.title}</h3>
-          <p className="text-sm text-center text-zinc-400">{feature.description}</p>
+    <section id="features" className="py-20 bg-background relative">
+      <style>{`
+        @keyframes wavePulse {
+          0% { transform: scaleY(1); }
+          100% { transform: scaleY(0.6); }
+        }
+        @keyframes spectrumBounce {
+          0% { transform: scaleY(1); }
+          100% { transform: scaleY(0.5); }
+        }
+        @keyframes riskLine {
+          0% { transform: translateX(-100%); }
+          100% { transform: translateX(100%); }
+        }
+        @keyframes riskPulse {
+          0%, 100% { opacity: 0.6; }
+          50% { opacity: 1; }
+        }
+      `}</style>
+      <div className="container mx-auto px-4">
+        <div className="grid md:grid-cols-3 gap-10 max-w-5xl mx-auto">
+          {features.map((feature, index) => (
+            <div key={index} className="flex flex-col items-center text-center space-y-4 group animate-fade-in" style={{ animationDelay: `${index * 0.1}s` }}>
+              <div className="w-full rounded-2xl bg-secondary/50 border border-border/30 p-3 group-hover:scale-105 group-hover:border-primary/50 transition-all overflow-hidden">
+                {feature.type === 'waveform' && <Waveform />}
+                {feature.type === 'studioImage' && <SpectrumAnalyzer />}
+                {feature.type === 'riskMeter' && <RiskMeter />}
+              </div>
+              <h3 className="text-xl font-bold text-foreground">{feature.title}</h3>
+              <p className="text-muted-foreground leading-relaxed text-sm">{feature.description}</p>
+            </div>
+          ))}
         </div>
-      ))}
-    </div>
+      </div>
+    </section>
   );
 };
 
