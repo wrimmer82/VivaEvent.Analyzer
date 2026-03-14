@@ -103,6 +103,14 @@ const Features = () => {
           0% { transform: scaleY(1); }
           100% { transform: scaleY(0.5); }
         }
+        @keyframes riskLine {
+          0% { transform: translateX(-100%); }
+          100% { transform: translateX(100%); }
+        }
+        @keyframes riskPulse {
+          0%, 100% { opacity: 0.6; }
+          50% { opacity: 1; }
+        }
       `}</style>
       <div className="container mx-auto px-4">
         <div className="grid md:grid-cols-3 gap-10 max-w-5xl mx-auto">
