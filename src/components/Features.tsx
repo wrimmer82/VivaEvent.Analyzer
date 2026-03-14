@@ -1,4 +1,4 @@
-import { ShieldCheck } from "lucide-react";
+import { useI18n } from "@/hooks/useI18n";
 import { useI18n } from "@/hooks/useI18n";
 
 const Waveform = () => {
