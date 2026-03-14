@@ -1,6 +1,5 @@
 import { ShieldCheck } from "lucide-react";
 import { useI18n } from "@/hooks/useI18n";
-import studioAnalytics from "@/assets/studio-analytics.png";
 
 const Waveform = () => {
   const bars = [
@@ -22,6 +21,49 @@ const Waveform = () => {
             boxShadow: h > 70 ? '0 0 4px hsl(195, 100%, 50%, 0.5)' : 'none',
             animation: `wavePulse ${1.5 + (i % 5) * 0.3}s ease-in-out infinite alternate`,
             animationDelay: `${i * 0.05}s`,
+          }}
+        />
+      ))}
+    </div>
+  );
+};
+
+const SpectrumAnalyzer = () => {
+  // Frequency spectrum bands like an EQ analyzer in a DAW
+  const bands = [
+    30, 45, 60, 80, 95, 85, 70, 90, 100, 88, 72, 65, 80, 92, 78, 55, 68, 85, 75, 60,
+    50, 70, 82, 68, 55, 45, 62, 75, 58, 42,
+  ];
+
+  return (
+    <div className="w-full h-24 flex items-end justify-center gap-[2px] px-2 relative">
+      {/* Grid lines */}
+      {[25, 50, 75].map((pos) => (
+        <div
+          key={pos}
+          className="absolute w-full left-0"
+          style={{
+            bottom: `${pos}%`,
+            height: '1px',
+            background: 'hsl(210, 50%, 20%)',
+            opacity: 0.4,
+          }}
+        />
+      ))}
+      {bands.map((h, i) => (
+        <div
+          key={i}
+          className="flex-1 rounded-t-sm relative"
+          style={{
+            height: `${h}%`,
+            background: h > 85
+              ? `linear-gradient(to top, hsl(195, 100%, 45%), hsl(45, 93%, 58%))`
+              : h > 60
+              ? `linear-gradient(to top, hsl(195, 100%, 40%), hsl(160, 84%, 50%))`
+              : `linear-gradient(to top, hsl(210, 80%, 30%), hsl(195, 100%, 45%))`,
+            boxShadow: h > 80 ? '0 -2px 8px hsl(45, 93%, 58%, 0.4)' : h > 60 ? '0 0 4px hsl(195, 100%, 50%, 0.3)' : 'none',
+            animation: `spectrumBounce ${0.8 + (i % 7) * 0.15}s ease-in-out infinite alternate`,
+            animationDelay: `${i * 0.08}s`,
           }}
         />
       ))}
@@ -58,6 +100,10 @@ const Features = () => {
           0% { transform: scaleY(1); }
           100% { transform: scaleY(0.6); }
         }
+        @keyframes spectrumBounce {
+          0% { transform: scaleY(1); }
+          100% { transform: scaleY(0.5); }
+        }
       `}</style>
       <div className="container mx-auto px-4">
         <div className="grid md:grid-cols-3 gap-10 max-w-5xl mx-auto">
@@ -69,8 +115,8 @@ const Features = () => {
                 </div>
               )}
               {feature.type === 'studioImage' && (
-                <div className="w-full rounded-2xl border border-border/30 group-hover:scale-105 group-hover:border-primary/50 transition-all overflow-hidden">
-                  <img src={studioAnalytics} alt="Studio di registrazione - Analisi predittiva" className="w-full h-32 object-cover" />
+                <div className="w-full rounded-2xl bg-secondary/50 border border-border/30 p-3 group-hover:scale-105 group-hover:border-primary/50 transition-all overflow-hidden">
+                  <SpectrumAnalyzer />
                 </div>
               )}
               {feature.type === 'icon' && 'icon' in feature && (
