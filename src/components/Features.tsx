@@ -100,6 +100,10 @@ const Features = () => {
           0% { transform: scaleY(1); }
           100% { transform: scaleY(0.6); }
         }
+        @keyframes spectrumBounce {
+          0% { transform: scaleY(1); }
+          100% { transform: scaleY(0.5); }
+        }
       `}</style>
       <div className="container mx-auto px-4">
         <div className="grid md:grid-cols-3 gap-10 max-w-5xl mx-auto">
