@@ -126,12 +126,9 @@ const Features = () => {
                   <SpectrumAnalyzer />
                 </div>
               )}
-              {feature.type === 'icon' && 'icon' in feature && (
-                <div className="w-16 h-16 rounded-2xl bg-secondary/50 border border-border/30 flex items-center justify-center group-hover:scale-110 group-hover:border-primary/50 transition-all">
-                  <feature.icon
-                    className="w-8 h-8 text-primary animate-pulse"
-                    style={{ filter: 'drop-shadow(0 0 10px hsl(195, 100%, 50%))' }}
-                  />
+              {feature.type === 'riskMeter' && (
+                <div className="w-full rounded-2xl bg-secondary/50 border border-border/30 p-3 group-hover:scale-105 group-hover:border-primary/50 transition-all overflow-hidden">
+                  <RiskMeter />
                 </div>
               )}
               <h3 className="text-xl font-bold text-foreground">{feature.title}</h3>
