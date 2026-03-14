@@ -1,8 +1,8 @@
-import { Brain, ShieldCheck } from "lucide-react";
+import { ShieldCheck } from "lucide-react";
 import { useI18n } from "@/hooks/useI18n";
+import studioAnalytics from "@/assets/studio-analytics.png";
 
 const Waveform = () => {
-  // Simulated waveform bars like a recording studio DAW
   const bars = [
     12, 25, 18, 35, 28, 45, 55, 40, 65, 75, 60, 85, 95, 80, 70, 90, 100, 85, 75, 95,
     88, 70, 60, 80, 90, 72, 55, 68, 82, 50, 40, 62, 78, 45, 35, 58, 70, 42, 30, 50,
@@ -34,22 +34,20 @@ const Features = () => {
 
   const features = [
     {
-      icon: null as any,
       title: t.features.title1[lang],
       description: t.features.desc1[lang],
-      isWaveform: true,
+      type: 'waveform' as const,
     },
     {
-      icon: Brain,
       title: t.features.title2[lang],
       description: t.features.desc2[lang],
-      isWaveform: false,
+      type: 'studioImage' as const,
     },
     {
       icon: ShieldCheck,
       title: t.features.title3[lang],
       description: t.features.desc3[lang],
-      isWaveform: false,
+      type: 'icon' as const,
     },
   ];
 
@@ -63,29 +61,30 @@ const Features = () => {
       `}</style>
       <div className="container mx-auto px-4">
         <div className="grid md:grid-cols-3 gap-10 max-w-5xl mx-auto">
-          {features.map((feature, index) => {
-            const Icon = feature.icon;
-            return (
-              <div key={index} className="flex flex-col items-center text-center space-y-4 group animate-fade-in" style={{ animationDelay: `${index * 0.1}s` }}>
-                {feature.isWaveform ? (
-                  <div className="w-full rounded-2xl bg-secondary/50 border border-border/30 p-3 group-hover:scale-105 group-hover:border-primary/50 transition-all overflow-hidden">
-                    <Waveform />
-                  </div>
-                ) : (
-                  <div className="w-16 h-16 rounded-2xl bg-secondary/50 border border-border/30 flex items-center justify-center group-hover:scale-110 group-hover:border-primary/50 transition-all">
-                    <Icon
-                      className="w-8 h-8 text-primary animate-pulse"
-                      style={{
-                        filter: 'drop-shadow(0 0 10px hsl(195, 100%, 50%))',
-                      }}
-                    />
-                  </div>
-                )}
-                <h3 className="text-xl font-bold text-foreground">{feature.title}</h3>
-                <p className="text-muted-foreground leading-relaxed text-sm">{feature.description}</p>
-              </div>
-            );
-          })}
+          {features.map((feature, index) => (
+            <div key={index} className="flex flex-col items-center text-center space-y-4 group animate-fade-in" style={{ animationDelay: `${index * 0.1}s` }}>
+              {feature.type === 'waveform' && (
+                <div className="w-full rounded-2xl bg-secondary/50 border border-border/30 p-3 group-hover:scale-105 group-hover:border-primary/50 transition-all overflow-hidden">
+                  <Waveform />
+                </div>
+              )}
+              {feature.type === 'studioImage' && (
+                <div className="w-full rounded-2xl border border-border/30 group-hover:scale-105 group-hover:border-primary/50 transition-all overflow-hidden">
+                  <img src={studioAnalytics} alt="Studio di registrazione - Analisi predittiva" className="w-full h-32 object-cover" />
+                </div>
+              )}
+              {feature.type === 'icon' && 'icon' in feature && (
+                <div className="w-16 h-16 rounded-2xl bg-secondary/50 border border-border/30 flex items-center justify-center group-hover:scale-110 group-hover:border-primary/50 transition-all">
+                  <feature.icon
+                    className="w-8 h-8 text-primary animate-pulse"
+                    style={{ filter: 'drop-shadow(0 0 10px hsl(195, 100%, 50%))' }}
+                  />
+                </div>
+              )}
+              <h3 className="text-xl font-bold text-foreground">{feature.title}</h3>
+              <p className="text-muted-foreground leading-relaxed text-sm">{feature.description}</p>
+            </div>
+          ))}
         </div>
       </div>
     </section>
