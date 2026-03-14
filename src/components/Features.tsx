@@ -115,8 +115,8 @@ const Features = () => {
                 </div>
               )}
               {feature.type === 'studioImage' && (
-                <div className="w-full rounded-2xl border border-border/30 group-hover:scale-105 group-hover:border-primary/50 transition-all overflow-hidden">
-                  <img src={studioAnalytics} alt="Studio di registrazione - Analisi predittiva" className="w-full h-32 object-cover" />
+                <div className="w-full rounded-2xl bg-secondary/50 border border-border/30 p-3 group-hover:scale-105 group-hover:border-primary/50 transition-all overflow-hidden">
+                  <SpectrumAnalyzer />
                 </div>
               )}
               {feature.type === 'icon' && 'icon' in feature && (
