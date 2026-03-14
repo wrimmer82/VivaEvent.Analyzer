@@ -86,10 +86,9 @@ const Features = () => {
       type: 'studioImage' as const,
     },
     {
-      icon: ShieldCheck,
       title: t.features.title3[lang],
       description: t.features.desc3[lang],
-      type: 'icon' as const,
+      type: 'riskMeter' as const,
     },
   ];
 
