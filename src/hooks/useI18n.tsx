@@ -11,14 +11,14 @@ const translations = {
   },
   hero: {
     title1: {
-      it: "INVESTI CON L'IA NEI DIRITTI MUSICALI.",
-      en: "INVEST WITH AI IN MUSIC RIGHTS.",
-      es: "INVIERTE CON IA EN DERECHOS MUSICALES.",
+      it: "ANALIZZATORE DELLE ROYALTY MUSICALI",
+      en: "MUSIC ROYALTY ANALYZER",
+      es: "ANALIZADOR DE REGALÍAS MUSICALES",
     },
     title2: {
-      it: "PREDIRE IL FUTURO CON I DATI.",
-      en: "PREDICT THE FUTURE WITH DATA.",
-      es: "PREDICE EL FUTURO CON DATOS.",
+      it: "",
+      en: "",
+      es: "",
     },
     subtitle: {
       it: "Piattaforma intelligente per analizzare cataloghi, valutare rischi e prevedere rendimenti con i dati, non con l'istinto.",
