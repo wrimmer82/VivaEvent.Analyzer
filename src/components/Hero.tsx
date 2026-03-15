@@ -24,26 +24,23 @@ const Hero = () => {
       <div className="container relative z-10 px-4 mx-auto text-center space-y-8">
         {/* Main heading */}
         <h1 className="text-3xl sm:text-4xl md:text-6xl lg:text-7xl font-black tracking-tight leading-tight animate-fade-in">
-          <span className="text-foreground">
+          <span style={{ color: '#FFFFFF' }}>
             {lang === "it" ? "INVESTI CON L'" : lang === "es" ? "INVIERTE CON " : "INVEST WITH "}
           </span>
-          <span className="text-primary" style={{ textShadow: '0 0 25px hsl(195, 100%, 50%, 0.5)' }}>
+          <span style={{ color: '#FFFFFF', textShadow: '0 0 25px hsl(195, 100%, 50%, 0.5)' }}>
             {lang === "it" ? "IA" : lang === "es" ? "IA" : "AI"}
           </span>
-          <span className="text-foreground">
+          <span style={{ color: '#FFFFFF' }}>
             {lang === "it" ? " NEI DIRITTI MUSICALI." : lang === "es" ? " EN DERECHOS MUSICALES." : " IN MUSIC RIGHTS."}
           </span>
           <br />
-          <span 
-            className="text-primary"
-            style={{ textShadow: '0 0 25px hsl(195, 100%, 50%, 0.5)' }}
-          >
+          <span style={{ color: '#FFFFFF', textShadow: '0 0 25px hsl(195, 100%, 50%, 0.5)' }}>
             {t.hero.title2[lang]}
           </span>
         </h1>
 
         {/* Subtitle */}
-        <p className="text-base md:text-lg lg:text-xl text-muted-foreground max-w-3xl mx-auto leading-relaxed animate-fade-in" style={{ animationDelay: '0.15s' }}>
+        <p className="text-base md:text-lg lg:text-xl max-w-3xl mx-auto leading-relaxed animate-fade-in" style={{ animationDelay: '0.15s', color: '#C7D2FE' }}>
           {t.hero.subtitle[lang]}
         </p>
 
@@ -57,10 +54,11 @@ const Hero = () => {
               className="flex-1 bg-transparent text-foreground placeholder:text-muted-foreground/50 outline-none text-sm md:text-base py-2"
             />
             <Button
-              className="rounded-full px-5 md:px-8 font-bold text-xs md:text-sm shrink-0 transition-all hover:shadow-[0_0_20px_hsl(195,100%,50%,0.4)]"
+              className="rounded-full px-5 md:px-8 font-bold text-xs md:text-sm shrink-0 transition-all"
               style={{
-                background: 'hsl(160, 84%, 45%)',
-                color: 'hsl(0, 0%, 100%)',
+                background: '#00F0FF',
+                color: '#020617',
+                boxShadow: '0 0 15px rgba(0, 240, 255, 0.4), 0 0 30px rgba(0, 240, 255, 0.2)',
               }}
             >
               {t.hero.analyzeNow[lang]}
