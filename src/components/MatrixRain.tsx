@@ -17,11 +17,8 @@ const MatrixRain = () => {
     
     resizeCanvas();
 
-    // Katakana + Latin + Numbers
-    const katakana = 'アイウエオカキクケコサシスセソタチツテトナニヌネノハヒフヘホマミムメモヤユヨラリルレロワヲン';
-    const latin = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
-    const nums = '0123456789';
-    const chars = katakana + latin + nums;
+    // Binary code - machine language style
+    const chars = '01';
 
     const fontSize = 14;
     const columns = Math.floor(canvas.width / fontSize);
