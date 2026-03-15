@@ -31,30 +31,10 @@ const MatrixRain = () => {
       drops[i] = Math.random() * -100;
     }
 
-    // Draw micro-grid once on a separate canvas for performance
-    const gridCanvas = document.createElement('canvas');
-    const gridCtx = gridCanvas.getContext('2d')!;
-    const drawGrid = () => {
-      gridCanvas.width = canvas.width;
-      gridCanvas.height = canvas.height;
-      gridCtx.strokeStyle = 'rgba(0, 194, 255, 0.10)';
-      gridCtx.lineWidth = 1;
-      for (let x = 0; x < gridCanvas.width; x += fontSize) {
-        gridCtx.beginPath();
-        gridCtx.moveTo(x, 0);
-        gridCtx.lineTo(x, gridCanvas.height);
-        gridCtx.stroke();
-      }
-    };
-    drawGrid();
-
     const draw = () => {
-      // Slower fade for smoother trails
-      ctx.fillStyle = 'rgba(2, 4, 15, 0.04)';
+      // Dark blue-black trail
+      ctx.fillStyle = 'rgba(2, 4, 15, 0.05)';
       ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-      // Draw micro-grid behind rain
-      ctx.drawImage(gridCanvas, 0, 0);
 
       ctx.font = `${fontSize}px monospace`;
 
@@ -66,11 +46,11 @@ const MatrixRain = () => {
         const brightness = Math.random();
         
         if (brightness > 0.98) {
-          ctx.fillStyle = 'rgba(255, 255, 255, 0.35)';
+          ctx.fillStyle = '#ffffff';
         } else if (brightness > 0.9) {
-          ctx.fillStyle = 'rgba(0, 255, 255, 0.3)';
+          ctx.fillStyle = '#00ffff';
         } else {
-          ctx.fillStyle = `rgba(0, 180, 255, ${0.1 + Math.random() * 0.25})`;
+          ctx.fillStyle = `rgba(0, 180, 255, ${0.3 + Math.random() * 0.5})`;
         }
 
         ctx.fillText(text, x, y);
@@ -83,12 +63,10 @@ const MatrixRain = () => {
       }
     };
 
-    // ~28fps for smoother linear feel
-    const interval = setInterval(draw, 28);
+    const interval = setInterval(draw, 35);
 
     const handleResize = () => {
       resizeCanvas();
-      drawGrid();
       const newColumns = Math.floor(canvas.width / fontSize);
       while (drops.length < newColumns) {
         drops.push(Math.random() * -100);
