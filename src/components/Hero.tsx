@@ -40,7 +40,7 @@ const Hero = () => {
         </h1>
 
         {/* Subtitle */}
-        <p className="text-base md:text-lg lg:text-xl text-muted-foreground max-w-3xl mx-auto leading-relaxed animate-fade-in" style={{ animationDelay: '0.15s' }}>
+        <p className="text-base md:text-lg lg:text-xl max-w-3xl mx-auto leading-relaxed animate-fade-in" style={{ animationDelay: '0.15s', color: '#C7D2FE' }}>
           {t.hero.subtitle[lang]}
         </p>
 
