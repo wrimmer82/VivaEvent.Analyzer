@@ -54,10 +54,11 @@ const Hero = () => {
               className="flex-1 bg-transparent text-foreground placeholder:text-muted-foreground/50 outline-none text-sm md:text-base py-2"
             />
             <Button
-              className="rounded-full px-5 md:px-8 font-bold text-xs md:text-sm shrink-0 transition-all hover:shadow-[0_0_20px_hsl(195,100%,50%,0.4)]"
+              className="rounded-full px-5 md:px-8 font-bold text-xs md:text-sm shrink-0 transition-all"
               style={{
-                background: 'hsl(160, 84%, 45%)',
-                color: 'hsl(0, 0%, 100%)',
+                background: '#00F0FF',
+                color: '#020617',
+                boxShadow: '0 0 15px rgba(0, 240, 255, 0.4), 0 0 30px rgba(0, 240, 255, 0.2)',
               }}
             >
               {t.hero.analyzeNow[lang]}
