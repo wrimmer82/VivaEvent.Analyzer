@@ -8,13 +8,18 @@ const Hero = () => {
   const { lang, t } = useI18n();
 
   return (
-    <section className="relative min-h-[90vh] flex flex-col items-center justify-center overflow-hidden bg-background pt-12 pb-8">
+    <section
+      className="relative min-h-[90vh] flex flex-col items-center justify-center overflow-hidden pt-12 pb-8"
+      style={{
+        background: 'radial-gradient(ellipse at center, #00C2FF 0%, #020617 70%)',
+      }}
+    >
       <MatrixRain />
 
-      <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute -top-40 -right-40 w-80 h-80 bg-primary/8 rounded-full blur-3xl" />
-        <div className="absolute -bottom-40 -left-40 w-96 h-96 bg-accent/8 rounded-full blur-3xl" />
-      </div>
+      {/* Vignettatura scura su tutti e 4 i lati */}
+      <div className="absolute inset-0 pointer-events-none" style={{
+        boxShadow: 'inset 0 0 200px 80px #020617',
+      }} />
 
       <div className="container relative z-10 px-4 mx-auto text-center space-y-8">
         {/* Main heading */}
