@@ -25,18 +25,16 @@ const Hero = () => {
         {/* Main heading */}
         <h1 className="text-3xl sm:text-4xl md:text-6xl lg:text-7xl font-black tracking-tight leading-tight animate-fade-in">
           <span style={{ color: '#FFFFFF' }}>
-            {lang === "it" ? "INVESTI CON L'" : lang === "es" ? "INVIERTE CON " : "INVEST WITH "}
+            {t.hero.title1[lang]}
           </span>
-          <span style={{ color: '#FFFFFF', textShadow: '0 0 25px hsl(195, 100%, 50%, 0.5)' }}>
-            {lang === "it" ? "IA" : lang === "es" ? "IA" : "AI"}
-          </span>
-          <span style={{ color: '#FFFFFF' }}>
-            {lang === "it" ? " NEI DIRITTI MUSICALI." : lang === "es" ? " EN DERECHOS MUSICALES." : " IN MUSIC RIGHTS."}
-          </span>
-          <br />
-          <span style={{ color: '#FFFFFF', textShadow: '0 0 25px hsl(195, 100%, 50%, 0.5)' }}>
-            {t.hero.title2[lang]}
-          </span>
+          {t.hero.title2[lang] && (
+            <>
+              <br />
+              <span style={{ color: '#FFFFFF', textShadow: '0 0 25px hsl(195, 100%, 50%, 0.5)' }}>
+                {t.hero.title2[lang]}
+              </span>
+            </>
+          )}
         </h1>
 
         {/* Subtitle */}
