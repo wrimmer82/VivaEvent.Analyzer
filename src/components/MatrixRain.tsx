@@ -88,6 +88,7 @@ const MatrixRain = () => {
 
     const handleResize = () => {
       resizeCanvas();
+      drawGrid();
       const newColumns = Math.floor(canvas.width / fontSize);
       while (drops.length < newColumns) {
         drops.push(Math.random() * -100);
