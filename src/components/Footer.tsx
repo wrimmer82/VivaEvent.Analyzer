@@ -26,7 +26,7 @@ const Footer = () => {
             <ul className="space-y-3 text-sm" style={{ color: 'hsl(0, 0%, 70%)' }}>
               <li><a href="#features" className="transition-colors hover:brightness-125">{t.footer.features[lang]}</a></li>
               <li><a href="#come-funziona" className="transition-colors hover:brightness-125">{t.footer.howItWorks[lang]}</a></li>
-              <li><a href="#pricing" className="transition-colors hover:brightness-125">{t.footer.pricing[lang]}</a></li>
+              
               <li><a href="#" className="transition-colors hover:brightness-125">{t.footer.roadmap[lang]}</a></li>
             </ul>
           </div>

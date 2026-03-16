@@ -22,9 +22,6 @@ const Navbar = () => {
             <a href="#come-funziona" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
               {t.nav.howItWorks[lang]}
             </a>
-            <a href="#pricing" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
-              {t.nav.pricing[lang]}
-            </a>
           </div>
 
           {/* Right side */}
@@ -77,17 +74,6 @@ const Navbar = () => {
                 🇩🇪
               </button>
             </div>
-
-            <Button 
-              size="sm" 
-              className="rounded-full px-5 font-semibold hidden sm:inline-flex"
-              style={{
-                background: 'hsl(160, 84%, 45%)',
-                color: 'hsl(0, 0%, 100%)',
-              }}
-            >
-              Start Free Trial
-            </Button>
 
             <a 
               href="#" 
