@@ -58,6 +58,24 @@ const Navbar = () => {
               >
                 🇪🇸
               </button>
+              <button
+                onClick={() => setLang("fr")}
+                className={`text-base px-1.5 py-0.5 rounded-full transition-all ${
+                  lang === "fr" ? "bg-primary/20 scale-110" : "opacity-50 hover:opacity-80"
+                }`}
+                title="Français"
+              >
+                🇫🇷
+              </button>
+              <button
+                onClick={() => setLang("de")}
+                className={`text-base px-1.5 py-0.5 rounded-full transition-all ${
+                  lang === "de" ? "bg-primary/20 scale-110" : "opacity-50 hover:opacity-80"
+                }`}
+                title="Deutsch"
+              >
+                🇩🇪
+              </button>
             </div>
 
             <Button 
