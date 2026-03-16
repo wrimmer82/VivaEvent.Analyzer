@@ -18,7 +18,7 @@ const MatrixRain = () => {
     resizeCanvas();
 
     // Binary code - machine language style
-    const chars = '01';
+    const chars = '01アイウエオカキクケコ0123456789ABCDEF';
 
     const fontSize = 14;
     const columns = Math.floor(canvas.width / fontSize);
@@ -58,6 +58,16 @@ const MatrixRain = () => {
         
         drops[i]++;
       }
+
+      // Micro-griglia verticale
+      ctx.strokeStyle = 'rgba(0, 194, 255, 0.08)';
+      ctx.lineWidth = 1;
+      for (let x = 0; x < canvas.width; x += 40) {
+        ctx.beginPath();
+        ctx.moveTo(x, 0);
+        ctx.lineTo(x, canvas.height);
+        ctx.stroke();
+      }
     };
 
     const interval = setInterval(draw, 35);
@@ -81,7 +91,7 @@ const MatrixRain = () => {
   return (
     <canvas
       ref={canvasRef}
-      className="absolute inset-0 opacity-30"
+      className="absolute inset-0 opacity-40"
       style={{ pointerEvents: 'none' }}
     />
   );
