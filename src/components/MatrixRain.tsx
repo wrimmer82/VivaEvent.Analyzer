@@ -58,6 +58,16 @@ const MatrixRain = () => {
         
         drops[i]++;
       }
+
+      // Micro-griglia verticale
+      ctx.strokeStyle = 'rgba(0, 194, 255, 0.08)';
+      ctx.lineWidth = 1;
+      for (let x = 0; x < canvas.width; x += 40) {
+        ctx.beginPath();
+        ctx.moveTo(x, 0);
+        ctx.lineTo(x, canvas.height);
+        ctx.stroke();
+      }
     };
 
     const interval = setInterval(draw, 35);
