@@ -136,6 +136,10 @@ All colors MUST be HSL.
   body {
     @apply bg-background text-foreground;
   }
+
+  section {
+    background-color: hsl(var(--background));
+  }
 }
 
 @layer utilities {
