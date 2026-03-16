@@ -18,7 +18,7 @@ const MatrixRain = () => {
     resizeCanvas();
 
     // Binary code - machine language style
-    const chars = '01';
+    const chars = '01アイウエオカキクケコ0123456789ABCDEF';
 
     const fontSize = 14;
     const columns = Math.floor(canvas.width / fontSize);
