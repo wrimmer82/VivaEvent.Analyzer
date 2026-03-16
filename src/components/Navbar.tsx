@@ -75,17 +75,6 @@ const Navbar = () => {
               </button>
             </div>
 
-            <Button 
-              size="sm" 
-              className="rounded-full px-5 font-semibold hidden sm:inline-flex"
-              style={{
-                background: 'hsl(160, 84%, 45%)',
-                color: 'hsl(0, 0%, 100%)',
-              }}
-            >
-              Start Free Trial
-            </Button>
-
             <a 
               href="#" 
               className="text-sm font-bold text-foreground hover:text-primary transition-colors"
