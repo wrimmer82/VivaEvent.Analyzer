@@ -81,7 +81,7 @@ const MatrixRain = () => {
   return (
     <canvas
       ref={canvasRef}
-      className="absolute inset-0 opacity-30"
+      className="absolute inset-0 opacity-40"
       style={{ pointerEvents: 'none' }}
     />
   );
