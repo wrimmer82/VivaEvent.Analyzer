@@ -22,9 +22,6 @@ const Navbar = () => {
             <a href="#come-funziona" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
               {t.nav.howItWorks[lang]}
             </a>
-            <a href="#pricing" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
-              {t.nav.pricing[lang]}
-            </a>
           </div>
 
           {/* Right side */}
