@@ -5,7 +5,7 @@ const Testimonials = () => {
   const { lang, t } = useI18n();
 
   return (
-    <section className="py-16 bg-background border-t border-border/20">
+    <section className="py-16 bg-transparent border-t border-border/20">
       <div className="container mx-auto px-4 max-w-4xl text-center">
         <Quote
           className="w-8 h-8 text-primary/40 mx-auto mb-6"
