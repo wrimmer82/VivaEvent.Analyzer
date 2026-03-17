@@ -45,7 +45,7 @@ const translations = {
     insight2: { it: "Alta longevità del catalogo", en: "High catalog longevity", es: "Alta longevidad del catálogo", fr: "Haute longévité du catalogue", de: "Hohe Katalog-Langlebigkeit" },
     insight3: { it: "Bassa dipendenza da TikTok", en: "Low TikTok dependency", es: "Baja dependencia de TikTok", fr: "Faible dépendance à TikTok", de: "Geringe TikTok-Abhängigkeit" },
     estimatedValue: { it: "VALORE STIMATO CATALOGO", en: "ESTIMATED CATALOG VALUE", es: "VALOR ESTIMADO DEL CATÁLOGO", fr: "VALEUR ESTIMÉE DU CATALOGUE", de: "GESCHÄTZTER KATALOGWERT" },
-    purchaseAdvice: { it: "CONSIGLIO D'ACQUISTO", en: "PURCHASE ADVICE", es: "CONSEJO DE COMPRA", fr: "CONSEIL D'ACHAT", de: "KAUFEMPFEHLUNG" },
+    purchaseAdvice: { it: "ANALISI COMPLETATA", en: "ANALYSIS COMPLETE", es: "ANÁLISIS COMPLETADO", fr: "ANALYSE TERMINÉE", de: "ANALYSE ABGESCHLOSSEN" },
   },
   features: {
     title1: { it: "Performance Storica", en: "Historical Performance", es: "Rendimiento Histórico", fr: "Performance Historique", de: "Historische Performance" },
