@@ -136,7 +136,7 @@ const Features = () => {
   ];
 
   return (
-    <section id="features" className="py-20 bg-background relative">
+    <section id="features" className="py-20 bg-transparent relative">
       <style>{`
         @keyframes wavePulse {
           0% { transform: scaleY(1); }
