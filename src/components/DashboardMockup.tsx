@@ -1,5 +1,5 @@
 import { useI18n } from "@/hooks/useI18n";
-import { CheckCircle } from "lucide-react";
+import { BarChart2 } from "lucide-react";
 
 const DashboardMockup = () => {
   const { lang, t } = useI18n();
