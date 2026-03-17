@@ -12,8 +12,8 @@ const Footer = () => {
           {/* Brand */}
           <div className="space-y-4">
             <div className="flex items-center gap-2">
-              <img src={logoVe} alt="VivaEvent AI" className="w-8 h-8 rounded-lg object-contain" />
-              <span className="text-lg font-bold">VivaEvent <span className="text-primary">AI</span></span>
+              <img src={logoVe} alt="VivaEvent Check" className="w-8 h-8 rounded-lg object-contain" />
+              <span className="text-lg font-bold">VivaEvent <span className="text-primary">Check</span></span>
             </div>
             <p className="text-sm" style={{ color: 'hsl(0, 0%, 70%)' }}>
               {t.footer.description[lang]}
