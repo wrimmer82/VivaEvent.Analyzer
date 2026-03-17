@@ -11,9 +11,9 @@ const Navbar = () => {
         <div className="flex h-16 items-center justify-between">
           {/* Logo */}
           <a href="#" className="flex items-center gap-2 hover:opacity-80 transition-all">
-            <img src={logoVe} alt="VivaEvent AI" className="w-9 h-9 rounded-lg object-contain" />
+            <img src={logoVe} alt="VivaEvent Check" className="w-9 h-9 rounded-lg object-contain" />
             <span className="text-lg font-bold text-foreground tracking-tight">
-              VivaEvent <span className="text-primary">AI</span>
+              VivaEvent <span className="text-primary">Check</span>
             </span>
           </a>
 
