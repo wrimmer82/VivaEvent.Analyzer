@@ -16,6 +16,33 @@ const Hero = () => {
     >
       <MatrixRain />
 
+      {/* Digital Cityscape */}
+      <div className="absolute bottom-0 left-0 right-0 pointer-events-none" style={{ height: '45vh' }}>
+        <div className="relative w-full h-full flex items-end justify-center">
+          {[
+            { w: '4.5%', h: '70%' }, { w: '3.2%', h: '45%' }, { w: '5.5%', h: '88%' },
+            { w: '3%', h: '35%' }, { w: '4%', h: '60%' }, { w: '5%', h: '95%' },
+            { w: '3.5%', h: '50%' }, { w: '4.8%', h: '78%' }, { w: '3%', h: '30%' },
+            { w: '5.2%', h: '82%' }, { w: '3.8%', h: '55%' }, { w: '4.2%', h: '72%' },
+            { w: '3.3%', h: '40%' }, { w: '5.8%', h: '90%' }, { w: '3.5%', h: '48%' },
+            { w: '4.5%', h: '65%' }, { w: '3%', h: '38%' }, { w: '5.5%', h: '85%' },
+            { w: '4%', h: '58%' }, { w: '3.8%', h: '75%' }, { w: '4.2%', h: '42%' },
+          ].map((col, i) => (
+            <div
+              key={i}
+              style={{
+                width: col.w,
+                height: col.h,
+                background: 'rgba(0, 194, 255, 0.06)',
+                borderTop: '1px solid rgba(0, 194, 255, 0.15)',
+                marginLeft: '0.2%',
+                marginRight: '0.2%',
+              }}
+            />
+          ))}
+        </div>
+      </div>
+
       {/* Vignettatura scura su tutti e 4 i lati */}
       <div className="absolute inset-0 pointer-events-none" style={{
         boxShadow: 'inset 0 0 200px 80px #020617',
