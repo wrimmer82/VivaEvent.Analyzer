@@ -92,7 +92,7 @@ const DashboardMockup = () => {
         </div>
 
         <div className="md:col-span-4 rounded-lg border border-border/30 p-4 flex flex-col items-center justify-center" style={{ background: 'hsl(160, 84%, 45%, 0.1)', borderColor: 'hsl(160, 84%, 45%, 0.3)' }}>
-          <CheckCircle className="w-8 h-8 mb-1" style={{ color: 'hsl(160, 84%, 45%)' }} />
+          <BarChart2 className="w-8 h-8 mb-1" style={{ color: 'hsl(160, 84%, 45%)' }} />
           <p className="text-xs font-bold" style={{ color: 'hsl(160, 84%, 45%)' }}>{t.dashboard.purchaseAdvice[lang]}</p>
         </div>
       </div>
