@@ -92,7 +92,21 @@ const Hero = () => {
         </div>
 
         {/* Dashboard Mockup */}
-        <div className="max-w-5xl mx-auto pt-4 animate-fade-in" style={{ animationDelay: '0.45s' }}>
+        <div
+          className="max-w-5xl mx-auto pt-4 animate-fade-in"
+          style={{
+            animationDelay: '0.45s',
+            transform: 'perspective(1200px) rotateX(6deg) rotateY(-2deg)',
+            transformOrigin: 'center top',
+            transition: 'transform 0.4s ease',
+          }}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.transform = 'perspective(1200px) rotateX(2deg) rotateY(0deg)';
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.transform = 'perspective(1200px) rotateX(6deg) rotateY(-2deg)';
+          }}
+        >
           <DashboardMockup />
         </div>
       </div>
